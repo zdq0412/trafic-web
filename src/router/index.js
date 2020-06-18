@@ -7,7 +7,7 @@ export default new Router({
     routes: [
         {
             path: '/',
-            redirect: '/dashboard'
+            redirect: '/console'
         },
         {
             path: '/',
@@ -15,8 +15,8 @@ export default new Router({
             meta: { title: '自述文件' },
             children: [
                 {
-                    path: '/dashboard',
-                    component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/Dashboard.vue'),
+                    path: '/console',
+                    component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/console.vue'),
                     meta: { title: '系统首页' }
                 },
                 {
@@ -107,7 +107,7 @@ export default new Router({
         {
             path: '/login',
             component: () => import(/* webpackChunkName: "login" */ '../components/page/Login.vue'),
-            meta: { title: '登录' }
+            meta: { title: '交通安全信息系统' }
         },
         {
             path: '*',

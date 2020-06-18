@@ -21,7 +21,6 @@
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm()">登录</el-button>
                 </div>
-                <p class="login-tips">Tips : 用户名和密码随便填。</p>
             </el-form>
         </div>
     </div>
@@ -32,8 +31,8 @@ export default {
     data: function() {
         return {
             param: {
-                username: 'admin',
-                password: '123123',
+                username: '',
+                password: '',
             },
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -44,10 +43,23 @@ export default {
     methods: {
         submitForm() {
             this.$refs.login.validate(valid => {
+                const that = this;
                 if (valid) {
-                    this.$message.success('登录成功');
-                    localStorage.setItem('ms_username', this.param.username);
-                    this.$router.push('/');
+                    //解决后台接受不到参数问题
+                    const params = new URLSearchParams();
+                    params.append("username",this.param.username);
+                    params.append("password",this.param.password);
+                    this.$axios.post("/login",params).then(function (res) {
+                        if(res.status===200){
+                            localStorage.setItem('username', that.param.username);
+                            that.$router.push("/");
+                        }else{
+                            that.$alert("用户名或密码错误!");
+                        }
+                    }).catch(function(error){
+                        that.$message.error("登陆失败，网络连接不可用!");
+                        console.log(error);
+                    });
                 } else {
                     this.$message.error('请输入账号和密码');
                     console.log('error submit!!');
