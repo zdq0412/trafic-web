@@ -45,12 +45,13 @@ export default {
             this.$refs.login.validate(valid => {
                 const that = this;
                 if (valid) {
-                    //解决后台接受不到参数问题
+                    //解决后台接收不到参数问题
                     const params = new URLSearchParams();
                     params.append("username",this.param.username);
                     params.append("password",this.param.password);
-                    this.$axios.post("/login",params).then(function (res) {
-                        if(res.status===200){
+                    this.$axios.post("/user/login",params).then(function (res) {
+                        console.log(res);
+                        if(res.data.resultCode===200){
                             localStorage.setItem('username', that.param.username);
                             that.$router.push("/");
                         }else{

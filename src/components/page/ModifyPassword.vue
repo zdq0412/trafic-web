@@ -2,7 +2,7 @@
     <el-dialog title="修改密码"  :visible.sync="dialogFormVisible">
         <el-form :model="form"  :rules="rules">
             <el-form-item  label="原密码" :label-width="formLabelWidth" prop="oldPassword">
-                <el-input type="password" v-model="form.oldPassword" autocomplete="off"></el-input>
+                <el-input type="password" v-model="form.oldPassword"  autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item  label="新密码" :label-width="formLabelWidth" prop="newPassword">
                 <el-input type="password" v-model="form.newPassword" autocomplete="off"></el-input>
@@ -47,10 +47,37 @@
                 }
             }
         },
+        mounted:function () {
+            this.oldPassword = '';
+        },
         methods:{
             //修改密码确定按钮点击事件
             ok(){
-
+                let that = this;
+                //解决后台接收不到参数问题
+                const params = new URLSearchParams();
+                params.append("oldPassword",this.form.oldPassword);
+                params.append("newPassword",this.form.newPassword);
+                params.append("username",localStorage.getItem("username"));
+                this.$axios.post("/user/modifyPassword",params).then(response => {
+                    //密码修改成功
+                    if(response.data.statusCode==200){
+                        this.$axios.get("/logout").then(response =>{
+                            this.$message({
+                                type:'success',
+                                message:"密码修改成功，即将重新登录!",
+                                onClose:()=>{
+                                    localStorage.removeItem("username");
+                                    this.$router.push('/login');
+                                }
+                            });
+                        });
+                    }else{
+                        this.$alert(response.data.message);
+                    }
+                }).catch(error =>{
+                    that.$message.error("密码修改失败!");
+                });
             }
         }
     }

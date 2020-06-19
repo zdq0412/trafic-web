@@ -6,6 +6,9 @@
             <i v-else class="el-icon-s-unfold"></i>
         </div>
         <div class="logo">后台管理系统</div>
+        <div class="schema" v-for="schema in schemas" :id="schema.id" >
+            {{schema.name}}
+        </div>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
@@ -62,7 +65,8 @@ export default {
             collapse: false,
             fullscreen: false,
             name: '',
-            message:0
+            message:0,
+            schemas:[]
         };
     },
     computed: {
@@ -72,6 +76,10 @@ export default {
         }
     },
     created:function(){
+        this.$axios.get("/schema/schemas").then(response => {
+           this.schemas = response.data.data;
+        });
+
         this.name = localStorage.getItem("username");
     },
     methods: {
@@ -156,6 +164,16 @@ export default {
     width: 250px;
     line-height: 70px;
 }
+
+.schema{
+    float: left;
+    width: 100px;
+    line-height: 70px;
+    cursor: pointer;
+}
+
+
+
 .header-right {
     float: right;
     padding-right: 50px;

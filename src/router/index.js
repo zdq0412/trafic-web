@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-
 Vue.use(Router);
 
 export default new Router({
@@ -16,7 +15,7 @@ export default new Router({
             children: [
                 {
                     path: '/console',
-                    component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/console.vue'),
+                    component: () => import( '../components/page/Console.vue'),
                     meta: { title: '系统首页' }
                 },
                 {
@@ -106,7 +105,7 @@ export default new Router({
         },
         {
             path: '/login',
-            component: () => import(/* webpackChunkName: "login" */ '../components/page/Login.vue'),
+            component: () => import( '../components/page/Login.vue'),
             meta: { title: '交通安全信息系统' }
         },
         {
