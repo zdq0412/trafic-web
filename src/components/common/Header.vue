@@ -93,6 +93,7 @@ export default {
                 }).then(() => {
                         this.$axios.post("/logout").then(response => {
                             localStorage.removeItem('username');
+                            localStorage.removeItem('token');
                             this.$router.push('/login');
                         });
                 }).catch(error => {

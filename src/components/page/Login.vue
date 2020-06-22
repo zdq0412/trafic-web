@@ -49,10 +49,10 @@ export default {
                     const params = new URLSearchParams();
                     params.append("username",this.param.username);
                     params.append("password",this.param.password);
-                    this.$axios.post("/user/login",params).then(function (res) {
-                        console.log(res);
+                    this.$axios.post("/login",params).then(function (res) {
                         if(res.data.resultCode===200){
                             localStorage.setItem('username', that.param.username);
+                            localStorage.setItem("token",res.data.data);
                             that.$router.push("/");
                         }else{
                             that.$alert("用户名或密码错误!");
