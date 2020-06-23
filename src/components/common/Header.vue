@@ -77,6 +77,7 @@ export default {
     },
     created:function(){
         this.$axios.get("/schema/schemas").then(response => {
+            console.log(response);
            this.schemas = response.data.data;
         });
 

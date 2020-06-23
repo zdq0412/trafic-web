@@ -62,7 +62,7 @@
                 this.$axios.post("/user/modifyPassword",params).then(response => {
                     console.log(response.data);
                     //密码修改成功
-                    if(response.data.statusCode==200){
+                    if(response.data.resultCode==200){
                         this.$axios.get("/logout").then(response =>{
                             this.$message({
                                 type:'success',
@@ -74,9 +74,10 @@
                             });
                         });
                     }else{
-                        this.$alert(response.data.resultMsg);
+                        this.$alert(response.data.message);
                     }
                 }).catch(error =>{
+                    console.log(error)
                     that.$message.error("密码修改失败!");
                 });
             }

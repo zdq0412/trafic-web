@@ -12,7 +12,7 @@ import './components/common/directives';
 import 'babel-polyfill';
 
 Vue.prototype.$axios = axios.create({
-    baseURL:"http://192.168.0.125:80",
+    baseURL:"http://localhost:8088",
     transformRequest:[function(data,header){
        header.token = localStorage.getItem("token");
         return data;

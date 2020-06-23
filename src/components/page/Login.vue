@@ -50,16 +50,24 @@ export default {
                     params.append("username",this.param.username);
                     params.append("password",this.param.password);
                     this.$axios.post("/login",params).then(function (res) {
-                        if(res.data.resultCode===200){
+                        if(res.data.result.resultCode===200){
                             localStorage.setItem('username', that.param.username);
-                            localStorage.setItem("token",res.data.data);
-                            that.$router.push("/");
+                            let token = res.data.data;
+                            localStorage.setItem("token",token);
+                            //登录类型：User：用户  AreaManager：区域管理员
+                            //登录类型不同，登录成功后访问的资源不同
+                            var loginType = token.substring(token.lastIndexOf("-")+1);
+                            if(loginType=='AreaManager'){
+
+                            }
+                            if(loginType=="User"){
+                                that.$router.push("/");
+                            }
                         }else{
                             that.$alert("用户名或密码错误!");
                         }
                     }).catch(function(error){
                         that.$message.error("登陆失败，网络连接不可用!");
-                        console.log(error);
                     });
                 } else {
                     this.$message.error('请输入账号和密码');

@@ -59,17 +59,11 @@
             };
         },
         mounted(){
-
-        },
-        computed: {
-            onRoutes() {
-                return this.$route.path.replace('/', '');
-            }
-        },
-        created() {
             //查找数据库菜单信息
-
-            this.items = [
+            this.$axios.get("/functions/menus").then(res =>{
+               this.items = res.data;
+            });
+            /*this.items = [
                 {
                     icon: 'el-icon-lx-home',
                     index: 'console',
@@ -163,7 +157,14 @@
                     icon: 'el-icon-lx-redpacket_fill',
                     index: '/donate',
                     title: '支持作者'
-                }];
+                }];*/
+        },
+        computed: {
+            onRoutes() {
+                return this.$route.path.replace('/', '');
+            }
+        },
+        created() {
             // 通过 Event Bus 进行组件间通信，来折叠侧边栏
             bus.$on('collapse', msg => {
                 this.collapse = msg;
