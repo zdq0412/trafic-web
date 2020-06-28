@@ -17,6 +17,17 @@ Vue.prototype.$axios = axios.create({
        header.token = localStorage.getItem("token");
         return data;
     }],
+    transformResponse: [function (res) {//返回的res为json字符串，非json对象
+        let jsonObj = JSON.parse(res);
+        if(jsonObj.result){
+            if(jsonObj.result.resultCode==600){
+                localStorage.removeItem("username");
+                localStorage.removeItem("token");
+                router.push("/login");
+            }
+        }
+        return jsonObj;
+    }],
     headers: {'token': ''},
 });
 Vue.config.productionTip = false;

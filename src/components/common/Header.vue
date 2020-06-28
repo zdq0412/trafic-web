@@ -76,12 +76,7 @@ export default {
         }
     },
     created:function(){
-        this.$axios.get("/schema/schemas").then(response => {
-            console.log(response);
-           this.schemas = response.data.data;
-        });
 
-        this.name = localStorage.getItem("username");
     },
     methods: {
         // 用户名下拉菜单选择事件
@@ -140,6 +135,17 @@ export default {
         }
     },
     mounted() {
+        this.$axios.get("/schema/schemas").then(response => {
+            /*
+            if(response.data.result.resultCode==600){
+                localStorage.removeItem("username");
+                localStorage.removeItem("token");
+                this.$router.push("/login");
+            }*/
+            this.schemas = response.data.data;
+        });
+
+        this.name = localStorage.getItem("username");
         if (document.body.clientWidth < 1500) {
             this.collapseChage();
         }
