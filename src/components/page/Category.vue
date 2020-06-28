@@ -2,66 +2,250 @@
     <div>
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-calendar"></i> 表单</el-breadcrumb-item>
-                <el-breadcrumb-item>markdown编辑器</el-breadcrumb-item>
+                <el-breadcrumb-item>
+                    <i class="el-icon-lx-cascades"></i> 类别管理
+                </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="plugins-tips">
-                mavonEditor：基于Vue的markdown编辑器。
-                访问地址：<a href="https://github.com/hinesboy/mavonEditor" target="_blank">mavonEditor</a>
+            <div class="handle-box">
+                <el-button
+                        type="primary"
+                        icon="el-icon-plus"
+                        class="handle-del mr10"
+                        @click="addVisible=true"
+                >新增</el-button>
+                <el-button
+                        type="primary"
+                        icon="el-icon-plus"
+                        class="handle-del mr10"
+                >导入</el-button>
+                <el-input v-model="query.name" placeholder="类别名称" class="handle-input mr10"></el-input>
+                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
-            <mavon-editor v-model="content" ref="md" @imgAdd="$imgAdd" @change="change" style="min-height: 600px"/>
-            <el-button class="editor-btn" type="primary" @click="submit">提交</el-button>
+            <el-table
+                    :data="tableData"
+                    style="width: 100%;margin-bottom: 20px;"
+                    row-key="id"
+                    border
+                    default-expand-all
+                    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+                <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
+                <el-table-column prop="name" label="类别名称"></el-table-column>
+                <el-table-column prop="createDate" label="创建日期"></el-table-column>
+                <el-table-column prop="note" label="备注"></el-table-column>
+                <el-table-column label="操作" width="180" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-edit"
+                                @click="handleEdit(scope.$index, scope.row)"
+                        >编辑</el-button>
+                        <el-button
+                                type="text"
+                                icon="el-icon-delete"
+                                class="red"
+                                @click="handleDelete(scope.$index, scope.row)"
+                        >删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="query.pageIndex"
+                        :page-size="query.pageSize"
+                        :total="pageTotal"
+                        @current-change="handlePageChange"
+                ></el-pagination>
+            </div>
         </div>
+
+        <!-- 编辑弹出框 -->
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+            <el-form ref="form" :model="form" label-width="70px">
+                <el-form-item label="类别名称">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input  type="textarea" v-model="form.note"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!-- 新增弹出框 -->
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%">
+            <el-form ref="form" :model="form" label-width="70px">
+                <el-form-item label="父类别">
+                    <el-input v-model="form.parentName"></el-input>
+                </el-form-item>
+                <el-form-item label="类别名称">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input  type="textarea" v-model="form.note"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="addVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
-    import { mavonEditor } from 'mavon-editor'
-    import 'mavon-editor/dist/css/index.css'
+    import FunctionComponent from '../common/FunctionComponent'
     export default {
-        name: 'markdown',
-        data: function(){
-            return {
-                content:'',
-                html:'',
-                configs: {
-                }
-            }
+        components:{
+            FunctionComponent
         },
-        components: {
-            mavonEditor
+        name: 'basetable',
+        data() {
+            return {
+                query: {
+                    address: '',
+                    name: '',
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                value :'',
+                role:'',
+                tableData: [],
+                delList: [],
+                editVisible: false,
+                addVisible: false,
+                functionVisible:false,
+                pageTotal: 0,
+                form: {
+                    parent:{
+                        name:''
+                    }
+                },
+                idx: -1,
+                id: -1
+            };
+        },
+        created() {
+            this.getData();
         },
         methods: {
-            // 将图片上传到服务器，返回地址替换到md中
-            $imgAdd(pos, $file){
-                var formdata = new FormData();
-                formdata.append('file', $file);
-                // 这里没有服务器供大家尝试，可将下面上传接口替换为你自己的服务器接口
-                this.$axios({
-                    url: '/common/upload',
-                    method: 'post',
-                    data: formdata,
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                }).then((url) => {
-                    this.$refs.md.$img2Url(pos, url);
+            // 获取 easy-mock 的模拟数据
+            getData() {
+                this.tableData = [
+                    {
+                        id:1,
+                        name:'浙江省',
+                        note:'浙江省',
+                        createDate:'2020-6-28',
+                        children:[
+                            {
+                                id:2,
+                                name:'嘉兴市',
+                                note:'嘉兴市',
+                                createDate:'2020-6-28',
+                                children:[
+                                    {
+                                        id:3,
+                                        name:'南湖区',
+                                        note:'南湖区',
+                                        createDate:'2020-6-28',
+                                    }
+                                ]
+                            }
+                        ]
+                    }, {
+                        id:4,
+                        name:'吉林省',
+                        note:'吉林省',
+                        createDate:'2020-6-28',
+                    }
+                ];
+                this.pageTotal = 2;
+            },
+            // 触发搜索按钮
+            handleSearch() {
+                this.$set(this.query, 'pageIndex', 1);
+                this.getData();
+            },
+            // 删除操作
+            handleDelete(index, row) {
+                // 二次确认删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
                 })
+                    .then(() => {
+                        this.$message.success('删除成功');
+                        this.tableData.splice(index, 1);
+                    })
+                    .catch(() => {});
             },
-            change(value, render){
-                // render 为 markdown 解析后的结果
-                this.html = render;
+            // 多选操作
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
             },
-            submit(){
-                console.log(this.content);
-                console.log(this.html);
-                this.$message.success('提交成功！');
+
+            // 编辑操作
+            handleEdit(index, row) {
+                this.idx = index;
+                this.form = row;
+                this.editVisible = true;
+            },
+            // 查看功能
+            handleFunction(index, row) {
+                this.idx = index;
+                this.form = row;
+                this.functionVisible = true;
+            },
+            // 保存编辑
+            saveEdit() {
+                this.editVisible = false;
+                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
+                this.$set(this.tableData, this.idx, this.form);
+            },
+            // 分页导航
+            handlePageChange(val) {
+                this.$set(this.query, 'pageIndex', val);
+                this.getData();
             }
         }
-    }
+    };
 </script>
+
 <style scoped>
-    .editor-btn{
-        margin-top: 20px;
+    .handle-box {
+        margin-bottom: 20px;
+    }
+
+    .handle-select {
+        width: 120px;
+    }
+
+    .handle-input {
+        width: 300px;
+        display: inline-block;
+    }
+    .table {
+        width: 100%;
+        font-size: 14px;
+    }
+    .red {
+        color: #ff0000;
+    }
+    .lightYellow {
+        color: #FF9900;
+    }
+    .mr10 {
+        margin-right: 10px;
+    }
+    .table-td-thumb {
+        display: block;
+        margin: auto;
+        width: 40px;
+        height: 40px;
     }
 </style>
