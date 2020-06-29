@@ -15,24 +15,15 @@
                         class="handle-del mr10"
                         @click="addVisible=true"
                 >新增</el-button>
-                <!--<el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
-                    <el-option key="1" label="广东省" value="广东省"></el-option>
-                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                </el-select>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
             </div>
             <el-table
                     :data="tableData"
                     border
                     class="table"
-                    ref="multipleTable"
                     header-cell-class-name="table-header"
-                    @selection-change="handleSelectionChange"
             >
-               <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
+                <el-table-column prop="id" label="id" v-if="false"></el-table-column>
                 <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="createDate" label="创建日期"></el-table-column>
                 <el-table-column prop="priority" label="优先级"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
@@ -65,12 +56,12 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="名称">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="优先级">
-                    <el-input v-model="form.priority" number></el-input>
+                    <el-input-number v-model="form.priority" number></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -83,12 +74,13 @@
         </el-dialog>
         <!-- 新增弹出框 -->
         <el-dialog title="新增" :visible.sync="addVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="名称">
+            <el-form ref="form" :model="form" :rules="rules"  label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.id" v-show="false"></el-input>
                 </el-form-item>
                 <el-form-item label="优先级">
-                    <el-input v-model="form.priority" number></el-input>
+                    <el-input-number v-model="form.priority"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -96,21 +88,18 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="addVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import { fetchData } from '../../api/index';
     export default {
         name: 'basetable',
         data() {
             return {
                 query: {
-                    address: '',
-                    name: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
@@ -119,47 +108,53 @@
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
-                form: {},
+                form: {
+                    priority:10
+                },
                 idx: -1,
-                id: -1
+                id: -1,
+                rules:{
+                    name: [
+                        { required: true, message: '请输入模式名称', trigger: 'blur' }
+                    ]
+                }
             };
         },
         created() {
             this.getData();
         },
         methods: {
-            showAddSchemaDialog(){
-
-            },
             // 获取 easy-mock 的模拟数据
             getData() {
-                fetchData(this.query).then(res => {
-                    this.tableData = res.list;
-                    this.pageTotal = res.pageTotal || 50;
+                this.$axios.get("/schema/schemasByPage",{
+                    params:{
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
+                    }
+                }).then(res => {
+                    console.log(res.data);
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
                 });
-            },
-            // 触发搜索按钮
-            handleSearch() {
-                this.$set(this.query, 'pageIndex', 1);
-                this.getData();
             },
             // 删除操作
             handleDelete(index, row) {
+                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                       this.$axios.delete("/schema/schema/" + this.form.id).then(res => {
+
+                           this.$message.success('删除成功');
+                           this.getData();
+                       }) .catch(error =>{
+                           console.log(error);
+                       });
                     })
                     .catch(() => {});
             },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
@@ -168,9 +163,41 @@
             },
             // 保存编辑
             saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/schema/schema?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error("编辑失败：模式名称已被使用!");
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/schema/schema",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                            }else{
+                                this.$message.error("添加失败：模式名称已被使用!");
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
             },
             // 分页导航
             handlePageChange(val) {

@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import qs from 'qs'
 import App from './App.vue';
 import router from './router';
 import ElementUI from 'element-ui';
@@ -10,6 +11,8 @@ import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
+
+Vue.prototype.$qs = qs;
 
 Vue.prototype.$axios = axios.create({
     baseURL:"http://localhost:8088",

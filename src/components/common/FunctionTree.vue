@@ -29,7 +29,7 @@
                 if (node.level === 0) {
                     return resolve([{ name: '用户管理' }, { name: '角色管理' }]);
                 }
-                if (node.level > 3) return resolve([]);
+                if (node.level > 1) return resolve([]);
 
                 var hasChild;
                 if (node.data.name === '用户管理') {
@@ -40,7 +40,7 @@
                     hasChild = Math.random() > 0.5;
                 }
 
-                setTimeout(() => {
+               setTimeout(() => {
                     var data;
                     if (hasChild) {
                         data = [{
