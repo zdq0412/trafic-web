@@ -55,7 +55,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
@@ -73,7 +73,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
             <el-form ref="form" :model="form" :rules="rules"  label-width="70px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
@@ -87,7 +87,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="addVisible = false">取 消</el-button>
+                <el-button @click="cancelAdd()">取 消</el-button>
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
@@ -124,6 +124,9 @@
             this.getData();
         },
         methods: {
+            closeDialog(){
+                this.$refs["form"].clearValidate();
+            },
             // 获取 easy-mock 的模拟数据
             getData() {
                 this.$axios.get("/schema/schemasByPage",{
@@ -132,10 +135,13 @@
                         limit:this.query.pageSize
                     }
                 }).then(res => {
-                    console.log(res.data);
                     this.tableData = res.data.data;
                     this.pageTotal = res.data.count;
                 });
+            },
+            cancelAdd(){
+                this.addVisible=false;
+                this.$refs["form"].clearValidate();
             },
             // 删除操作
             handleDelete(index, row) {
@@ -160,6 +166,7 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
+                this.$refs["form"].clearValidate();
             },
             // 保存编辑
             saveEdit() {
@@ -182,6 +189,7 @@
             },
             // 保存新增
             saveAdd(){
+                this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
                         this.$axios.post("/schema/schema",this.$qs.stringify(this.form)).then(res=>{

@@ -15,7 +15,7 @@
                         class="handle-del mr10"
                         @click="addVisible=true"
                 >新增</el-button>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
+                <el-input v-model="query.username" placeholder="用户名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table
@@ -24,7 +24,6 @@
                     class="table"
                     ref="multipleTable"
                     header-cell-class-name="table-header"
-                    @selection-change="handleSelectionChange"
             >
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="username" label="用户名"></el-table-column>
@@ -32,8 +31,14 @@
                 <el-table-column prop="realname" label="真名"></el-table-column>
                 <el-table-column prop="tel" label="手机号"></el-table-column>
                 <el-table-column prop="org.name" label="所在企业"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="230" align="center">
                     <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-reset"
+                                class="lightYellow"
+                                @click="resetPassword(scope.$index, scope.row)"
+                        >密码重置</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -62,11 +67,11 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="用户名">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="用户名" prop="username">
                     <el-input v-model="form.username"></el-input>
                 </el-form-item>
-                <el-form-item label="所属角色">
+                <el-form-item label="所属角色" prop="role">
                     <el-select v-model="role">
                         <el-option v-for="item in roles"
                                    :key="item.value"
@@ -97,12 +102,12 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="用户名">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="findRoles">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="用户名" prop="username">
                     <el-input v-model="form.username"></el-input>
                 </el-form-item>
-                <el-form-item label="所属角色">
+                <el-form-item label="角色" prop="role">
                     <el-select v-model="role">
                         <el-option v-for="item in roles"
                                    :key="item.value"
@@ -136,14 +141,12 @@
 </template>
 
 <script>
-    import { fetchData } from '../../api/index';
     export default {
         name: 'basetable',
         data() {
             return {
                 query: {
-                    address: '',
-                    name: '',
+                    username: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
@@ -158,61 +161,63 @@
                 idx: -1,
                 id: -1,
                 orgs:[
-                    {
-                        label:'华为',
-                        value:'华为'
-                    },
-                    {
-                        label:'腾讯',
-                        value:'腾讯'
-                    }
+
                 ],
                 roles:[
-                    {
+                    /*{
                         label:'超级管理员',
                         value:'超级管理员'
                     },
                     {
                         label:'普通管理员',
                         value:'普通管理员'
-                    }
-                ]
+                    }*/
+                ],
+                rules:{
+                    username: [
+                        { required: true, message: '请输入用户名', trigger: 'blur' }
+                    ],
+                    role: [
+                        { required: true, message: '请选择角色', trigger: 'blur' }
+                    ]
+                }
             };
         },
         created() {
             this.getData();
         },
         methods: {
-            showAddSchemaDialog(){
-
+            findRoles(){
+                this.$axios.get("")
             },
-            // 获取 easy-mock 的模拟数据
-            getData() {
-                this.tableData = [
-                    {
-                        username:'admin',
-                        realname:'admin',
-                        tel :'110',
-                        role:{
-                            name:'admin'
-                        },
-                        org:{
-                            name:''
-                        }
-                    },
-                    {
-                        username:'test',
-                        realname:'test',
-                        tel :'119',
-                        role:{
-                            name:'test'
-                        },
-                        org:{
-                            name:'华为'
-                        }
+            resetPassword(index, row){
+                this.$axios.get("/user/resetPassword",{
+                    params:{
+                        username : row.username
                     }
-                ];
-                this.pageTotal = 2;
+                }).then(res=>{
+                    if(res.data.result.resultCode==200){
+                        this.$message.success("密码已修改!");
+                    }else{
+                        this.$message.error(res.data.result.message);
+                    }
+                }).catch(error=>{
+                    console.log(error);
+                });
+            },
+            getData() {
+                this.$axios.get("/user/usersByPage",{
+                    params:{
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize,
+                        name : this.query.username
+                    }
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error=>{
+                    console.log(error);
+                });
             },
             // 触发搜索按钮
             handleSearch() {
@@ -231,11 +236,6 @@
                     })
                     .catch(() => {});
             },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
@@ -256,7 +256,6 @@
         }
     };
 </script>
-
 <style scoped>
     .handle-box {
         margin-bottom: 20px;
@@ -285,5 +284,8 @@
         margin: auto;
         width: 40px;
         height: 40px;
+    }
+    .lightYellow {
+        color: #FF9900;
     }
 </style>
