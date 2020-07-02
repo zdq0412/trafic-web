@@ -37,7 +37,7 @@
                 <el-table-column prop="city" label="市"></el-table-column>
                 <el-table-column prop="region" label="区"></el-table-column>
                 <el-table-column prop="note" label="描述"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="120" align="center">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"

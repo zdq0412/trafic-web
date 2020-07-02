@@ -67,23 +67,27 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="名称">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"
+                   @open="loadSchema" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="图标">
                     <el-input v-model="form.icon"></el-input>
                 </el-form-item>
                 <el-form-item label="所属模式">
-                    <el-select v-model="form.schema.name" placeholder="请选择">
-                        <el-option>
-                            一般模式
-                        </el-option>
-                        <el-option>
-                            普通模式
+                    <el-select v-model="form.schemaId" placeholder="请选择">
+                        <el-option
+                                v-for="item in schemas"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item label="优先级">
+                    <el-input-number v-model="form.priority"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -95,23 +99,27 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="名称">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%"
+                  @open="loadSchema" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="图标">
                     <el-input v-model="form.icon"></el-input>
                 </el-form-item>
                 <el-form-item label="所属模式">
-                    <el-select v-model="form.schema.name" placeholder="请选择">
-                        <el-option>
-                            一般模式
-                        </el-option>
-                        <el-option>
-                            普通模式
+                    <el-select v-model="form.schemaId" placeholder="请选择">
+                        <el-option
+                                v-for="item in schemas"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item label="优先级">
+                    <el-input-number v-model="form.priority"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -119,7 +127,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="addVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增授权对话框 -->
@@ -145,58 +153,56 @@
         data() {
             return {
                 query: {
-                    address: '',
                     name: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
                 tableData: [],
+                schemas:[],
                 delList: [],
                 editVisible: false,
                 addVisible: false,
                 grantFunctionVisible:false,
                 pageTotal: 0,
                 form: {
-                    schema:{}
                 },
                 idx: -1,
-                id: -1
+                id: -1,
+                rules:{
+                    name:[{
+                        required:true,message:'请输入目录名称',trgger:'blur'
+                    }]
+                }
             };
         },
         created() {
             this.getData();
         },
         methods: {
-            //格式化布尔类型值
-            formatBoolean(row,column,cellValue){
-                if(cellValue){
-                    return '是';
-                }else{
-                    return '否';
-                }
+            loadSchema(){
+                this.$axios.get("/schema/schemas").then(res=>{
+                    this.schemas=res.data.data;
+                }).catch(error=>{
+                    console.log(error);
+                });
+            },
+            closeDialog(){
+                this.$refs["form"].clearValidate();
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.tableData=[{
-                    id : '1',
-                    name : '目录一',
-                    note:'目录一',
-                    icon:'plus',
-                    priority : 10,
-                    schema:{
-                        name : '一般模式'
+                this.$axios.get("/directory/directorysByPage",{
+                    params:{
+                        name:this.query.name,
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
                     }
-                },{
-                    id : '2',
-                    name : '目录二',
-                    note:'目录二',
-                    icon:'trash',
-                    priority : 20,
-                    schema:{
-                        name : '普通模式'
-                    }
-                }];
-                this.pageTotal=2;
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             // 触发搜索按钮
             handleSearch() {
@@ -205,13 +211,18 @@
             },
             // 删除操作
             handleDelete(index, row) {
+                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                        this.$axios.delete("/directory/directory/" + this.form.id).then(res => {
+                            this.$message.success('删除成功');
+                            this.getData();
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
                     })
                     .catch(() => {});
             },
@@ -225,6 +236,7 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
+                this.form.schemaId=row.schema.id;
             },
             // 授权操作
             handleFunction(index, row) {
@@ -233,9 +245,42 @@
             },
             // 保存编辑
             saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/directory/directory?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error("编辑失败：目录名称已被使用!");
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/directory/directory",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                            }else{
+                                this.$message.error("添加失败：目录名称已被使用!");
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
             },
             // 分页导航
             handlePageChange(val) {

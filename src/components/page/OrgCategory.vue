@@ -24,11 +24,10 @@
                     class="table"
                     ref="multipleTable"
                     header-cell-class-name="table-header"
-                    @selection-change="handleSelectionChange"
             >
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="createDate" label="创建日期"></el-table-column>
+                <el-table-column prop="createDate" label="创建日期" :formatter="formatDate"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -65,9 +64,9 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="名称">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
@@ -80,9 +79,9 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="名称">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
@@ -91,7 +90,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="addVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增授权对话框 -->
@@ -109,6 +108,8 @@
 
 <script>
     import FunctionTree from "../common/FunctionTree"
+    import {getDate,getDateTime} from "../common/utils";
+
     export default {
         components:{
             FunctionTree
@@ -130,35 +131,43 @@
                 pageTotal: 0,
                 form: {},
                 idx: -1,
-                id: -1
+                id: -1,
+                rules:{
+                    name:[{
+                        required:true,message:'请输入企业类别名称',trigger:'blur'
+                    }]
+                }
             };
         },
         created() {
             this.getData();
         },
         methods: {
+            closeDialog(){
+                this.$refs["form"].clearValidate();
+            },
             //格式化布尔类型值
-            formatBoolean(row,column,cellValue){
+            formatDate(row,column,cellValue){
                 if(cellValue){
-                    return '是';
+                    return getDate(new Date(cellValue));
                 }else{
-                    return '否';
+                    return '';
                 }
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.tableData=[{
-                    id : '1',
-                    name : '轻货',
-                    createDate : '2020-6-26',
-                    note:'轻货'
-                },{
-                    id : '2',
-                    name : '重货',
-                    createDate : '2020-6-26',
-                    note:'重货'
-                }];
-                this.pageTotal=2;
+                this.$axios.get("/orgCategory/orgCategorysByPage",{
+                    params:{
+                        name:this.query.name,
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
+                    }
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             // 触发搜索按钮
             handleSearch() {
@@ -167,21 +176,21 @@
             },
             // 删除操作
             handleDelete(index, row) {
+                this.form = row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                        this.$axios.delete("/orgCategory/orgCategory/" + this.form.id).then(res => {
+                            this.$message.success('删除成功');
+                            this.getData();
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
                     })
                     .catch(() => {});
             },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
@@ -195,9 +204,42 @@
             },
             // 保存编辑
             saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/orgCategory/orgCategory?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error("编辑失败：企业类别名称已被使用!");
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/orgCategory/orgCategory",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                            }else{
+                                this.$message.error("添加失败：企业类别名称已被使用!");
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
             },
             // 分页导航
             handlePageChange(val) {
