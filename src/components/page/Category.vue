@@ -28,11 +28,13 @@
                     style="width: 100%;margin-bottom: 20px;"
                     row-key="id"
                     border
-                    default-expand-all
-                    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+                    highlight-current-row
+                    :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+                    @current-change="handleCurrentChange">
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="name" label="类别名称"></el-table-column>
-                <el-table-column prop="createDate" label="创建日期"></el-table-column>
+                <el-table-column prop="type" label="类型"></el-table-column>
+                <el-table-column prop="createDate" label="创建日期" :formatter="formatDate"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -63,10 +65,15 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="类别名称">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="类型">
+                    <el-select v-model="form.type">
+                        <el-option label="区域"  value="区域"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input  type="textarea" v-model="form.note"></el-input>
@@ -78,13 +85,18 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="父类别">
-                    <el-input v-model="form.parentName"></el-input>
+                    <el-input v-model="form.parentName" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="类别名称">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="类型">
+                    <el-select v-model="form.type">
+                        <el-option label="区域"  value="区域"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input  type="textarea" v-model="form.note"></el-input>
@@ -92,7 +104,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="addVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -100,6 +112,8 @@
 
 <script>
     import FunctionComponent from '../common/FunctionComponent'
+    import {getDate} from "../common/utils";
+
     export default {
         components:{
             FunctionComponent
@@ -108,13 +122,12 @@
         data() {
             return {
                 query: {
-                    address: '',
                     name: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
                 value :'',
-                role:'',
+                row:{},
                 tableData: [],
                 delList: [],
                 editVisible: false,
@@ -122,50 +135,42 @@
                 functionVisible:false,
                 pageTotal: 0,
                 form: {
-                    parent:{
-                        name:''
-                    }
                 },
                 idx: -1,
-                id: -1
+                id: -1,
+                rules:{
+                    name:[{required:true,message:'请输入名称',trigger:'blur'}]
+                }
             };
         },
         created() {
             this.getData();
         },
         methods: {
+            closeDialog(){
+                this.$refs["form"].clearValidate();
+            },
+            formatDate(row,column,cellValue){
+                if(cellValue){
+                    return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
+            },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.tableData = [
-                    {
-                        id:1,
-                        name:'浙江省',
-                        note:'浙江省',
-                        createDate:'2020-6-28',
-                        children:[
-                            {
-                                id:2,
-                                name:'嘉兴市',
-                                note:'嘉兴市',
-                                createDate:'2020-6-28',
-                                children:[
-                                    {
-                                        id:3,
-                                        name:'南湖区',
-                                        note:'南湖区',
-                                        createDate:'2020-6-28',
-                                    }
-                                ]
-                            }
-                        ]
-                    }, {
-                        id:4,
-                        name:'吉林省',
-                        note:'吉林省',
-                        createDate:'2020-6-28',
+                this.$axios.get("/category/categorysByPage",{
+                    params:{
+                        name:this.query.name,
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
                     }
-                ];
-                this.pageTotal = 2;
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             // 触发搜索按钮
             handleSearch() {
@@ -174,26 +179,31 @@
             },
             // 删除操作
             handleDelete(index, row) {
+                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                        this.$axios.delete("/category/category/" + this.form.id).then(res => {
+
+                            this.$message.success('删除成功');
+                            this.getData();
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
                     })
                     .catch(() => {});
             },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
+                if(row.parent){
+                    this.form.parentId=row.parent.id;
+                    this.form.parentName=row.parent.name;
+                }
             },
             // 查看功能
             handleFunction(index, row) {
@@ -201,11 +211,50 @@
                 this.form = row;
                 this.functionVisible = true;
             },
+            // 点击行
+            handleCurrentChange(currentRow) {
+                this.row = currentRow;
+                this.form.parentId=currentRow.id;
+                this.form.parentName=currentRow.name;
+            },
             // 保存编辑
             saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/category/category?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error("编辑失败：类别名称已被使用!");
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/category/category",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                            }else{
+                                this.$message.error("添加失败：类别名称已被使用!");
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
             },
             // 分页导航
             handlePageChange(val) {

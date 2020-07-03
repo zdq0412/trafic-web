@@ -137,6 +137,8 @@
                 }).then(res => {
                     this.tableData = res.data.data;
                     this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
                 });
             },
             cancelAdd(){

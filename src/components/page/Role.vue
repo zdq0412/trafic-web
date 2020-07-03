@@ -24,11 +24,10 @@
                     class="table"
                     ref="multipleTable"
                     header-cell-class-name="table-header"
-                    @selection-change="handleSelectionChange"
             >
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="createDate" label="创建日期"></el-table-column>
+                <el-table-column prop="createDate" label="创建日期" :formatter="formatDate"></el-table-column>
                 <el-table-column prop="orgCategory.name" label="企业类别"></el-table-column>
                 <el-table-column prop="allowedDelete" label="允许删除" :formatter="formatBoolean"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
@@ -67,18 +66,18 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="名称">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadOrgCategory">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="企业类别">
-                    <el-select v-model="value" placeholder="请选择">
+                    <el-select v-model="form.orgCategoryId" placeholder="请选择" @change="$set(form,orgCategoryId)">
                         <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
+                                v-for="item in orgCategories"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -92,18 +91,18 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="名称">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadOrgCategory">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="企业类别">
-                    <el-select v-model="value" placeholder="请选择">
+                    <el-select v-model="form.orgCategoryId" placeholder="请选择">
                         <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
+                                v-for="item in orgCategories"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -113,7 +112,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="addVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增授权对话框 -->
@@ -131,6 +130,8 @@
 
 <script>
     import FunctionTree from "../common/FunctionTree"
+    import {getDate} from "../common/utils";
+
     export default {
         components:{
             FunctionTree
@@ -139,27 +140,46 @@
         data() {
             return {
                 query: {
-                    address: '',
                     name: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
+                orgCategoryId:'',
                 tableData: [],
+                orgCategories: [],
                 delList: [],
                 editVisible: false,
                 addVisible: false,
                 grantFunctionVisible:false,
                 pageTotal: 0,
-                form: {},
+                form: {
+                    orgCategoryId:''
+                },
                 idx: -1,
-                id: -1
+                id: -1,
+                rules:{
+                    name:[{required:true,message:'请输入角色名称',trigger:'blur'}]
+                }
             };
         },
         created() {
             this.getData();
         },
         methods: {
-            //格式化布尔类型值
+            loadOrgCategory(){
+                this.$axios.get("/orgCategory/orgCategorys").then(res => {
+                    this.orgCategories = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                })
+            },
+            formatDate(row,column,cellValue){
+                if(cellValue){
+                    return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
+            },
             formatBoolean(row,column,cellValue){
                 if(cellValue){
                     return '是';
@@ -169,24 +189,18 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.tableData=[{
-                    id : '1',
-                    name : 'admin',
-                    createDate : '2020-6-26',
-                    note:'系统管理员，不允许删除!',
-                    allowedDelete :false
-                },{
-                    id : '2',
-                    name : 'test',
-                    createDate : '2020-6-26',
-                    note:'测试角色',
-                    allowedDelete :true,
-                    orgCategory : {
-                        id : '3',
-                        name :"轻货"
+                this.$axios.get("/role/rolesByPage",{
+                    params:{
+                        name:this.query.name,
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
                     }
-                }];
-                this.pageTotal=2;
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             // 触发搜索按钮
             handleSearch() {
@@ -195,26 +209,31 @@
             },
             // 删除操作
             handleDelete(index, row) {
+                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                        this.$axios.delete("/role/role/" + this.form.id).then(res => {
+                            if(res.data.result.resultCode==200){
+                                this.$message.success('删除成功');
+                                this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
                     })
                     .catch(() => {});
             },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
+                this.form.orgCategoryId=row.orgCategory.id;
             },
             // 授权操作
             handleFunction(index, row) {
@@ -223,9 +242,42 @@
             },
             // 保存编辑
             saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/role/role?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error("编辑失败：角色名称已被使用!");
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/role/role",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                            }else{
+                                this.$message.error("添加失败：角色名称已被使用!");
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
             },
             // 分页导航
             handlePageChange(val) {

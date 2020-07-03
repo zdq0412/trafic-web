@@ -66,8 +66,8 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="40%">
-            <el-form ref="form" :model="form" label-width="70px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="代码">
@@ -107,10 +107,21 @@
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="省市区">
-                            <el-cascader style="width: 100%;"
-                                         v-model="value"
+                            <el-cascader  v-model="form.area"
                                          :options="options"
                                          @change="handleChange"></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                    <el-col>
+                        <el-form-item label="企业类别">
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                                <el-option
+                                        v-for="item in orgCategories"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -128,16 +139,16 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="40%">
-            <el-form ref="form" :model="form" label-width="70px">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
-                        <el-form-item label="代码">
+                        <el-form-item label="代码" prop="code">
                             <el-input v-model="form.code"></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col>
-                        <el-form-item label="名称">
+                        <el-form-item label="名称" prop="name">
                             <el-input v-model="form.name"></el-input>
                         </el-form-item>
                     </el-col>
@@ -169,10 +180,22 @@
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="省市区">
-                            <el-cascader style="width: 100%;"
-                                    v-model="value"
+                            <el-cascader
+                                    v-model="form.area"
                                     :options="options"
                                     @change="handleChange"></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                    <el-col>
+                        <el-form-item label="企业类别">
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                                <el-option
+                                        v-for="item in orgCategories"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -186,20 +209,17 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="addVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
-
 <script>
-    import { fetchData } from '../../api/index';
     export default {
         name: 'basetable',
         data() {
             return {
                 query: {
-                    address: '',
                     name: '',
                     pageIndex: 1,
                     pageSize: 10
@@ -209,58 +229,45 @@
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
+                orgCategories:[],
                 form: {},
                 idx: -1,
                 id: -1,
-                options: [{
-                    value: '浙江',
-                    label: '浙江',
-                    children: [{
-                        value: '嘉兴',
-                        label: '嘉兴',
-                        children: [{
-                            value: '南湖',
-                            label: '南湖'
-                        }, {
-                            value: '秀洲',
-                            label: '秀洲'
-                        }]
-                    }]}]
+                options: [],
+                rules:{
+                    name:[{
+                        required:true,message:'请输入企业名称',trigger:'blur'
+                    }],
+                    code:[{
+                        required:true,message:'请输入企业代码',trigger:'blur'
+                    }]
+                }
             };
         },
         created() {
             this.getData();
         },
         methods: {
-            showAddSchemaDialog(){
+            handleChange(){
 
+            },
+            closeDialog(){
+                this.$refs["form"].clearValidate();
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                    this.tableData = [{
-                        code:'1001',
-                        name:'华为',
-                        addr:'北京朝阳区',
-                        province:'北京',
-                        city:'北京',
-                        region:'朝阳',
-                        contact:'任正非',
-                        tel :'13025841265',
-                        note:'手机供应商',
-                        legalPerson:'任正非'
-                    },{
-                        code:'1002',
-                        name:'小米',
-                        addr:'北京朝阳区',
-                        province:'北京',
-                        city:'北京',
-                        region:'朝阳',
-                        contact:'雷军',
-                        tel :'13025841265',
-                        note:'手机供应商',
-                        legalPerson:'雷军'
-                    }];
-                    this.pageTotal = 2;
+                this.$axios.get("/org/orgsByPage",{
+                    params:{
+                        name:this.query.name,
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
+                    }
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             // 触发搜索按钮
             handleSearch() {
@@ -295,6 +302,26 @@
                 this.editVisible = false;
                 this.$message.success(`修改第 ${this.idx + 1} 行成功`);
                 this.$set(this.tableData, this.idx, this.form);
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/org/org",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                            }else{
+                                this.$message.error("添加失败：企业名称已被使用!");
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
             },
             // 分页导航
             handlePageChange(val) {

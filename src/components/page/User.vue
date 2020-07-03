@@ -30,6 +30,7 @@
                 <el-table-column prop="role.name" label="角色"></el-table-column>
                 <el-table-column prop="realname" label="真名"></el-table-column>
                 <el-table-column prop="tel" label="手机号"></el-table-column>
+                <el-table-column prop="allowedDelete" label="允许删除" :formatter="formatBoolean"></el-table-column>
                 <el-table-column prop="org.name" label="所在企业"></el-table-column>
                 <el-table-column label="操作" width="230" align="center">
                     <template slot-scope="scope">
@@ -66,17 +67,17 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="用户名" prop="username">
                     <el-input v-model="form.username"></el-input>
                 </el-form-item>
-                <el-form-item label="所属角色" prop="role">
-                    <el-select v-model="role">
+                <el-form-item label="所属角色" >
+                    <el-select v-model="form.roleId" @change="$set(form,roleId)">
                         <el-option v-for="item in roles"
-                                   :key="item.value"
-                                   :label="item.label"
-                                   :value="item.value"></el-option>
+                                   :key="item.id"
+                                   :label="item.name"
+                                   :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="真名">
@@ -86,12 +87,12 @@
                     <el-input v-model="form.tel"></el-input>
                 </el-form-item>
                 <el-form-item label="所在企业">
-                    <el-select v-model="value">
+                    <el-select v-model="form.orgId" @change="$set(form,orgId)">
                         <el-option
                                 v-for="item in orgs"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -102,17 +103,17 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="findRoles">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="用户名" prop="username">
                     <el-input v-model="form.username"></el-input>
                 </el-form-item>
-                <el-form-item label="角色" prop="role">
-                    <el-select v-model="role">
+                <el-form-item label="角色">
+                    <el-select v-model="form.roleId" @change="$set(form,roleId)">
                         <el-option v-for="item in roles"
-                                   :key="item.value"
-                                   :label="item.label"
-                                   :value="item.value"></el-option>
+                                   :key="item.id"
+                                   :label="item.name"
+                                   :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="真名">
@@ -122,19 +123,19 @@
                     <el-input v-model="form.tel"></el-input>
                 </el-form-item>
                 <el-form-item label="所在企业">
-                    <el-select v-model="value">
+                    <el-select v-model="form.orgId" @change="$set(form,orgId)">
                         <el-option
                                 v-for="item in orgs"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="addVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -146,12 +147,13 @@
         data() {
             return {
                 query: {
-                    username: '',
+                    name: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
                 value :'',
-                role:'',
+                roleId:'',
+                orgId:'',
                 tableData: [],
                 delList: [],
                 editVisible: false,
@@ -160,25 +162,11 @@
                 form: {},
                 idx: -1,
                 id: -1,
-                orgs:[
-
-                ],
-                roles:[
-                    /*{
-                        label:'超级管理员',
-                        value:'超级管理员'
-                    },
-                    {
-                        label:'普通管理员',
-                        value:'普通管理员'
-                    }*/
-                ],
+                orgs:[],
+                roles:[],
                 rules:{
                     username: [
                         { required: true, message: '请输入用户名', trigger: 'blur' }
-                    ],
-                    role: [
-                        { required: true, message: '请选择角色', trigger: 'blur' }
                     ]
                 }
             };
@@ -187,8 +175,25 @@
             this.getData();
         },
         methods: {
-            findRoles(){
-                this.$axios.get("")
+            formatBoolean(row,column,cellValue){
+                if(cellValue){
+                    return '是';
+                }else{
+                    return '否';
+                }
+            },
+            //加载角色和企业信息
+            loadSelectData(){
+                this.$axios.get("/role/roles").then(res => {
+                    this.roles = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+                this.$axios.get("/org/orgs").then(res => {
+                    this.orgs = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             resetPassword(index, row){
                 this.$axios.get("/user/resetPassword",{
@@ -226,13 +231,22 @@
             },
             // 删除操作
             handleDelete(index, row) {
+                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                        this.$axios.delete("/user/user/" + this.form.id).then(res => {
+                            if(res.data.result.resultCode==200){
+                                this.$message.success('删除成功');
+                                this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
                     })
                     .catch(() => {});
             },
@@ -241,12 +255,51 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
+                if(row.role){
+                    this.form.roleId=row.role.id;
+                }
+                if(row.org){
+                    this.form.orgId=row.org.id;
+                }
             },
             // 保存编辑
             saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/user/user?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error("编辑失败：用户名称已被使用!");
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/user/user",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                            }else{
+                                this.$message.error("添加失败：用户名称已被使用!");
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
             },
             // 分页导航
             handlePageChange(val) {
