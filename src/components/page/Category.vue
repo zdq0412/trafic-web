@@ -13,7 +13,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addVisible=true"
+                        @click="handleAdd"
                 >新增</el-button>
                 <el-button
                         type="primary"
@@ -103,7 +103,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="addVisible = false">取 消</el-button>
+                <el-button @click="resetForm">重置</el-button>
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
@@ -147,6 +147,9 @@
             this.getData();
         },
         methods: {
+            resetForm(){
+              this.form={};
+            },
             closeDialog(){
                 this.$refs["form"].clearValidate();
             },
@@ -205,8 +208,12 @@
                     this.form.parentName=row.parent.name;
                 }
             },
+            handleAdd(){
+                this.addVisible=true;
+            },
             // 查看功能
             handleFunction(index, row) {
+                this.form={};
                 this.idx = index;
                 this.form = row;
                 this.functionVisible = true;

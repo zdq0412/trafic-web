@@ -51,7 +51,7 @@ export default new Router({
                     // 富文本编辑器组件
                     path: '/org',
                     component: () => import(/* webpackChunkName: "editor" */ '../components/page/Org.vue'),
-                    meta: { title: '组织机构管理' }
+                    meta: { title: '企业管理' }
                 },
                 {
                     // markdown组件
@@ -82,6 +82,11 @@ export default new Router({
                     meta: { title: '403' }
                 }
             ]
+        },
+        {
+            path:'/reg',
+            component:()=>import('../components/page/Register.vue'),
+            meta:{title:'企业用户注册'}
         },
         {
             path: '/login',

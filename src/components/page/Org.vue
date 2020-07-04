@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 组织机构管理
+                    <i class="el-icon-lx-cascades"></i> 企业管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -24,7 +24,6 @@
                     class="table"
                     ref="multipleTable"
                     header-cell-class-name="table-header"
-                    @selection-change="handleSelectionChange"
             >
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="code" label="机构代码"></el-table-column>
@@ -66,16 +65,16 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
-                        <el-form-item label="代码">
+                        <el-form-item label="代码" prop="code">
                             <el-input v-model="form.code"></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col>
-                        <el-form-item label="名称">
+                        <el-form-item label="名称" prop="name">
                             <el-input v-model="form.name"></el-input>
                         </el-form-item>
                     </el-col>
@@ -87,7 +86,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col>
-                        <el-form-item label="手机号">
+                        <el-form-item label="手机号" prop="tel">
                             <el-input v-model="form.tel"></el-input>
                         </el-form-item>
                     </el-col>
@@ -108,13 +107,15 @@
                     <el-col >
                         <el-form-item label="省市区">
                             <el-cascader  v-model="form.area"
-                                         :options="options"
+                                         :options="areas"
+                                          :props="{label:'name',value:'name'}"
                                          @change="handleChange"></el-cascader>
                         </el-form-item>
                     </el-col>
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择"
+                                      @change="$set(form,orgCategoryId)" style="width: 100%;" >
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -139,7 +140,8 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="40%" @close="closeDialog">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"
+                  @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
@@ -160,7 +162,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col>
-                        <el-form-item label="手机号">
+                        <el-form-item label="手机号" prop="tel">
                             <el-input v-model="form.tel"></el-input>
                         </el-form-item>
                     </el-col>
@@ -182,7 +184,8 @@
                         <el-form-item label="省市区">
                             <el-cascader
                                     v-model="form.area"
-                                    :options="options"
+                                    :options="areas"
+                                    :props="{label:'name',value:'name'}"
                                     @change="handleChange"></el-cascader>
                         </el-form-item>
                     </el-col>
@@ -218,6 +221,18 @@
     export default {
         name: 'basetable',
         data() {
+            let checkTel=(rule, value, callback) =>{
+              if(value){
+                  var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
+                  if (!myreg.test(value)) {
+                      callback(new Error("不是有效的手机号码格式!"));
+                  } else {
+                     callback();
+                  }
+              }  else{
+                  callback(new Error("请输入手机号"));
+              }
+            };
             return {
                 query: {
                     name: '',
@@ -231,15 +246,20 @@
                 pageTotal: 0,
                 orgCategories:[],
                 form: {},
+                areas:[],
                 idx: -1,
                 id: -1,
-                options: [],
                 rules:{
                     name:[{
                         required:true,message:'请输入企业名称',trigger:'blur'
                     }],
                     code:[{
                         required:true,message:'请输入企业代码',trigger:'blur'
+                    }],
+                    tel:[{
+                        required:true,message:'请输入手机号',trigger:'blur'
+                    },{
+                        validator:checkTel,trigger:'blur'
                     }]
                 }
             };
@@ -248,8 +268,29 @@
             this.getData();
         },
         methods: {
-            handleChange(){
+            loadSelectData(){
+                this.$axios.get("/orgCategory/orgCategorys").then(res => {
+                    this.orgCategories = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+                this.$axios.get("/category/categorys",{
+                    params:{
+                        type:'区域'
+                    }
+                }).then(res => {
+                    this.areas = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
 
+            },
+            handleChange(){
+                if(this.form.area&&this.form.area.length>0){
+                    this.form.province=this.form.area[0];
+                    this.form.city=this.form.area[1];
+                    this.form.region=this.form.area[2];
+                }
             },
             closeDialog(){
                 this.$refs["form"].clearValidate();
@@ -276,32 +317,49 @@
             },
             // 删除操作
             handleDelete(index, row) {
+                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
+                        this.$axios.delete("/org/org/" + this.form.id).then(res => {
+                            this.$message.success('删除成功');
+                            this.getData();
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
                     })
                     .catch(() => {});
             },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
+                if(row.orgCategory){
+                    this.form.orgCategoryId = row.orgCategory.id;
+                }
+                this.form.area=[row.province,row.city,row.region];
             },
             // 保存编辑
             saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/org/org?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error(res.data.result.message);
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
             },
             // 保存新增
             saveAdd(){
@@ -313,7 +371,7 @@
                                 this.addVisible = false;
                                 this.getData();
                             }else{
-                                this.$message.error("添加失败：企业名称已被使用!");
+                                this.$message.error(res.data.result.message);
                             }
                         }).catch(err =>{
                             console.log(err);

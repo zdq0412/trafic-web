@@ -43,7 +43,8 @@
                 rules:{
                     oldPassword : [{required:true,message:'请输入原密码',trigger:'blur'}],
                     newPassword : [{required:true,message:'请输入新密码',trigger:'blur'}],
-                    confirmPassword : [{required:true,message:'请输入确认密码',trigger:'blur'},{validator:confirmPasswordValidate,trigger:'blur'}],
+                    confirmPassword : [{required:true,message:'请输入确认密码',trigger:'blur'},
+                        {validator:confirmPasswordValidate,trigger:'blur'}],
                 }
             }
         },
