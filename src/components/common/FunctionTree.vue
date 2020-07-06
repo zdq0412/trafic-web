@@ -1,63 +1,63 @@
 <template>
     <el-tree
-            :props="props"
-            :load="loadNode"
-            lazy
+            :data="functions"
             show-checkbox
-            @check-change="handleCheckChange">
+            node-key="id"
+            ref="tree"
+            :default-checked-keys="functionIds"
+            :props="defaultProps">
     </el-tree>
 </template>
 <script>
     export default {
+        props:['paramType','param'],
         data() {
             return {
-                props: {
-                    label: 'name',
-                    children: 'zones'
-                },
-                count: 1
+                functions:[],
+                functionIds:[],
+                defaultProps: {
+                    children: 'children',
+                    label: 'name'
+                }
             };
         },
-        methods: {
-            handleCheckChange(data, checked, indeterminate) {
-                console.log(data, checked, indeterminate);
+        mounted(){
+            this.getData();
+        },
+        methods:{
+            getCheckedKeys(){
+              return this.$refs.tree.getCheckedKeys();
             },
-            handleNodeClick(data) {
-                console.log(data);
-            },
-            loadNode(node, resolve) {
-                if (node.level === 0) {
-                    return resolve([{ name: '用户管理' }, { name: '角色管理' }]);
-                }
-                if (node.level > 1) return resolve([]);
-
-                var hasChild;
-                if (node.data.name === '用户管理') {
-                    hasChild = true;
-                } else if (node.data.name === '角色管理') {
-                    hasChild = false;
-                } else {
-                    hasChild = Math.random() > 0.5;
-                }
-
-               setTimeout(() => {
-                    var data;
-                    if (hasChild) {
-                        data = [{
-                            name: '添加用户'
-                        }, {
-                            name: '修改用户'
-                        }];
-                    } else {
-                        data = [{
-                            name: '添加角色'
-                        }, {
-                            name: '修改角色'
-                        }];
+            getData(){
+                let url = '';
+                let params = {};
+                switch (this.paramType) {
+                    case 'role':{
+                        url = 'functions/roleFunctions';
+                        params={roleId:this.param};
+                        break;
                     }
+                    case 'directory':{
+                        url='functions/directoryFunctions';
+                        params={dirId:this.param};
+                        break;
+                    }
+                    case 'orgCategory':{
+                        url='functions/orgCategoryFunctions';
+                        params={orgCategoryId:this.param};
+                        break;
+                    }
+                }
 
-                    resolve(data);
-                }, 500);
+                console.log(params);
+                this.$axios.get(url,{
+                    params:params
+                }).then(res =>{
+                    this.functions=res.data.functions;
+                    this.functionIds = res.data.functionIds;
+                }).catch(error => {
+                    console.log(error);
+                })
             }
         }
     };

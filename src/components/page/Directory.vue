@@ -24,7 +24,6 @@
                     class="table"
                     ref="multipleTable"
                     header-cell-class-name="table-header"
-                    @selection-change="handleSelectionChange"
             >
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="name" label="名称"></el-table-column>
@@ -132,12 +131,12 @@
         </el-dialog>
         <!-- 新增授权对话框 -->
         <el-dialog title="授权" :visible.sync="grantFunctionVisible" width="30%">
-            <div style="height:200px;overflow: auto;">
-                <function-tree></function-tree>
+            <div style="height:500px;overflow: auto;">
+                <function-tree ref="functionTree" v-if="grantFunctionVisible" :paramType="param" :param="dirId"></function-tree>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="grantFunctionVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveFunctions">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -157,6 +156,8 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+                dirId:'',
+                param:'directory',
                 tableData: [],
                 schemas:[],
                 delList: [],
@@ -179,6 +180,22 @@
             this.getData();
         },
         methods: {
+            //保存权限
+            saveFunctions(){
+                let checkedIds = this.$refs.functionTree.getCheckedKeys();
+                let param = new FormData();
+                param.append("functionsId",JSON.stringify(checkedIds));
+                param.append("dirId",this.dirId);
+                this.$axios.put("functions/directoryFunctions",param).then(res=>{
+                    if(res.data.result.resultCode==200){
+                        this.grantFunctionVisible = false;
+                        this.$message.success("授权成功!");
+                    }
+                }).catch(error=>{
+                    console.log(error);
+                });
+                console.log(checkedIds);
+            },
             loadSchema(){
                 this.$axios.get("/schema/schemas").then(res=>{
                     this.schemas=res.data.data;
@@ -226,11 +243,6 @@
                     })
                     .catch(() => {});
             },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
@@ -242,6 +254,7 @@
             handleFunction(index, row) {
                 this.idx = index;
                 this.grantFunctionVisible = true;
+                this.dirId=row.id;
             },
             // 保存编辑
             saveEdit() {

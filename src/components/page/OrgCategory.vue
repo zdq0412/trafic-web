@@ -95,12 +95,12 @@
         </el-dialog>
         <!-- 新增授权对话框 -->
         <el-dialog title="授权" :visible.sync="grantFunctionVisible" width="30%">
-            <div style="height:200px;overflow: auto;">
-                <function-tree></function-tree>
+            <div style="height:500px;overflow: auto;">
+                <function-tree ref="functionTree" v-if="grantFunctionVisible" :paramType="param" :param="orgCategoryId"></function-tree>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="grantFunctionVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveFunctions">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -118,13 +118,14 @@
         data() {
             return {
                 query: {
-                    address: '',
                     name: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
                 tableData: [],
                 delList: [],
+                orgCategoryId:'',
+                param:'orgCategory',
                 editVisible: false,
                 addVisible: false,
                 grantFunctionVisible:false,
@@ -143,6 +144,22 @@
             this.getData();
         },
         methods: {
+            //保存权限
+            saveFunctions(){
+                let checkedIds = this.$refs.functionTree.getCheckedKeys();
+                let param = new FormData();
+                param.append("functionsId",JSON.stringify(checkedIds));
+                param.append("orgCategoryId",this.orgCategoryId);
+                this.$axios.put("functions/orgCategoryFunctions",param).then(res=>{
+                    if(res.data.result.resultCode==200){
+                        this.grantFunctionVisible = false;
+                        this.$message.success("授权成功!");
+                    }
+                }).catch(error=>{
+                    console.log(error);
+                });
+                console.log(checkedIds);
+            },
             closeDialog(){
                 this.$refs["form"].clearValidate();
             },
@@ -201,6 +218,7 @@
             handleFunction(index, row) {
                 this.idx = index;
                 this.grantFunctionVisible = true;
+                this.orgCategoryId = row.id;
             },
             // 保存编辑
             saveEdit() {

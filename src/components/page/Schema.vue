@@ -153,13 +153,16 @@
                     type: 'warning'
                 })
                     .then(() => {
-                       this.$axios.delete("/schema/schema/" + this.form.id).then(res => {
-
-                           this.$message.success('删除成功');
-                           this.getData();
-                       }) .catch(error =>{
-                           console.log(error);
-                       });
+                        this.$axios.delete("/schema/schema/" + this.form.id).then(res => {
+                            if(res.data.result.resultCode==200){
+                                this.$message.success('删除成功');
+                                this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
                     })
                     .catch(() => {});
             },
@@ -173,6 +176,7 @@
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
+                    console.log(this.form);
                     if (validate) {
                         this.$axios.put("/schema/schema?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
