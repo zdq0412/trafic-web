@@ -23,6 +23,11 @@ export default new Router({
                     meta: { title: '系统首页' }
                 },
                 {
+                  path:'/employee',
+                  component:()=>import('../components/page/Employee.vue'),
+                  meta:{title:'企业人员资料'}
+                },
+                {
                     path: '/function',
                     component: () => import( '../components/page/Function.vue'),
                     meta: { title: '权限管理' }

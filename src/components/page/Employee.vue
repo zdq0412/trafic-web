@@ -1,0 +1,376 @@
+<template>
+    <div>
+        <div class="crumbs">
+            <el-breadcrumb separator="/">
+                <el-breadcrumb-item>
+                    <i class="el-icon-lx-cascades"></i> 企业人员资料
+                </el-breadcrumb-item>
+            </el-breadcrumb>
+        </div>
+        <div class="container">
+            <div class="handle-box">
+                <el-button
+                        type="primary"
+                        icon="el-icon-plus"
+                        class="handle-del mr10"
+                        @click="addVisible=true"
+                >新增</el-button>
+                <el-input v-model="query.name" placeholder="人员名称" class="handle-input mr10"></el-input>
+                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+            </div>
+            <el-table
+                    :data="tableData"
+                    border
+                    class="table"
+                    ref="multipleTable"
+                    header-cell-class-name="table-header"
+            >
+                <el-table-column prop="photo" label="大头照"></el-table-column>
+                <el-table-column prop="name" label="姓名"></el-table-column>
+                <el-table-column prop="sex" label="性别"></el-table-column>
+                <el-table-column prop="age" label="年龄"></el-table-column>
+                <el-table-column prop="tel" label="联系电话"></el-table-column>
+                <el-table-column prop="idnum" label="身份证"></el-table-column>
+                <el-table-column prop="note" label="备注"></el-table-column>
+                <el-table-column label="操作" width="230" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-edit"
+                                @click="handleEdit(scope.$index, scope.row)"
+                        >编辑</el-button>
+                        <el-button
+                                type="text"
+                                icon="el-icon-delete"
+                                class="red"
+                                @click="handleDelete(scope.$index, scope.row)"
+                        >删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="query.pageIndex"
+                        :page-size="query.pageSize"
+                        :total="pageTotal"
+                        @current-change="handlePageChange"
+                ></el-pagination>
+            </div>
+        </div>
+        <!-- 编辑弹出框 -->
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="姓名" prop="name">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" prop="tel">
+                    <el-input v-model="form.tel"></el-input>
+                </el-form-item>
+                <el-form-item label="身份证" prop="idnum">
+                    <el-input v-model="form.idnum"></el-input>
+                </el-form-item>
+                <el-form-item label="大头照">
+                    <div>
+                        <el-upload
+                                class="avatar-uploader"
+                                :action="uploadUrl"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess"
+                                :before-upload="beforeAvatarUpload">
+                            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                    </div>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input type="textarea" v-model="form.note"></el-input>
+                </el-form-item>
+                <el-form-item label="角色">
+                    <el-select v-model="form.roleId" @change="$set(form,roleId)">
+                        <el-option v-for="item in roles"
+                                   :key="item.id"
+                                   :label="item.name"
+                                   :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!-- 新增弹出框 -->
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form-item label="姓名" prop="name">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" prop="tel">
+                    <el-input v-model="form.tel"></el-input>
+                </el-form-item>
+                <el-form-item label="身份证" prop="idnum">
+                    <el-input v-model="form.idnum"></el-input>
+                </el-form-item>
+                <el-form-item label="大头照">
+                    <div>
+                        <el-upload
+                                class="avatar-uploader"
+                                :action="uploadUrl"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess"
+                                :before-upload="beforeAvatarUpload">
+                            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                    </div>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input type="textarea" v-model="form.note"></el-input>
+                </el-form-item>
+                <el-form-item label="角色">
+                    <el-select v-model="form.roleId" @change="$set(form,roleId)" style="width:100%;">
+                        <el-option v-for="item in roles"
+                                   :key="item.id"
+                                   :label="item.name"
+                                   :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="addVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+    export default {
+        name: 'basetable',
+        data() {
+            let checkTel=(rule, value, callback) =>{
+                if(value){
+                    var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
+                    if (!myreg.test(value)) {
+                        callback(new Error("不是有效的手机号码格式!"));
+                    } else {
+                        callback();
+                    }
+                }  else{
+                    callback(new Error("请输入手机号"));
+                }
+            };
+            let checkIdNum=(rule,value,callback) => {
+                if(value){
+                    let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+                    if(!reg.test(card))
+                    {
+                        alert("身份证号不合法");
+                        return  false;
+                    }
+                }  else{
+                    callback(new Error("请输入身份证号"));
+                }
+            };
+            return {
+                query: {
+                    name: '',
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                dialogImageUrl:'',
+                dialogVisible:false,
+                uploadUrl:'',
+                roleId:'',
+                imageUrl:'',
+                tableData: [],
+                editVisible: false,
+                addVisible: false,
+                pageTotal: 0,
+                form: {},
+                idx: -1,
+                id: -1,
+                roles:[],
+                fileList:[],
+                rules:{
+                    name: [
+                        { required: true, message: '请输入用户名', trigger: 'blur' }
+                    ],
+                    tel:[
+                        { required: true, message: '请输入联系电话', trigger: 'blur' },
+                        {validator:checkTel,trigger:'blur'}
+                    ],
+                    idnum:[
+                        { required: true, message: '请输入身份证号', trigger: 'blur' },
+                        {validator:checkTel,trigger:'blur'}
+                    ]
+                }
+            };
+        },
+        created() {
+            this.getData();
+        },
+        methods: {
+            handleAvatarSuccess(res, file) {
+                this.imageUrl = URL.createObjectURL(file.raw);
+            },
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            },
+            //加载角色和企业信息
+            loadSelectData() {
+                this.$axios.get("/role/roles").then(res => {
+                    this.roles = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            getData() {
+                this.$axios.get("/employee/employeesByPage", {
+                    params: {
+                        page: this.query.pageIndex,
+                        limit: this.query.pageSize,
+                        name: this.query.name
+                    }
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            // 触发搜索按钮
+            handleSearch() {
+                this.$set(this.query, 'pageIndex', 1);
+                this.getData();
+            },
+            // 删除操作
+            handleDelete(index, row) {
+                this.form = row;
+                // 二次确认删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.$axios.delete("/employee/employee/" + this.form.id).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.$message.success('删除成功');
+                                this.getData();
+                            } else {
+                                this.$message.error(res.data.result.message);
+                            }
+                        }).catch(error => {
+                            console.log(error);
+                        });
+                    })
+                    .catch(() => {
+                    });
+            },
+            // 编辑操作
+            handleEdit(index, row) {
+                this.idx = index;
+                this.form = row;
+                this.editVisible = true;
+                if (row.role) {
+                    this.form.roleId = row.role.id;
+                }
+            },
+            // 保存编辑
+            saveEdit() {
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/employee/employee?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd() {
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.post("/employee/employee", this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.addVisible = false;
+                                this.getData();
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 分页导航
+            handlePageChange(val) {
+                this.$set(this.query, 'pageIndex', val);
+                this.getData();
+            }
+        }
+    };
+</script>
+<style scoped>
+    .handle-box {
+        margin-bottom: 20px;
+    }
+    .handle-input {
+        width: 300px;
+        display: inline-block;
+    }
+    .table {
+        width: 100%;
+        font-size: 14px;
+    }
+    .red {
+        color: #ff0000;
+    }
+    .mr10 {
+        margin-right: 10px;
+    }
+    .avatar-uploader ,.el-upload{
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        width:100px;
+        height:100px;
+    }
+    .avatar-uploader:hover,.el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 100px;
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+        float: left;
+    }
+  /* .avatar {
+        width: 100px;
+        height: 120px;
+        display: block;
+    }*/
+</style>

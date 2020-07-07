@@ -15,22 +15,21 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
-                <el-button
+                <!--<el-button
                         type="primary"
                         icon="el-icon-upload"
                         class="handle-del mr10"
                         @click="handleImport"
-                >导入</el-button>
-                <!--<el-upload
+                >导入</el-button>-->
+                <el-upload style="width: 100px;"
                         action=""
                         :limit="1"
                         show-file-list="false"
                         :on-exceed="handleImport"
                         accept=".xls,.xlsx"
                         :file-list="fileList">
-                    <el-button size="small" type="primary" icon="el-icon-upload"
-                               class="handle-del mr10">导入</el-button>
-                </el-upload>-->
+                    <el-button size="small" type="primary">导入</el-button>
+                </el-upload>
                 <el-input v-model="query.name" placeholder="类别名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
