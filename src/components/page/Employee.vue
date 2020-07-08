@@ -13,7 +13,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addVisible=true"
+                        @click="handleAdd"
                 >新增</el-button>
                 <el-input v-model="query.name" placeholder="人员名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
@@ -25,7 +25,15 @@
                     ref="multipleTable"
                     header-cell-class-name="table-header"
             >
-                <el-table-column prop="photo" label="大头照"></el-table-column>
+                <el-table-column prop="photo" label="大头照" align="center">
+                    <template slot-scope="scope">
+                        <el-image
+                                class="table-td-thumb"
+                                :src="baseUrl + '/' + scope.row.photo"
+                                :preview-src-list="[baseUrl + '/' +scope.row.photo]"
+                        ></el-image>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="name" label="姓名"></el-table-column>
                 <el-table-column prop="sex" label="性别"></el-table-column>
                 <el-table-column prop="age" label="年龄"></el-table-column>
@@ -73,15 +81,24 @@
                 </el-form-item>
                 <el-form-item label="大头照">
                     <div>
-                        <el-upload
-                                class="avatar-uploader"
-                                :action="uploadUrl"
-                                :show-file-list="false"
-                                :on-success="handleAvatarSuccess"
-                                :before-upload="beforeAvatarUpload">
-                            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
+                        <div>
+                            <el-upload
+                                    class="avatar-uploader"
+                                    ref="upload_edit"
+                                    :data="updata"
+                                    :action="modifyUrl"
+                                    :headers="headers"
+                                    accept="image/*"
+                                    :file-list="fileList"
+                                    :auto-upload="false"
+                                    :on-change="handlePhotoChange"
+                                    :show-file-list="true"
+                                    :on-success="handleAvatarSuccess"
+                                    :before-upload="beforeAvatarUpload">
+                                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                            </el-upload>
+                        </div>
                     </div>
                 </el-form-item>
                 <el-form-item label="备注">
@@ -117,8 +134,15 @@
                     <div>
                         <el-upload
                                 class="avatar-uploader"
+                                 ref="upload_add"
+                                :data="updata"
                                 :action="uploadUrl"
-                                :show-file-list="false"
+                                :file-list="fileList"
+                                :headers="headers"
+                                accept="image/*"
+                                :auto-upload="false"
+                                :on-change="handlePhotoChange"
+                                :show-file-list="true"
                                 :on-success="handleAvatarSuccess"
                                 :before-upload="beforeAvatarUpload">
                             <img v-if="imageUrl" :src="imageUrl" class="avatar">
@@ -152,7 +176,7 @@
         data() {
             let checkTel=(rule, value, callback) =>{
                 if(value){
-                    var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
+                    let myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
                     if (!myreg.test(value)) {
                         callback(new Error("不是有效的手机号码格式!"));
                     } else {
@@ -165,10 +189,11 @@
             let checkIdNum=(rule,value,callback) => {
                 if(value){
                     let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-                    if(!reg.test(card))
+                    if(!reg.test(value))
                     {
-                        alert("身份证号不合法");
-                        return  false;
+                        callback(new Error("身份证号不合法"));
+                    }else{
+                        callback();
                     }
                 }  else{
                     callback(new Error("请输入身份证号"));
@@ -183,8 +208,13 @@
                 dialogImageUrl:'',
                 dialogVisible:false,
                 uploadUrl:'',
+                modifyUrl:'',
                 roleId:'',
+                headers:{
+                    token : localStorage.getItem("token")
+                },
                 imageUrl:'',
+                baseUrl:'',
                 tableData: [],
                 editVisible: false,
                 addVisible: false,
@@ -196,7 +226,7 @@
                 fileList:[],
                 rules:{
                     name: [
-                        { required: true, message: '请输入用户名', trigger: 'blur' }
+                        { required: true, message: '请输入员工名称', trigger: 'blur' }
                     ],
                     tel:[
                         { required: true, message: '请输入联系电话', trigger: 'blur' },
@@ -204,17 +234,33 @@
                     ],
                     idnum:[
                         { required: true, message: '请输入身份证号', trigger: 'blur' },
-                        {validator:checkTel,trigger:'blur'}
+                        {validator:checkIdNum,trigger:'blur'}
                     ]
                 }
             };
         },
+        computed:{
+            updata:function(){
+                return this.form;
+            }
+        },
         created() {
+            this.baseUrl = this.$baseURL;
+            this.modifyUrl = this.baseUrl + "/employee/updateEmployee";
+            this.uploadUrl = this.$baseURL + "/employee/addEmployee";
+            this.imageUrl = this.baseUrl + "/files/defaultUser.jpg";
+            this.fileList = [{name:'defaultUser',url:this.imageUrl}];
             this.getData();
         },
         methods: {
+            handlePhotoChange(file){
+                this.imageUrl=URL.createObjectURL(file.raw);
+            },
             handleAvatarSuccess(res, file) {
-                this.imageUrl = URL.createObjectURL(file.raw);
+                this.addVisible= false;
+                this.getData();
+                this.$refs.upload_add.clearFiles();
+                this.$refs.upload_edit.clearFiles();
             },
             beforeAvatarUpload(file) {
                 const isJPG = file.type === 'image/jpeg';
@@ -282,22 +328,20 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                if (row.role) {
-                    this.form.roleId = row.role.id;
+                if (row.user) {
+                    this.form.roleId = row.user.role.id;
                 }
+
+                this.imageUrl = this.baseUrl + "/" + row.photo;
+            },
+            handleAdd(){
+              this.addVisible = true;
             },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.$axios.put("/employee/employee?" + this.$qs.stringify(this.form)).then(res => {
-                            if (res.data.result.resultCode == 200) {
-                                this.editVisible = false;
-                                this.getData();
-                            }
-                        }).catch(err => {
-                            console.log(err);
-                        });
+                        this.$refs.upload_edit.submit();
                     } else {
                         return false;
                     }
@@ -308,14 +352,8 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.$axios.post("/employee/employee", this.$qs.stringify(this.form)).then(res => {
-                            if (res.data.result.resultCode == 200) {
-                                this.addVisible = false;
-                                this.getData();
-                            }
-                        }).catch(err => {
-                            console.log(err);
-                        });
+                        //触发组件的action
+                        this.$refs.upload_add.submit();
                     } else {
                         return false;
                     }
@@ -368,9 +406,17 @@
         text-align: center;
         float: left;
     }
-  /* .avatar {
-        width: 100px;
-        height: 120px;
+    .table-td-thumb {
         display: block;
-    }*/
+        margin: auto;
+        width: 40px;
+        height: 40px;
+    }
+    .avatar{
+        width: 100px;
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+        float: left;
+    }
 </style>
