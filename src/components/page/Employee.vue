@@ -89,11 +89,10 @@
                                     :action="modifyUrl"
                                     :headers="headers"
                                     accept="image/*"
-                                    :file-list="fileList"
                                     :auto-upload="false"
                                     :on-change="handlePhotoChange"
-                                    :show-file-list="true"
-                                    :on-success="handleAvatarSuccess"
+                                    :show-file-list="false"
+                                    :on-success="handleUpdateSuccess"
                                     :before-upload="beforeAvatarUpload">
                                 <img v-if="imageUrl" :src="imageUrl" class="avatar">
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -134,15 +133,14 @@
                     <div>
                         <el-upload
                                 class="avatar-uploader"
-                                 ref="upload_add"
+                                ref="upload_add"
                                 :data="updata"
                                 :action="uploadUrl"
-                                :file-list="fileList"
                                 :headers="headers"
                                 accept="image/*"
                                 :auto-upload="false"
                                 :on-change="handlePhotoChange"
-                                :show-file-list="true"
+                                :show-file-list="false"
                                 :on-success="handleAvatarSuccess"
                                 :before-upload="beforeAvatarUpload">
                             <img v-if="imageUrl" :src="imageUrl" class="avatar">
@@ -163,7 +161,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="addVisible = false">取 消</el-button>
+                <el-button @click="resetForm">取 消</el-button>
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
@@ -219,11 +217,11 @@
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
+                isSelectFile:false,
                 form: {},
                 idx: -1,
                 id: -1,
                 roles:[],
-                fileList:[],
                 rules:{
                     name: [
                         { required: true, message: '请输入员工名称', trigger: 'blur' }
@@ -248,22 +246,26 @@
             this.baseUrl = this.$baseURL;
             this.modifyUrl = this.baseUrl + "/employee/updateEmployee";
             this.uploadUrl = this.$baseURL + "/employee/addEmployee";
-            this.imageUrl = this.baseUrl + "/files/defaultUser.jpg";
-            this.fileList = [{name:'defaultUser',url:this.imageUrl}];
             this.getData();
         },
         methods: {
             handlePhotoChange(file){
                 this.imageUrl=URL.createObjectURL(file.raw);
+                this.isSelectFile = true;
             },
             handleAvatarSuccess(res, file) {
+                this.isSelectFile = false;
                 this.addVisible= false;
                 this.getData();
                 this.$refs.upload_add.clearFiles();
-                this.$refs.upload_edit.clearFiles();
+            },
+            handleUpdateSuccess(res, file) {
+                this.editVisible= false;
+                this.getData();
+                this.isSelectFile = false;
             },
             beforeAvatarUpload(file) {
-                const isJPG = file.type === 'image/jpeg';
+                /*const isJPG = file.type === 'image/jpeg';
                 const isLt2M = file.size / 1024 / 1024 < 2;
 
                 if (!isJPG) {
@@ -272,7 +274,8 @@
                 if (!isLt2M) {
                     this.$message.error('上传头像图片大小不能超过 2MB!');
                 }
-                return isJPG && isLt2M;
+                return isJPG && isLt2M;*/
+                return true;
             },
             //加载角色和企业信息
             loadSelectData() {
@@ -327,25 +330,56 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                if(this.form.photo) {
+                    this.imageUrl =this.$baseURL + "/" + this.form.photo;
+                }else{
+                    this.imageUrl = '';
+                }
                 this.editVisible = true;
                 if (row.user) {
-                    this.form.roleId = row.user.role.id;
+                    if(row.user.role){
+                        this.form.roleId = row.user.role.id;
+                    }
                 }
 
-                this.imageUrl = this.baseUrl + "/" + row.photo;
+                this.isSelectFile = false;
             },
             handleAdd(){
-              this.addVisible = true;
+                this.addVisible = true;
+                if (this.$refs.form) {
+                    this.$refs.form.resetFields();
+                }
+                this.form = {};
+                this.imageUrl = '';
+                this.isSelectFile = false;
             },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.$refs.upload_edit.submit();
+                        if(this.isSelectFile) {
+                            this.$refs.upload_edit.submit();
+                        }else{
+                            this.$axios.post("/employee/updateEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
+                                this.editVisible= false;
+                                this.getData();
+                                this.isSelectFile = false;
+                            }).catch(error=>{
+                                console.log(error);
+                            });
+                        }
                     } else {
                         return false;
                     }
                 });
+            },
+            resetForm() {
+                this.addVisible = false;
+                if (this.$refs.form) {
+                    this.$refs.form.resetFields();
+                }
+                this.fileList = [];
+                this.imageUrl = '';
             },
             // 保存新增
             saveAdd() {
@@ -353,7 +387,17 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         //触发组件的action
-                        this.$refs.upload_add.submit();
+                       if(this.isSelectFile){
+                            this.$refs.upload_add.submit();
+                        }else{
+                            this.$axios.post("/employee/addEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
+                                this.addVisible= false;
+                                this.getData();
+                                this.isSelectFile = false;
+                            }).catch(error=>{
+                                console.log(error);
+                            });
+                        }
                     } else {
                         return false;
                     }
