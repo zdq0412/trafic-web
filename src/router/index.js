@@ -28,6 +28,11 @@ export default new Router({
                   meta:{title:'企业人员资料'}
                 },
                 {
+                  path:'/introduction',
+                  component:()=>import('../components/page/Introduction.vue'),
+                  meta:{title:'企业简要介绍'}
+                },
+                {
                     path: '/function',
                     component: () => import( '../components/page/Function.vue'),
                     meta: { title: '权限管理' }

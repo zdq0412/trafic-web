@@ -38,12 +38,12 @@
                         </template>
                     </el-submenu>
                 </template>
-                <template v-else>
+                <!--<template v-else>
                     <el-menu-item :index="item.index" :key="item.index">
                         <i :class="item.icon"></i>
                         <span slot="title">{{ item.title }}</span>
                     </el-menu-item>
-                </template>
+                </template>-->
             </template>
         </el-menu>
     </div>

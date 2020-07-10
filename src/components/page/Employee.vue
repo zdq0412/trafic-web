@@ -265,7 +265,7 @@
                 this.isSelectFile = false;
             },
             beforeAvatarUpload(file) {
-                /*const isJPG = file.type === 'image/jpeg';
+                const isJPG = file.type === 'image/jpeg';
                 const isLt2M = file.size / 1024 / 1024 < 2;
 
                 if (!isJPG) {
@@ -274,8 +274,7 @@
                 if (!isLt2M) {
                     this.$message.error('上传头像图片大小不能超过 2MB!');
                 }
-                return isJPG && isLt2M;*/
-                return true;
+                return isJPG && isLt2M;
             },
             //加载角色和企业信息
             loadSelectData() {
