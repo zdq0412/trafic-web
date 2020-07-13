@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
-        <v-head></v-head>
-        <v-sidebar></v-sidebar>
+        <v-head :pf="getData"></v-head>
+        <v-sidebar ref="sidebar"></v-sidebar>
         <div class="content-box" :class="{'content-collapse':collapse}">
             <v-tags></v-tags>
             <div class="content">
@@ -27,6 +27,11 @@ export default {
             tagsList: [],
             collapse: false
         };
+    },
+    methods:{
+      getData(){
+          this.$refs.sidebar.getData();
+      }
     },
     components: {
         vHead,

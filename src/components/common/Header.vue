@@ -6,9 +6,12 @@
             <i v-else class="el-icon-s-unfold"></i>
         </div>
         <div class="logo">后台管理系统</div>
-        <div class="schema" v-for="schema in schemas" :id="schema.id" >
-            {{schema.name}}
-        </div>
+        <!--<el-radio v-model="radio1" :label="schema.id" border>{{schema.name}}</el-radio>-->
+        <el-radio-group v-model="schemaId" style="height: 100px;"  @change="switchSchema()">
+            <el-radio-button style="height: 100%;line-height: 100px;" v-for="schema in schemas"
+                             border   :id="schema.id" :label="schema.id"
+           >{{schema.name}}</el-radio-button>
+        </el-radio-group>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
@@ -17,19 +20,6 @@
                         <i class="el-icon-rank"></i>
                     </el-tooltip>
                 </div>
-                <!-- 消息中心 -->
-            <!--    <div class="btn-bell">
-                    <el-tooltip
-                        effect="dark"
-                        :content="message?`有${message}条未读消息`:`消息中心`"
-                        placement="bottom"
-                    >
-                        <router-link to="/tabs">
-                            <i class="el-icon-bell"></i>
-                        </router-link>
-                    </el-tooltip>
-                    <span class="btn-bell-badge" v-if="message"></span>
-                </div>-->
                 <!-- 用户头像 -->
                 <div class="user-avator">
                     <img src="../../assets/img/img.jpg" />
@@ -41,9 +31,6 @@
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                       <!-- <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-                            <el-dropdown-item>项目仓库</el-dropdown-item>
-                        </a>-->
                         <el-dropdown-item command="modifyPassword">修改密码</el-dropdown-item>
                         <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
@@ -54,187 +41,205 @@
     </div>
 </template>
 <script>
-import bus from '../common/bus';
-import ModifyPassword from '../page/ModifyPassword';
-export default {
-    components:{
-        ModifyPassword
-    },
-    data() {
-        return {
-            collapse: false,
-            fullscreen: false,
-            name: '',
-            message:0,
-            schemas:[]
-        };
-    },
-    computed: {
-        username() {
-            let username = localStorage.getItem('username');
-            return username ? username : this.name;
-        }
-    },
-    created:function(){
+    import bus from '../common/bus';
+    import ModifyPassword from '../page/ModifyPassword';
+    export default {
+        props:['pf'],
+        components:{
+            ModifyPassword
+        },
+        data() {
+            return {
+                collapse: false,
+                fullscreen: false,
+                name: '',
+                message:0,
+                schemas:[],
+               schemaId:''
+            };
+        },
+        computed: {
+            username() {
+                let username = localStorage.getItem('username');
+                return username ? username : this.name;
+            }
+        },
+        created:function(){
 
-    },
-    methods: {
-        // 用户名下拉菜单选择事件
-        handleCommand(command) {
-            if (command == 'logout') {
-                this.$confirm('确认退出?', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
+        },
+        methods: {
+            switchSchema(){
+                this.$axios.get("/schema/switchSchema",{
+                    params:{
+                        schemaId:this.schemaId
+                    }
+                }).then(res=>{
+                    //window.location.reload();
+                    //调用菜单中的方法
+                    this.pf();
+                }).catch(error=>{
+                    console.log(error)
+                });
+            },
+            getData(){
+                this.$axios.get("/schema/schemas").then(response => {
+                    this.schemas = response.data.data;
+                    if(this.schemas.length>0){
+                        for(let i = 0;i<this.schemas.length;i++){
+                            let schema = this.schemas[i];
+                            if(schema.selected==true){
+                                this.schemaId = schema.id;
+                            }
+                        }
+                    }
+                });
+            },
+            // 用户名下拉菜单选择事件
+            handleCommand(command) {
+                if (command == 'logout') {
+                    this.$confirm('确认退出?', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
                         this.$axios.post("/logout").then(response => {
                             localStorage.removeItem('username');
                             localStorage.removeItem('token');
                             this.$router.push('/login');
                         });
-                }).catch(error => {
+                    }).catch(error => {
 
-                });
-            }
-            //弹出修改密码窗口
-            if(command == 'modifyPassword'){
-                this.$refs.showDialog.dialogFormVisible=true;
+                    });
+                }
+                //弹出修改密码窗口
+                if(command == 'modifyPassword'){
+                    this.$refs.showDialog.dialogFormVisible=true;
+                }
+            },
+            // 侧边栏折叠
+            collapseChage() {
+                this.collapse = !this.collapse;
+                bus.$emit('collapse', this.collapse);
+            },
+            // 全屏事件
+            handleFullScreen() {
+                let element = document.documentElement;
+                if (this.fullscreen) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitCancelFullScreen) {
+                        document.webkitCancelFullScreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                } else {
+                    if (element.requestFullscreen) {
+                        element.requestFullscreen();
+                    } else if (element.webkitRequestFullScreen) {
+                        element.webkitRequestFullScreen();
+                    } else if (element.mozRequestFullScreen) {
+                        element.mozRequestFullScreen();
+                    } else if (element.msRequestFullscreen) {
+                        // IE11
+                        element.msRequestFullscreen();
+                    }
+                }
+                this.fullscreen = !this.fullscreen;
             }
         },
-        // 侧边栏折叠
-        collapseChage() {
-            this.collapse = !this.collapse;
-            bus.$emit('collapse', this.collapse);
-        },
-        // 全屏事件
-        handleFullScreen() {
-            let element = document.documentElement;
-            if (this.fullscreen) {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitCancelFullScreen) {
-                    document.webkitCancelFullScreen();
-                } else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
-            } else {
-                if (element.requestFullscreen) {
-                    element.requestFullscreen();
-                } else if (element.webkitRequestFullScreen) {
-                    element.webkitRequestFullScreen();
-                } else if (element.mozRequestFullScreen) {
-                    element.mozRequestFullScreen();
-                } else if (element.msRequestFullscreen) {
-                    // IE11
-                    element.msRequestFullscreen();
-                }
+        mounted() {
+            this.getData();
+            this.name = localStorage.getItem("username");
+            if (document.body.clientWidth < 1500) {
+                this.collapseChage();
             }
-            this.fullscreen = !this.fullscreen;
         }
-    },
-    mounted() {
-        this.$axios.get("/schema/schemas").then(response => {
-            /*
-            if(response.data.result.resultCode==600){
-                localStorage.removeItem("username");
-                localStorage.removeItem("token");
-                this.$router.push("/login");
-            }*/
-            this.schemas = response.data.data;
-        });
-
-        this.name = localStorage.getItem("username");
-        if (document.body.clientWidth < 1500) {
-            this.collapseChage();
-        }
-    }
-};
+    };
 </script>
 <style scoped>
-.header {
-    position: relative;
-    box-sizing: border-box;
-    width: 100%;
-    height: 70px;
-    font-size: 22px;
-    color: #fff;
-}
-.collapse-btn {
-    float: left;
-    padding: 0 21px;
-    cursor: pointer;
-    line-height: 70px;
-}
-.header .logo {
-    float: left;
-    width: 250px;
-    line-height: 70px;
-}
+    .header {
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        height: 70px;
+        font-size: 22px;
+        color: #fff;
+    }
+    .collapse-btn {
+        float: left;
+        padding: 0 21px;
+        cursor: pointer;
+        line-height: 70px;
+    }
+    .header .logo {
+        float: left;
+        width: 250px;
+        line-height: 70px;
+    }
 
-.schema{
-    float: left;
-    width: 100px;
-    line-height: 70px;
-    cursor: pointer;
-}
+    /*.schema{
+        float: left;
+        width: 100%;
+        line-height: 70px;
+        cursor: pointer;
 
+    }*/
 
-
-.header-right {
-    float: right;
-    padding-right: 50px;
-}
-.header-user-con {
-    display: flex;
-    height: 70px;
-    align-items: center;
-}
-.btn-fullscreen {
-    transform: rotate(45deg);
-    margin-right: 5px;
-    font-size: 24px;
-}
-.btn-bell,
-.btn-fullscreen {
-    position: relative;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    border-radius: 15px;
-    cursor: pointer;
-}
-.btn-bell-badge {
-    position: absolute;
-    right: 0;
-    top: -2px;
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
-    background: #f56c6c;
-    color: #fff;
-}
-.btn-bell .el-icon-bell {
-    color: #fff;
-}
-.user-name {
-    margin-left: 10px;
-}
-.user-avator {
-    margin-left: 20px;
-}
-.user-avator img {
-    display: block;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-.el-dropdown-link {
-    color: #fff;
-    cursor: pointer;
-}
-.el-dropdown-menu__item {
-    text-align: center;
-}
+    .header-right {
+        float: right;
+        padding-right: 50px;
+    }
+    .header-user-con {
+        display: flex;
+        height: 70px;
+        align-items: center;
+    }
+    .btn-fullscreen {
+        transform: rotate(45deg);
+        margin-right: 5px;
+        font-size: 24px;
+    }
+    .btn-bell,
+    .btn-fullscreen {
+        position: relative;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        border-radius: 15px;
+        cursor: pointer;
+    }
+    .btn-bell-badge {
+        position: absolute;
+        right: 0;
+        top: -2px;
+        width: 8px;
+        height: 8px;
+        border-radius: 4px;
+        background: #f56c6c;
+        color: #fff;
+    }
+    .btn-bell .el-icon-bell {
+        color: #fff;
+    }
+    .user-name {
+        margin-left: 10px;
+    }
+    .user-avator {
+        margin-left: 20px;
+    }
+    .user-avator img {
+        display: block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+    .el-dropdown-link {
+        color: #fff;
+        cursor: pointer;
+    }
+    .el-dropdown-menu__item {
+        text-align: center;
+    }
 </style>

@@ -32,8 +32,29 @@
                 <el-table-column prop="tel" label="手机号"></el-table-column>
                 <el-table-column prop="allowedDelete" label="允许删除" :formatter="formatBoolean"></el-table-column>
                 <el-table-column prop="org.name" label="所在企业"></el-table-column>
+                <el-table-column prop="status" label="状态" :formatter="formatStatus" >
+                    <!--<template slot-scope="scope">
+                        <el-switch
+                                v-model="status"
+                                active-text="正常"
+                                inactive-text="禁用">
+                        </el-switch>
+                    </template>-->
+                </el-table-column>
                 <el-table-column label="操作" width="230" align="center">
                     <template slot-scope="scope">
+                        <el-button v-if="scope.row.status=='0' && scope.row.allowedDelete==true"
+                                   type="text"
+                                   icon="el-icon-reset"
+                                   class="gray"
+                                   @click="disabledUser(scope.$index, scope.row)"
+                        >禁用</el-button>
+                        <el-button v-if="scope.row.status=='1' && scope.row.allowedDelete==true"
+                                   type="text"
+                                   icon="el-icon-reset"
+                                   class="green"
+                                   @click="enabledUser(scope.$index, scope.row)"
+                        >启用</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-reset"
@@ -162,6 +183,7 @@
                 form: {},
                 idx: -1,
                 id: -1,
+                status:false,
                 orgs:[],
                 roles:[],
                 rules:{
@@ -175,11 +197,46 @@
             this.getData();
         },
         methods: {
+            disabledUser(index,row){
+                  this.$axios.get("/user/enableOrDisableUser",{
+                      params:{
+                          id:row.id,
+                          status:"0"
+                      }
+                  }).then(res=>{
+                      this.getData();
+                      this.$message.success("已禁用!");
+                  }).catch(error=>{
+                      console.log(error);
+                  })
+            },
+            enabledUser(index,row){
+                  this.$axios.get("/user/enableOrDisableUser",{
+                      params:{
+                          id:row.id,
+                          status:"1"
+                      }
+                  }).then(res=>{
+                      this.getData();
+                      this.$message.success("已启用!");
+                  }).catch(error=>{
+                      console.log(error);
+                  })
+            },
             formatBoolean(row,column,cellValue){
                 if(cellValue){
                     return '是';
                 }else{
                     return '否';
+                }
+            },
+            formatStatus(row,column,cellValue){
+                if(cellValue=='0'){
+                    return '正常';
+                }
+                if(cellValue=='1'){
+                    // return "<template style='color:red;'>禁用</template>";
+                    return "禁用";
                 }
             },
             //加载角色和企业信息
@@ -340,5 +397,11 @@
     }
     .lightYellow {
         color: #FF9900;
+    }
+    .green{
+        color:green;
+    }
+    .gray{
+        color:#909399;
     }
 </style>

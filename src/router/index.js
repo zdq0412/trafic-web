@@ -33,6 +33,11 @@ export default new Router({
                   meta:{title:'企业简要介绍'}
                 },
                 {
+                  path:'/structure',
+                  component:()=>import('../components/page/Structure.vue'),
+                  meta:{title:'管理组织架构'}
+                },
+                {
                     path: '/function',
                     component: () => import( '../components/page/Function.vue'),
                     meta: { title: '权限管理' }

@@ -15,20 +15,29 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
-                <!--<el-button
+                <el-button
                         type="primary"
                         icon="el-icon-upload"
                         class="handle-del mr10"
                         @click="handleImport"
-                >导入</el-button>-->
-                <el-upload style="width: 100px;"
-                        action=""
-                        :limit="1"
-                        show-file-list="false"
-                        :on-exceed="handleImport"
-                        accept=".xls,.xlsx"
-                        :file-list="fileList">
-                    <el-button size="small" type="primary">导入</el-button>
+                        v-loading.fullscreen.lock="fullscreenLoading"
+                >导入</el-button>
+                <el-button
+                        type="warning"
+                        icon="el-icon-download"
+                        class="handle-del mr10"
+                        @click="handleDownload"
+                >下载导入模板</el-button>
+                <el-upload style="display: none;"
+                           :action="importCategoryUrl"
+                           :limit="1"
+                           :auto-upload="true"
+                           accept=".xls,.xlsx"
+                           :on-success="handleAvatarSuccess"
+                           :before-upload="beforeAvatarUpload"
+                           :headers="headers"
+                >
+                    <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
                 </el-upload>
                 <el-input v-model="query.name" placeholder="类别名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
@@ -138,7 +147,12 @@
                 fileList:[],
                 value :'',
                 row:{},
+                fullscreenLoading:false,
+                headers:{
+                    token : localStorage.getItem("token")
+                },
                 tableData: [],
+                importCategoryUrl:'',
                 delList: [],
                 editVisible: false,
                 addVisible: false,
@@ -154,15 +168,45 @@
             };
         },
         created() {
+            this.importCategoryUrl = this.$baseURL + "/category/importCategory";
             this.getData();
         },
         methods: {
+            handleDownload(){
+              window.location.href=this.$baseURL + "/category.xlsx"
+            },
+            handleAvatarSuccess(res, file) {
+                if(res.result.resultCode==200){
+                    this.fullscreenLoading = false;
+                    this.getData();
+                }else{
+                    this.$message.error(res.result.message);
+                }
+            },
+            beforeAvatarUpload(file) {
+                const isLt2M = file.size / 1024 / 1024 < 2;
+                const isExcel1 = file.type === 'application/vnd.ms-excel';
+                const isExcel2 = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+                file.type
+
+                if (!isExcel1 && !isExcel2) {
+                    this.$message.error("只能上传Excel文件!");
+                    return false;
+                }
+                if (!isLt2M) {
+                    this.$message.error('文件大小不能超过 2MB!');
+                    return false
+                }
+                this.fullscreenLoading = true;
+                return true;
+            },
             //导入
             handleImport(){
-
+                this.$refs.fileUploadBtn.$el.click();
             },
             resetForm(){
-              this.form={};
+                this.form={};
             },
             closeDialog(){
                 this.$refs["form"].clearValidate();

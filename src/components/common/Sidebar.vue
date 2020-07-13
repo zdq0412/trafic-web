@@ -58,11 +58,16 @@
                 items: []
             };
         },
+        methods:{
+          getData(){
+              //查找数据库菜单信息
+              this.$axios.get("/functions/menus").then(res =>{
+                  this.items = res.data;
+              });
+          }
+        },
         mounted(){
-            //查找数据库菜单信息
-            this.$axios.get("/functions/menus").then(res =>{
-               this.items = res.data;
-            });
+          this.getData();
         },
         computed: {
             onRoutes() {
