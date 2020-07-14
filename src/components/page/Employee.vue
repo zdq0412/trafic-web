@@ -39,8 +39,10 @@
                 <el-table-column prop="age" label="年龄"></el-table-column>
                 <el-table-column prop="tel" label="联系电话"></el-table-column>
                 <el-table-column prop="idnum" label="身份证"></el-table-column>
+                <el-table-column prop="department.name" label="所在部门"></el-table-column>
+                <el-table-column prop="position.name" label="职务"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
-                <el-table-column label="操作" width="230" align="center">
+                <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
@@ -100,6 +102,23 @@
                         </div>
                     </div>
                 </el-form-item>
+                <el-form-item label="所在部门">
+                    <el-cascader  v-model="departmentIds"
+                                  :options="depts"
+                                  :props="{label:'name',value:'id',checkStrictly: true}"
+                                  clearable
+                    ></el-cascader>
+                </el-form-item>
+                <el-form-item label="职务">
+                    <el-select v-model="form.positionId" placeholder="请选择">
+                        <el-option
+                                v-for="item in positions"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="form.note"></el-input>
                 </el-form-item>
@@ -147,6 +166,26 @@
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </div>
+                </el-form-item>
+
+                <el-form-item label="所在部门">
+                    <el-cascader  v-model="departmentIds"
+                                  :options="depts"
+                                  :props="{label:'name',value:'id',checkStrictly: true}"
+                                  clearable
+                                  @change="changeDepartment"
+                    ></el-cascader>
+                </el-form-item>
+                <el-form-item label="职务">
+                    <el-select v-model="form.positionId" placeholder="请选择">
+                        <el-option
+                                ref="addPosition"
+                                v-for="item in positions"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="form.note"></el-input>
@@ -218,6 +257,9 @@
                 addVisible: false,
                 pageTotal: 0,
                 isSelectFile:false,
+                positions:[],
+                depts:[],
+                departmentIds:[],
                 form: {},
                 idx: -1,
                 id: -1,
@@ -249,6 +291,10 @@
             this.getData();
         },
         methods: {
+            changeDepartment(value){
+               this.$set(this.form,'positionId','');
+              this.getPositionByDepartmentId(value[value.length-1]);
+            },
             handlePhotoChange(file){
                 this.imageUrl=URL.createObjectURL(file.raw);
                 this.isSelectFile = true;
@@ -279,13 +325,34 @@
                 }
                 return isJPG && isLt2M;
             },
-            //加载角色和企业信息
+            getPositionByDepartmentId(departmentId){
+                this.$axios.get("/position/positions",{
+                    params:{
+                        departmentId:departmentId
+                    }
+                }).then(res => {
+                    this.positions = res.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+
+            },
+            //加载角色
             loadSelectData() {
                 this.$axios.get("/role/roles").then(res => {
                     this.roles = res.data.data;
                 }).catch(error => {
                     console.log(error);
                 });
+                this.$axios.get("/department/departments").then(res => {
+                    this.depts = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+
+                if(this.departmentIds){
+                    this.getPositionByDepartmentId(this.departmentIds[this.departmentIds.length-1]);
+                }
             },
             getData() {
                 this.$axios.get("/employee/employeesByPage", {

@@ -21,6 +21,7 @@
                 </div>
                 <el-table
                         :data="departments"
+                        height="400"
                         style="width: 100%;height:80%;"
                         row-key="id"
                         border
@@ -77,10 +78,11 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="父部门">
-                                <el-cascader  v-model="form.area"
+                                <el-cascader  v-model="pids"
                                               :options="depts"
-                                              :props="{label:'name',value:'name'}"
-                                              @change="handleChange"></el-cascader>
+                                              :props="{label:'name',value:'id',checkStrictly: true}"
+                                              clearable
+                                              ></el-cascader>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -118,10 +120,11 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="父部门">
-                                <el-cascader  v-model="form.area" style="width:100%;"
+                                <el-cascader  v-model="pids" style="width:100%;"
                                               :options="depts"
-                                              :props="{label:'name',value:'name'}"
-                                              @change="handleChange"></el-cascader>
+                                              :props="{label:'name',value:'id',checkStrictly: true}"
+                                              clearable
+                                              ></el-cascader>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -156,8 +159,8 @@
                             class="handle-del mr10"
                             @click="handlePositionAdd"
                     >新增</el-button>
-                   <!-- <el-input v-model="query.name" placeholder="名称" class="handle-input mr10"></el-input>
-                    <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
+                    <!-- <el-input v-model="query.name" placeholder="名称" class="handle-input mr10"></el-input>
+                     <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
                 </div>
                 <el-table
                         :data="positions"
@@ -209,10 +212,11 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="部门">
-                                <el-cascader  v-model="form.area"
+                                <el-cascader  v-model="deptIds"
                                               :options="depts"
-                                              :props="{label:'name',value:'name'}"
-                                              @change="handleChange"></el-cascader>
+                                              :props="{label:'name',value:'id',checkStrictly: true}"
+                                              clearable
+                                              ></el-cascader>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -240,17 +244,18 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                    <el-row type="flex" class="row-bg" >
+                    <!--<el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="部门">
-                                <el-cascader  v-model="form.area"
+                                <el-cascader  v-model="deptIds"
                                               style="width:100%"
                                               :options="depts"
-                                              :props="{label:'name',value:'name'}"
+                                              :props="{label:'name',value:'id',checkStrictly: true}"
+                                              clearable
                                               @change="handleChange"></el-cascader>
                             </el-form-item>
                         </el-col>
-                    </el-row>
+                    </el-row>-->
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="职位描述">
@@ -293,6 +298,8 @@
                     pageIndex: 1,
                     pageSize:10
                 },
+                pids:[],
+                deptIds:[],
                 departments: [],
                 positions:[],
                 depts:[],//级联部门
@@ -327,51 +334,53 @@
             },
             handlePositionAdd(){
                 this.form = {};
-                this.addPositionVisible = true;
+                if(!this.row){
+                    this.$message.error("请选择部门!");
+                }else{
+                    this.addPositionVisible = true;
+                }
             },
-            // 点击行
-            handleCurrentChange(currentRow) {
-                this.row = currentRow;
-                this.form.parentId=currentRow.id;
-                this.form.parentName=currentRow.name;
-            },
-            loadSelectData(){
-                this.$axios.get("/orgCategory/orgCategorys").then(res => {
-                    this.orgCategories = res.data.data;
-                }).catch(error => {
-                    console.log(error);
-                });
-                this.$axios.get("/category/categorys",{
+            getPositionByDepartmentId(departmentId){
+                this.$axios.get("/position/positionsByPage",{
                     params:{
-                        type:'区域'
+                        departmentId:departmentId,
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
                     }
                 }).then(res => {
-                    this.depts = res.data.data;
+                    this.positions = res.data.data;
+                    this.positionPageTotal = res.data.count;
                 }).catch(error => {
                     console.log(error);
                 });
 
             },
-            handleChange(){
-                if(this.form.area&&this.form.area.length>0){
-                    this.form.province=this.form.area[0];
-                    this.form.city=this.form.area[1];
-                    this.form.region=this.form.area[2];
-                }
+            // 点击行
+            handleCurrentChange(currentRow) {
+                this.row = currentRow;
+                this.getPositionByDepartmentId(this.row.id);
+            },
+            loadSelectData(){
+                this.$axios.get("/department/departments").then(res => {
+                    this.depts = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             closeDialog(){
                 this.$refs["form"].clearValidate();
+                this.form = {};
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/org/orgsByPage",{
+                this.$axios.get("/department/departmentsByPage",{
                     params:{
                         name:this.query.name,
                         page:this.query.pageIndex,
                         limit:this.query.pageSize
                     }
                 }).then(res => {
-                    this.tableData = res.data.data;
+                    this.departments = res.data.data;
                     this.pageTotal = res.data.count;
                 }).catch(error => {
                     console.log(error);
@@ -390,7 +399,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/org/org/" + this.form.id).then(res => {
+                        this.$axios.delete("/department/department/" + this.form.id).then(res => {
                             this.$message.success('删除成功');
                             this.getData();
                         }) .catch(error =>{
@@ -401,32 +410,62 @@
             },
             // 删除操作
             handlePositionDelete(index, row) {
+                this.form=row;
+                // 二次确认删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.$axios.delete("/position/position/" + this.form.id).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.$message.success('删除成功');
+                                this.getPositionByDepartmentId(this.row.id);
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
+                    })
+                    .catch(() => {});
             },
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                if(row.orgCategory){
-                    this.form.orgCategoryId = row.orgCategory.id;
-                }
-                this.form.area=[row.province,row.city,row.region];
+                this.$axios.get("/department/findParent",{
+                    params:{
+                        id:row.id
+                    }
+                }).then(res=>{
+                    this.pids=res.data;
+                }).catch(error=>console.log(error));
             },
             // 编辑操作
             handlePositionEdit(index, row) {
                 this.idx = index;
                 this.form = row;
-                this.editVisible = true;
-                if(row.orgCategory){
-                    this.form.orgCategoryId = row.orgCategory.id;
+                this.editPositionVisible = true;
+                if(row.department){
+                    this.$axios.get("/department/findParent",{
+                        params:{
+                            id:row.department.id
+                        }
+                    }).then(res=>{
+                        this.deptIds=res.data;
+                    }).catch(error=>console.log(error));
                 }
-                this.form.area=[row.province,row.city,row.region];
+
             },
             // 保存编辑
             saveEdit() {
+                if(this.pids && this.pids.length>0){
+                    this.form.pid = this.pids[this.pids.length-1];
+                }
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.$axios.put("/org/org?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/department/department?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -442,17 +481,55 @@
                 });
             },
             savePositionEdit(){
-
+                if(this.deptIds && this.deptIds.length>0){
+                    this.form.departmentId = this.deptIds[this.deptIds.length-1];
+                }
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.$axios.put("/position/position?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editPositionVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error(res.data.result.message);
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
             },
             savePositionAdd(){
-
+                this.form.departmentId = this.row.id;
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/position/position",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addPositionVisible = false;
+                               this.getPositionByDepartmentId(this.row.id);
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
             },
             // 保存新增
             saveAdd(){
+                if(this.pids && this.pids.length>0){
+                    this.form.pid = this.pids[this.pids.length-1];
+                    this.form.parentLevel = this.pids.join(",");
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.$axios.post("/org/org",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/department/department",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
