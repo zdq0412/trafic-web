@@ -21,7 +21,7 @@
                 </div>
                 <el-table
                         :data="departments"
-                        height="400"
+                        height="320"
                         style="width: 100%;height:80%;"
                         row-key="id"
                         border
