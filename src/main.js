@@ -14,12 +14,12 @@ import 'babel-polyfill';
 
 Vue.prototype.$qs = qs;
 
-Vue.prototype.$baseURL='http://localhost:8088';
-//Vue.prototype.$baseURL='http://192.168.0.125:8088';
+//Vue.prototype.$baseURL='http://localhost:8088';
+Vue.prototype.$baseURL='http://192.168.0.125:8088';
 
 Vue.prototype.$axios = axios.create({
-   baseURL:"http://localhost:8088",
-    //baseURL:"http://192.168.0.125:8088",
+   //baseURL:"http://localhost:8088",
+    baseURL:"http://192.168.0.125:8088",
     transformRequest:[function(data,header){
        header.token = localStorage.getItem("token");
         return data;
