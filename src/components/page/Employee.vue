@@ -107,6 +107,7 @@
                                   :options="depts"
                                   :props="{label:'name',value:'id',checkStrictly: true}"
                                   clearable
+                                  @change="changeDepartment"
                     ></el-cascader>
                 </el-form-item>
                 <el-form-item label="职务">
@@ -292,7 +293,7 @@
         },
         methods: {
             changeDepartment(value){
-               this.$set(this.form,'positionId','');
+                this.$set(this.form,'positionId','');
               this.getPositionByDepartmentId(value[value.length-1]);
             },
             handlePhotoChange(file){
@@ -337,7 +338,7 @@
                 });
 
             },
-            //加载角色
+            //加载下拉选择数据
             loadSelectData() {
                 this.$axios.get("/role/roles").then(res => {
                     this.roles = res.data.data;
@@ -349,10 +350,6 @@
                 }).catch(error => {
                     console.log(error);
                 });
-
-                if(this.departmentIds){
-                    this.getPositionByDepartmentId(this.departmentIds[this.departmentIds.length-1]);
-                }
             },
             getData() {
                 this.$axios.get("/employee/employeesByPage", {
@@ -410,8 +407,30 @@
                         this.form.roleId = row.user.role.id;
                     }
                 }
-
                 this.isSelectFile = false;
+
+                if(row.department){
+                    this.$axios.get("/department/findParent",{
+                        params:{
+                            id:row.department.id
+                        }
+                    }).then(res=>{
+                        this.departmentIds=res.data;
+                        if(row.position){
+                            this.$axios.get("/position/positions",{
+                                params:{
+                                    departmentId:row.department.id
+                                }
+                            }).then(res => {
+                                this.positions = res.data;
+                                this.form.positionId=row.position.id;
+                            }).catch(error => {
+                                console.log(error);
+                            });
+                        }
+                    }).catch(error=>console.log(error));
+                }
+
             },
             handleAdd(){
                 this.addVisible = true;
@@ -424,6 +443,9 @@
             },
             // 保存编辑
             saveEdit() {
+                if(this.departmentIds && this.departmentIds.length>0){
+                    this.form.departmentId=this.departmentIds[this.departmentIds.length-1];
+                }
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         if(this.isSelectFile) {
@@ -452,6 +474,9 @@
             },
             // 保存新增
             saveAdd() {
+                if(this.departmentIds && this.departmentIds.length>0){
+                    this.form.departmentId=this.departmentIds[this.departmentIds.length-1];
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {

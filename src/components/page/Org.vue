@@ -283,7 +283,6 @@
                 }).catch(error => {
                     console.log(error);
                 });
-
             },
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
