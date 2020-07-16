@@ -28,6 +28,11 @@ export default new Router({
                   meta:{title:'企业人员资料'}
                 },
                 {
+                  path:'/riskControl',
+                  component:()=>import('../components/page/RiskControl.vue'),
+                  meta:{title:'风险辨识管控'}
+                },
+                {
                   path:'/introduction',
                   component:()=>import('../components/page/Introduction.vue'),
                   meta:{title:'企业简要介绍'}
