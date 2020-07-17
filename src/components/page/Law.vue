@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 模式管理
+                    <i class="el-icon-lx-cascades"></i> 法律法规政策
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -22,6 +22,15 @@
                     class="table"
                     header-cell-class-name="table-header"
             >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(query.pageIndex - 1) * query.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="name" label="名称"></el-table-column>
                 <el-table-column prop="priority" label="优先级"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>

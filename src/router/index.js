@@ -28,6 +28,11 @@ export default new Router({
                   meta:{title:'企业人员资料'}
                 },
                 {
+                  path:'/law',
+                  component:()=>import('../components/page/Law.vue'),
+                  meta:{title:'法律法规政策'}
+                },
+                {
                   path:'/riskControl',
                   component:()=>import('../components/page/RiskControl.vue'),
                   meta:{title:'风险辨识管控'}

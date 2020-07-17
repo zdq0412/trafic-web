@@ -162,6 +162,7 @@
                     <el-date-picker
                             v-model="orgDoc.beginDate"
                             type="date"
+                            value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
@@ -169,12 +170,13 @@
                     <el-date-picker
                             v-model="orgDoc.endDate"
                             type="date"
+                            value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="resetForm">取 消</el-button>
+                <el-button @click="addOrgDocVisible=false">取 消</el-button>
                 <el-button type="primary" @click="saveAddOrgDoc">确 定</el-button>
             </span>
         </el-dialog>
@@ -210,6 +212,7 @@
                     <el-date-picker
                             v-model="orgDoc.beginDate"
                             type="date"
+                            value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
@@ -217,12 +220,13 @@
                     <el-date-picker
                             v-model="orgDoc.endDate"
                             type="date"
+                            value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="resetForm">取 消</el-button>
+                <el-button @click="editOrgDocVisible=false">取 消</el-button>
                 <el-button type="primary" @click="saveEditOrgDoc">确 定</el-button>
             </span>
         </el-dialog>
@@ -428,7 +432,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/orgDoc/orgDoc/" + this.orgDoc.id).then(res => {
+                        this.$axios.delete("/orgDoc/orgDoc/" + row.id).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -473,6 +477,7 @@
                 });
             },
             handleAddOrgDoc(){
+                this.imageUrl = false;
                 this.addOrgDocVisible=true;
                 this.orgDoc={};
                 this.isSelectFile = false;
@@ -487,9 +492,6 @@
             },
             resetForm() {
                 this.uploadVisible = false;
-                if (this.$refs.form) {
-                    this.$refs.form.resetFields();
-                }
                 this.imageUrl = '';
             },
             saveAdd(){
@@ -606,6 +608,12 @@
               this.uploadOrgDocUrl = this.$baseURL + "/orgDoc/updateOrgDoc";
               this.editOrgDocVisible=true;
               this.orgDoc = row;
+              if(row.beginDate){
+                  this.orgDoc.beginDate=getDate(new Date(row.beginDate));
+              }
+              if(row.endDate){
+                  this.orgDoc.endDate=getDate(new Date(row.endDate));
+              }
               this.imageUrl = this.$baseURL + "/" + row.url;
             },
             getData(){

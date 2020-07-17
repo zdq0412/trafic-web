@@ -236,7 +236,15 @@
             <!-- 新增弹出框 -->
             <el-dialog title="新增" :visible.sync="addPositionVisible" width="30%"
                        @open="loadSelectData" @close="closeDialog">
+              <!--  <span style="color:red;">{{deptName}}</span>-->
                 <el-form ref="form" :rules="rules" :model="form" label-width="80px">
+                    <el-row type="flex" class="row-bg">
+                        <el-col>
+                            <el-form-item label="所在部门" >
+                                <el-input v-model="deptName" :disabled="true"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
@@ -310,6 +318,7 @@
                 pageTotal: 0,
                 positionPageTotal: 0,
                 form: {},
+                deptName:'',
                 idx: -1,
                 id: -1,
                 rules:{
@@ -334,6 +343,7 @@
             },
             handlePositionAdd(){
                 this.form = {};
+                this.deptName = this.row.name;
                 if(!this.row){
                     this.$message.error("请选择部门!");
                 }else{

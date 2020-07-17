@@ -30,8 +30,9 @@
                         <el-image
                                 class="table-td-thumb"
                                 :src="baseUrl + '/' + scope.row.photo"
-                                :preview-src-list="[baseUrl + '/' +scope.row.photo]"
+                                @click="showPreview(baseUrl + '/' + scope.row.photo)"
                         ></el-image>
+                        <!-- :preview-src-list="[baseUrl + '/' +scope.row.photo]"-->
                     </template>
                 </el-table-column>
                 <el-table-column prop="name" label="姓名"></el-table-column>
@@ -69,6 +70,9 @@
                 ></el-pagination>
             </div>
         </div>
+        <el-dialog :visible.sync="dialogVisible">
+            <img style="width: 100%;" :src="imgUrl" alt="">
+        </el-dialog>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
@@ -265,6 +269,7 @@
                 idx: -1,
                 id: -1,
                 roles:[],
+                imgUrl:'',
                 rules:{
                     name: [
                         { required: true, message: '请输入员工名称', trigger: 'blur' }
@@ -292,6 +297,10 @@
             this.getData();
         },
         methods: {
+            showPreview(imgUrl){
+                this.imgUrl = imgUrl;
+                this.dialogVisible = true;
+            },
             changeDepartment(value){
                 this.$set(this.form,'positionId','');
               this.getPositionByDepartmentId(value[value.length-1]);

@@ -13,8 +13,9 @@
                         <span>安全风险等级判定准则（R）及控制措施</span>
                     </div>
                     <el-table
-                            :data="tableData"
+                            :data="riskSourcesData"
                             border
+                            stripe
                             style="width: 100%"
                             :cell-style="cellStyle">
                         <el-table-column
@@ -87,30 +88,130 @@
             <el-col :span="24">
                 <el-card shadow="hover" style="height:403px;">
                     <div slot="header" class="clearfix">
-                        <span>待办事项</span>
-                        <el-button style="float: right; padding: 3px 0" type="text">添加</el-button>
+                        <span>危险源清单</span>
+                        <el-button style="float: right; padding: 3px 0" type="text" @click="handleAdd">添加</el-button>
                     </div>
-                    <el-table :show-header="false" :data="todoList" style="width:100%;">
-                        <el-table-column width="40">
-                            <template slot-scope="scope">
-                                <el-checkbox v-model="scope.row.status"></el-checkbox>
+                    <el-table
+                            :data="tableData"
+                            border
+                            stripe
+                            class="table"
+                            :cell-style="fourColorBg"
+                            header-cell-class-name="table-header"
+                    >
+                        <el-table-column
+                                label="序号"
+                                type="index"
+                                width="50"
+                                align="center">
+                            <template scope="scope">
+                                <span>{{(query.pageIndex - 1) * query.pageSize + scope.$index + 1}}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column>
+                        <el-table-column prop="name" label="危险源名称"></el-table-column>
+                        <el-table-column prop="happen" label="发生可能性(L)"></el-table-column>
+                        <el-table-column prop="consequence" label="后果严重性(S)"></el-table-column>
+                        <el-table-column prop="criterion" label="判定准则(R)"></el-table-column>
+                        <el-table-column prop="riskLevel" label="安全风险等级"></el-table-column>
+                        <el-table-column prop="fourColor" label="四色标识">
                             <template slot-scope="scope">
-                                <div
-                                        class="todo-item"
-                                        :class="{'todo-item-del': scope.row.status}"
-                                >{{scope.row.title}}</div>
+                                <span></span>
                             </template>
                         </el-table-column>
-                        <el-table-column width="60">
-                            <template>
-                                <i class="el-icon-edit"></i>
-                                <i class="el-icon-delete"></i>
+                        <el-table-column prop="measures" label="应采取的行动/控制措施"></el-table-column>
+                        <el-table-column prop="timeLimit" label="实施期限"></el-table-column>
+                        <el-table-column label="操作" width="180" align="center">
+                            <template slot-scope="scope">
+                                <el-button
+                                        type="text"
+                                        icon="el-icon-edit"
+                                        @click="handleEdit(scope.$index, scope.row)"
+                                >编辑</el-button>
+                                <el-button
+                                        type="text"
+                                        icon="el-icon-delete"
+                                        class="red"
+                                        @click="handleDelete(scope.$index, scope.row)"
+                                >删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
+                    <div class="pagination">
+                        <el-pagination
+                                background
+                                layout="total, prev, pager, next"
+                                :current-page="query.pageIndex"
+                                :page-size="query.pageSize"
+                                :total="pageTotal"
+                                @current-change="handlePageChange"
+                        ></el-pagination>
+                    </div>
+                    <!-- 编辑弹出框 -->
+                    <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
+                        <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                            <el-form-item label="名称" prop="name">
+                                <el-input v-model="form.name"></el-input>
+                            </el-form-item>
+                            <el-form-item label="发生可能性" prop="happen">
+                                <el-input-number v-model="form.happen" number></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="后果严重性" prop="consequence">
+                                <el-input-number v-model="form.consequence" number></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="判定准则" prop="criterion">
+                                <el-input-number v-model="form.criterion" number></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="风险等级" prop="riskLevel">
+                                <el-input v-model="form.riskLevel"></el-input>
+                            </el-form-item>
+                            <el-form-item label="四色标识" prop="fourColor">
+                                <el-color-picker v-model="form.fourColor"></el-color-picker>
+                            </el-form-item>
+                            <el-form-item label="控制措施" prop="measures">
+                                <el-input v-model="form.measures" type="textarea"></el-input>
+                            </el-form-item>
+                            <el-form-item label="实施期限" prop="timeLimit">
+                                <el-input v-model="form.timeLimit"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </span>
+                    </el-dialog>
+                    <!-- 新增弹出框 -->
+                    <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
+                        <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                            <el-form-item label="名称" prop="name">
+                                <el-input v-model="form.name"></el-input>
+                            </el-form-item>
+                            <el-form-item label="发生可能性" prop="happen">
+                                <el-input-number v-model="form.happen" number></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="后果严重性" prop="consequence">
+                                <el-input-number v-model="form.consequence" number></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="判定准则" prop="criterion">
+                                <el-input-number v-model="form.criterion" number></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="风险等级" prop="riskLevel">
+                                <el-input v-model="form.riskLevel"></el-input>
+                            </el-form-item>
+                            <el-form-item label="四色标识" prop="fourColor">
+                                <el-color-picker v-model="form.fourColor"></el-color-picker>
+                            </el-form-item>
+                            <el-form-item label="控制措施" prop="measures">
+                                <el-input v-model="form.measures" type="textarea"></el-input>
+                            </el-form-item>
+                            <el-form-item label="实施期限" prop="timeLimit">
+                                <el-input v-model="form.timeLimit"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <span slot="footer" class="dialog-footer">
+                <el-button @click="cancelAdd()">取 消</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
+            </span>
+                    </el-dialog>
                 </el-card>
             </el-col>
         </el-row>
@@ -118,18 +219,53 @@
 </template>
 
 <script>
-    import bus from '../common/bus';
     export default {
         name: 'dashboard',
         data() {
             return {
+                rules:{
+                    name:[{
+                        required:true,message:'请输入危险源名称',trigger:'blur'
+                    }],
+                    happen:[{
+                        required:true,message:'请输入发生可能性',trigger:'blur'
+                    }],
+                    consequence:[{
+                        required:true,message:'请输入后果严重性',trigger:'blur'
+                    }],
+                    criterion:[{
+                        required:true,message:'请输入判定准则',trigger:'blur'
+                    }],
+                    riskLevel:[{
+                        required:true,message:'请输入安全风险等级',trigger:'blur'
+                    }],
+                    measures:[{
+                        required:true,message:'请输入控制措施',trigger:'blur'
+                    }],
+                    timeLimit:[{
+                        required:true,message:'请输入实施期限',trigger:'blur'
+                    }],
+                    fourColor:[{
+                        required:true,message:'请选择四色标识',trigger:'blur'
+                    }]
+                },
+                query: {
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                pageTotal: 0,
+                tableData: [],
+                addVisible:false,
+                editVisible:false,
                 helpDialog:false,
                 fourColorPic:'',
                 uploadUrl:'',
+                form:{},
+                idx:-1,
                 headers:{
                     token : localStorage.getItem("token")
                 },
-                tableData: [{
+                riskSourcesData: [{
                     col0: '20-25',
                     col1: '重大风险',
                     col2: '在采取措施降低风险前，不能继续作业，对改进措施进行评估',
@@ -160,120 +296,115 @@
                         col3: '需保存记录'
                     }
                 ],
-                name: localStorage.getItem('ms_username'),
-                todoList: [
-                    {
-                        title: '今天要修复100个bug',
-                        status: false
-                    },
-                    {
-                        title: '今天要修复100个bug',
-                        status: false
-                    },
-                    {
-                        title: '今天要写100行代码加几个bug吧',
-                        status: false
-                    },
-                    {
-                        title: '今天要修复100个bug',
-                        status: false
-                    },
-                    {
-                        title: '今天要修复100个bug',
-                        status: true
-                    },
-                    {
-                        title: '今天要写100行代码加几个bug吧',
-                        status: true
-                    }
-                ],
-                data: [
-                    {
-                        name: '2018/09/04',
-                        value: 1083
-                    },
-                    {
-                        name: '2018/09/05',
-                        value: 941
-                    },
-                    {
-                        name: '2018/09/06',
-                        value: 1139
-                    },
-                    {
-                        name: '2018/09/07',
-                        value: 816
-                    },
-                    {
-                        name: '2018/09/08',
-                        value: 327
-                    },
-                    {
-                        name: '2018/09/09',
-                        value: 228
-                    },
-                    {
-                        name: '2018/09/10',
-                        value: 1065
-                    }
-                ],
-                options: {
-                    type: 'bar',
-                    title: {
-                        text: '最近一周各品类销售图'
-                    },
-                    xRorate: 25,
-                    labels: ['周一', '周二', '周三', '周四', '周五'],
-                    datasets: [
-                        {
-                            label: '家电',
-                            data: [234, 278, 270, 190, 230]
-                        },
-                        {
-                            label: '百货',
-                            data: [164, 178, 190, 135, 160]
-                        },
-                        {
-                            label: '食品',
-                            data: [144, 198, 150, 235, 120]
-                        }
-                    ]
-                },
-                options2: {
-                    type: 'line',
-                    title: {
-                        text: '最近几个月各品类销售趋势图'
-                    },
-                    labels: ['6月', '7月', '8月', '9月', '10月'],
-                    datasets: [
-                        {
-                            label: '家电',
-                            data: [234, 278, 270, 190, 230]
-                        },
-                        {
-                            label: '百货',
-                            data: [164, 178, 150, 135, 160]
-                        },
-                        {
-                            label: '食品',
-                            data: [74, 118, 200, 235, 90]
-                        }
-                    ]
-                }
             };
-        },
-        components: {
-        },
-        computed: {
-            role() {
-                return this.name === 'admin' ? '超级管理员' : '普通用户';
-            }
         },
         created(){
             this.uploadUrl = this.$baseURL + "/org/upload4ColorPic";
             this.loadFourColorPic();
+            this.getData();
         },
         methods: {
+            handleAdd(){
+                this.addVisible=true;
+                this.$refs["form"].clearValidate();
+              this.form = {};
+            },
+            closeDialog(){
+                this.$refs["form"].clearValidate();
+                this.form = {};
+            },
+            // 获取 easy-mock 的模拟数据
+            getData() {
+                this.$axios.get("/hazardSourcesList/hazardSourcesListsByPage",{
+                    params:{
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
+                    }
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            cancelAdd(){
+                this.addVisible=false;
+                this.$refs["form"].clearValidate();
+                this.form = {};
+            },
+            // 删除操作
+            handleDelete(index, row) {
+                this.form=row;
+                // 二次确认删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.$axios.delete("/hazardSourcesList/hazardSourcesList/" + this.form.id).then(res => {
+                            if(res.data.result.resultCode==200){
+                                this.$message.success('删除成功');
+                                this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
+                    })
+                    .catch(() => {});
+            },
+            // 编辑操作
+            handleEdit(index, row) {
+                this.idx = index;
+                this.form = row;
+                this.editVisible = true;
+                this.$refs["form"].clearValidate();
+            },
+            // 保存编辑
+            saveEdit() {
+                this.$refs.form.validate(validate => {
+                    console.log(this.form);
+                    if (validate) {
+                        this.$axios.put("/hazardSourcesList/hazardSourcesList?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error(res.data.result.message);
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.$axios.post("/hazardSourcesList/hazardSourcesList",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
+            },
+            // 分页导航
+            handlePageChange(val) {
+                this.$set(this.query, 'pageIndex', val);
+                this.getData();
+            },
             loadFourColorPic(){
                 this.$axios.get("/org/fourColorPic").then(res =>{
                     if(res.data.result.resultCode==200){
@@ -284,7 +415,12 @@
                 })
             },
             handleAvatarSuccess(res, file) {
-                this.loadFourColorPic();
+                console.log(res);
+                if(res.result.resultCode==200){
+                    this.loadFourColorPic();
+                }else{
+                    this.$message.error(res.result.message);
+                }
             },
             beforeAvatarUpload(file) {
                 const isLt2M = file.size / 1024 / 1024 < 2;
@@ -302,6 +438,12 @@
                 return isJPG && isLt2M;
             },
             // cellStyle(row, column, rowIndex, columnIndex){
+            fourColorBg(obj){
+               if(obj.columnIndex==5){
+                    return 'backgroundColor:' + obj.row.fourColor;
+               }
+               return '';
+            },
             cellStyle(obj){
                 if(obj.rowIndex==0 && obj.columnIndex==0){
                     return 'backgroundColor:red';
