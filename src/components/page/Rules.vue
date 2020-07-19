@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 法律法规政策-<span style="color:red;">{{(org.province==null?'':org.province)+(org.city==null?'':org.city)+(org.region==null?'':org.region)}}
+                    <i class="el-icon-lx-cascades"></i> 安全规章制度-<span style="color:red;">{{(org.province==null?'':org.province)+(org.city==null?'':org.city)+(org.region==null?'':org.region)}}
                     {{org.orgCategory==null?'':org.orgCategory.name}}类</span>
                 </el-breadcrumb-item>
             </el-breadcrumb>
@@ -293,7 +293,7 @@
         },
         methods: {
             saveContent(){
-                this.$axios.put("/law/content?" + this.$qs.stringify(this.form)).then(res => {
+                this.$axios.put("/rules/content?" + this.$qs.stringify(this.form)).then(res => {
                     if (res.data.result.resultCode == 200) {
                         this.editContentVisible = false;
                         this.getData();
@@ -353,7 +353,7 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/law/lawsByPage",{
+                this.$axios.get("/rules/rulesByPage",{
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize
@@ -377,7 +377,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/law/law/" + this.form.id).then(res => {
+                        this.$axios.delete("/rules/rules/" + this.form.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -412,7 +412,7 @@
                 this.$refs.form.validate(validate => {
                     console.log(this.form);
                     if (validate) {
-                        this.$axios.put("/law/law?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/rules/rules?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -432,7 +432,7 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.$axios.post("/law/law",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/rules/rules",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();

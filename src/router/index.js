@@ -33,6 +33,16 @@ export default new Router({
                   meta:{title:'法律法规政策'}
                 },
                 {
+                  path:'/rules',
+                  component:()=>import('../components/page/Rules.vue'),
+                  meta:{title:'安全规章制度'}
+                },
+                {
+                  path:'/notification',
+                  component:()=>import('../components/page/Notification.vue'),
+                  meta:{title:'企业发文通知'}
+                },
+                {
                   path:'/riskControl',
                   component:()=>import('../components/page/RiskControl.vue'),
                   meta:{title:'风险辨识管控'}
