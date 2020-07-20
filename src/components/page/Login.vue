@@ -46,6 +46,10 @@ width:500px;text-align: center;height:500px;" stretch>
                                 <el-input v-model="form.name" tabindex="2" placeholder="企业名称">
                                 </el-input>
                             </el-form-item>
+                            <el-form-item label=" " prop="shortName">
+                                <el-input v-model="form.shortName" tabindex="2" placeholder="企业简称">
+                                </el-input>
+                            </el-form-item>
                             <el-form-item label=" ">
                                 <el-input v-model="form.contact" tabindex="3" placeholder="联系人">
                                 </el-input>
@@ -88,7 +92,7 @@ width:500px;text-align: center;height:500px;" stretch>
                                 </el-input>
                             </el-form-item>-->
                             <el-form-item>
-                                <span style="color:#F56C6C;">手机号将作为您的用户名，初始密码为:123456</span>
+                                <span style="color:#F56C6C;">手机号将作为您的用户名，初始密码为手机号后6位,请登录后修改!</span>
                             </el-form-item>
                             <div class="login-btn">
                                 <el-button type="primary" tabindex="10" @click="register">注册</el-button>
@@ -130,6 +134,7 @@ width:500px;text-align: center;height:500px;" stretch>
                     password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
                     name: [{ required: true, message: '请输入企业名称', trigger: 'blur' }],
                     code: [{ required: true, message: '请输入企业代码', trigger: 'blur' }],
+                    shortName: [{ required: true, message: '请输入企业简称', trigger: 'blur' }],
                     tel: [{ required: true, message: '请输入手机号码', trigger: 'blur' },{
                         validator:checkTel,trigger:'blur'
                     }],

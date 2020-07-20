@@ -104,7 +104,7 @@
                 <el-form-item label="真名">
                     <el-input v-model="form.realname"></el-input>
                 </el-form-item>
-                <el-form-item label="手机号">
+                <el-form-item label="手机号" prop="tel">
                     <el-input v-model="form.tel"></el-input>
                 </el-form-item>
                 <el-form-item label="所在企业">
@@ -140,7 +140,7 @@
                 <el-form-item label="真名">
                     <el-input v-model="form.realname"></el-input>
                 </el-form-item>
-                <el-form-item label="手机号">
+                <el-form-item label="手机号" prop="tel">
                     <el-input v-model="form.tel"></el-input>
                 </el-form-item>
                 <el-form-item label="所在企业">
@@ -166,6 +166,18 @@
     export default {
         name: 'basetable',
         data() {
+            let checkTel=(rule, value, callback) =>{
+                if(value){
+                    var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
+                    if (!myreg.test(value)) {
+                        callback(new Error("不是有效的手机号码格式!"));
+                    } else {
+                        callback();
+                    }
+                }  else{
+                    callback(new Error("请输入手机号"));
+                }
+            };
             return {
                 query: {
                     name: '',
@@ -189,6 +201,12 @@
                 rules:{
                     username: [
                         { required: true, message: '请输入用户名', trigger: 'blur' }
+                    ],
+                    tel: [
+                        { required: true, message: '请输入手机号码', trigger: 'blur' },
+                        {
+                            validator:checkTel,trigger:'blur'
+                        }
                     ]
                 }
             };

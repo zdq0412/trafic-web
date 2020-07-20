@@ -270,12 +270,8 @@
                     publishDate:[
                         { required: true, message: '请选择发布日期', trigger: 'blur' }
                     ],
-                    area:[
-                        { required: true, message: '请选择区域', trigger: 'blur' }
-                    ],
-                    orgCategoryId:[
-                        { required: true, message: '请选择企业类别', trigger: 'blur' }
-                    ],
+                    area: [{ type:'array', required: true, message: '请选择区域', trigger:['blur','change'] }],
+                    orgCategoryId: [{ required: true, message: '请选择企业类别', trigger: ['blur','change'] }],
                     timeliness:[
                         { required: true, message: '请选择时效性', trigger: 'blur' }
                     ],

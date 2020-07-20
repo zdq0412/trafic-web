@@ -26,8 +26,9 @@
                     header-cell-class-name="table-header"
             >
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
-                <el-table-column prop="code" label="机构代码"></el-table-column>
+               <!-- <el-table-column prop="code" label="机构代码"></el-table-column>-->
                 <el-table-column prop="name" label="名称"></el-table-column>
+                <el-table-column prop="shortName" label="简称"></el-table-column>
                 <el-table-column prop="contact" label="联系人"></el-table-column>
                 <el-table-column prop="tel" label="手机号"></el-table-column>
                 <el-table-column prop="addr" label="地址"></el-table-column>
@@ -68,14 +69,19 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-row type="flex" class="row-bg">
-                    <el-col>
+                    <!--<el-col>
                         <el-form-item label="代码" prop="code">
                             <el-input v-model="form.code"></el-input>
                         </el-form-item>
-                    </el-col>
+                    </el-col>-->
                     <el-col>
                         <el-form-item label="名称" prop="name">
                             <el-input v-model="form.name"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col>
+                        <el-form-item label="简称" prop="shortName">
+                            <el-input v-model="form.shortName"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -144,14 +150,19 @@
                   @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-row type="flex" class="row-bg">
-                    <el-col>
+                    <!--<el-col>
                         <el-form-item label="代码" prop="code">
                             <el-input v-model="form.code"></el-input>
                         </el-form-item>
-                    </el-col>
+                    </el-col>-->
                     <el-col>
                         <el-form-item label="名称" prop="name">
                             <el-input v-model="form.name"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col>
+                        <el-form-item label="简称" prop="shortName">
+                            <el-input v-model="form.shortName"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -255,6 +266,9 @@
                     }],
                     code:[{
                         required:true,message:'请输入企业代码',trigger:'blur'
+                    }],
+                    shortName:[{
+                        required:true,message:'请输入企业见吗',trigger:'blur'
                     }],
                     tel:[{
                         required:true,message:'请输入手机号',trigger:'blur'
