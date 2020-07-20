@@ -34,21 +34,27 @@
                 </el-table-column>
                 <el-table-column prop="name" label="名称">
                     <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
+                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.rules.name }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="implementDate" label="实施日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="publishDepartment" label="发文部门"></el-table-column>
-                <el-table-column prop="num" label="发文字号"></el-table-column>
-                <el-table-column prop="timeliness" label="时效性"></el-table-column>
-                <el-table-column prop="note" label="备注">
+                <el-table-column prop="rules.publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="rules.implementDate" label="实施日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="rules.publishDepartment" label="发文部门"></el-table-column>
+                <el-table-column prop="rules.num" label="发文字号"></el-table-column>
+                <el-table-column prop="rules.timeliness" label="时效性"></el-table-column>
+                <el-table-column prop="rules.note" label="备注">
                     <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.rules.note)">{{ scope.row.rules.note }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                style="color: #67C23A;"
+                                icon="el-icon-video-play"
+                                @click="handleExecute(scope.$index, scope.row)"
+                        ><span v-if="scope.row.sended">重新发文</span><span v-else>发文执行</span></el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -292,6 +298,32 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            handleExecute(index,row){
+                if(!row.rules.content){
+                    this.$message.error("该文件内容为空，不能发布!");
+                    return false;
+                }
+                this.$confirm('确定要发布该通知吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.$axios.get("/rules/publishRules" ,{
+                            params:{
+                                id:row.id
+                            }
+                        } ).then(res => {
+                            if(res.data.result.resultCode==200){
+                                this.$message.success('发布成功，请到企业发文通知中查看!');
+                                this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
+                    })
+                    .catch(() => {});
+            },
             saveContent(){
                 this.$axios.put("/rules/content?" + this.$qs.stringify(this.form)).then(res => {
                     if (res.data.result.resultCode == 200) {
@@ -305,7 +337,7 @@
                 });
             },
             showContent(row){
-                this.form = row;
+                this.form = row.rules;
                 this.showContentVisible=true;
             },
             showNote(note){
@@ -371,13 +403,13 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
+                this.form=row.rules;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/rules/rules/" + this.form.id).then(res => {
+                        this.$axios.delete("/rules/rules/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -393,24 +425,22 @@
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
-                this.form = row;
+                this.form = row.rules;
                 this.editVisible = true;
-                this.$refs["form"].clearValidate();
-                if(row.publishDate){
-                    this.form.publishDate = getDate(new Date(row.publishDate));
+                if(row.rules.publishDate){
+                    this.form.publishDate = getDate(new Date(row.rules.publishDate));
                 }
-                if(row.implementDate){
-                    this.form.implementDate = getDate(new Date(row.implementDate));
+                if(row.rules.implementDate){
+                    this.form.implementDate = getDate(new Date(row.rules.implementDate));
                 }
-                if(row.orgCategory){
-                    this.form.orgCategoryId = row.orgCategory.id;
+                if(row.rules.orgCategory){
+                    this.form.orgCategoryId = row.rules.orgCategory.id;
                 }
-                this.form.area=[row.province,row.city,row.region];
+                this.form.area=[row.rules.province,row.rules.city,row.rules.region];
             },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
-                    console.log(this.form);
                     if (validate) {
                         this.$axios.put("/rules/rules?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
@@ -456,7 +486,6 @@
         }
     };
 </script>
-
 <style scoped>
     .handle-box {
         margin-bottom: 20px;
