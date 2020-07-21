@@ -26,9 +26,9 @@
                     header-cell-class-name="table-header"
             >
                 <el-table-column prop="username" label="用户名"></el-table-column>
-                <el-table-column prop="province" label="省"></el-table-column>
-                <el-table-column prop="city" label="市"></el-table-column>
-                <el-table-column prop="region" label="区"></el-table-column>
+                <el-table-column prop="province.name" label="省"></el-table-column>
+                <el-table-column prop="city.name" label="市"></el-table-column>
+                <el-table-column prop="region.name" label="区"></el-table-column>
                 <el-table-column prop="orgCategory.name" label="企业类别"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -68,7 +68,7 @@
                     <el-cascader style="width: 100%;"
                                  v-model="form.area"
                                  :options="areas"
-                                 :props="{label:'name',value:'name'}"
+                                 :props="{label:'name',value:'id'}"
                                  @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别">
@@ -97,7 +97,7 @@
                     <el-cascader style="width: 100%;"
                                  v-model="form.area"
                                  :options="areas"
-                                 :props="{label:'name',value:'name'}"
+                                 :props="{label:'name',value:'id'}"
                                  @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别">
@@ -153,9 +153,9 @@
         methods: {
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
-                    this.form.province=this.form.area[0];
-                    this.form.city=this.form.area[1];
-                    this.form.region=this.form.area[2];
+                    this.form.provinceId=this.form.area[0];
+                    this.form.cityId=this.form.area[1];
+                    this.form.regionId=this.form.area[2];
                 }
             },
             closeDialog(){
@@ -218,7 +218,7 @@
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
                 }
-                this.form.area=[row.province,row.city,row.region];
+                this.form.area=[row.province.id,row.city.id,row.region.id];
             },
             // 保存编辑
             saveEdit() {

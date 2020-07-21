@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 法律法规政策-<span style="color:red;">{{(org.province==null?'':org.province)+(org.city==null?'':org.city)+(org.region==null?'':org.region)}}
+                    <i class="el-icon-lx-cascades"></i> 法律法规政策-<span style="color:red;">{{(org.province==null?'':org.province.name)+(org.city==null?'':org.city.name)+(org.region==null?'':org.region.name)}}
                     {{org.orgCategory==null?'':org.orgCategory.name}}类</span>
                 </el-breadcrumb-item>
             </el-breadcrumb>
@@ -110,7 +110,7 @@
                     <el-cascader
                             v-model="form.area"
                             :options="areas"
-                            :props="{label:'name',value:'name'}"
+                            :props="{label:'name',value:'id'}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别" v-if="!haveOrg" prop="orgCategoryId">
@@ -167,7 +167,7 @@
                     <el-cascader
                             v-model="form.area"
                             :options="areas"
-                            :props="{label:'name',value:'name'}"
+                            :props="{label:'name',value:'id'}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别" v-if="!haveOrg" prop="orgCategoryId">
@@ -365,9 +365,9 @@
             },
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
-                    this.form.province=this.form.area[0];
-                    this.form.city=this.form.area[1];
-                    this.form.region=this.form.area[2];
+                    this.form.provinceId=this.form.area[0];
+                    this.form.cityId=this.form.area[1];
+                    this.form.regionId=this.form.area[2];
                 }
             },
             dateFormatter(row, column, cellValue, index){
@@ -433,7 +433,7 @@
                 if(row.law.orgCategory){
                     this.form.orgCategoryId = row.law.orgCategory.id;
                 }
-                this.form.area=[row.law.province,row.law.city,row.law.region];
+                this.form.area=[row.law.province.id,row.law.city.id,row.law.region.id];
             },
             // 保存编辑
             saveEdit() {

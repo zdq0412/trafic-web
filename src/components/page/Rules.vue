@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 安全规章制度-<span style="color:red;">{{(org.province==null?'':org.province)+(org.city==null?'':org.city)+(org.region==null?'':org.region)}}
+                    <i class="el-icon-lx-cascades"></i> 安全规章制度-<span style="color:red;">{{(org.province==null?'':org.province.name)+(org.city==null?'':org.city.name)+(org.region==null?'':org.region.name)}}
                     {{org.orgCategory==null?'':org.orgCategory.name}}类</span>
                 </el-breadcrumb-item>
             </el-breadcrumb>
@@ -38,7 +38,6 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="rules.publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="rules.implementDate" label="实施日期" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="rules.publishDepartment" label="发文部门"></el-table-column>
                 <el-table-column prop="rules.num" label="发文字号"></el-table-column>
                 <el-table-column prop="rules.timeliness" label="时效性"></el-table-column>
@@ -95,14 +94,6 @@
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="实施日期" prop="implementDate">
-                    <el-date-picker
-                            v-model="form.implementDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
-                </el-form-item>
                 <el-form-item label="发文部门">
                     <el-input v-model="form.publishDepartment" ></el-input>
                 </el-form-item>
@@ -110,7 +101,7 @@
                     <el-cascader
                             v-model="form.area"
                             :options="areas"
-                            :props="{label:'name',value:'name'}"
+                            :props="{label:'name',value:'id'}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别" v-if="!haveOrg" prop="orgCategoryId">
@@ -152,14 +143,6 @@
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="实施日期" prop="implementDate">
-                    <el-date-picker
-                            v-model="form.implementDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
-                </el-form-item>
                 <el-form-item label="发文部门">
                     <el-input v-model="form.publishDepartment" ></el-input>
                 </el-form-item>
@@ -167,7 +150,7 @@
                     <el-cascader
                             v-model="form.area"
                             :options="areas"
-                            :props="{label:'name',value:'name'}"
+                            :props="{label:'name',value:'id'}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别" v-if="!haveOrg" prop="orgCategoryId">
@@ -277,9 +260,6 @@
                     ],
                     content:[
                         { required: true, message: '请输入文本内容', trigger: 'blur' }
-                    ],
-                    implementDate:[
-                        { required: true, message: '请选择实施日期', trigger: 'blur' }
                     ]
                 }
             };
@@ -364,9 +344,9 @@
             },
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
-                    this.form.province=this.form.area[0];
-                    this.form.city=this.form.area[1];
-                    this.form.region=this.form.area[2];
+                    this.form.provinceId=this.form.area[0];
+                    this.form.cityId=this.form.area[1];
+                    this.form.regionId=this.form.area[2];
                 }
             },
             dateFormatter(row, column, cellValue, index){
@@ -426,13 +406,10 @@
                 if(row.rules.publishDate){
                     this.form.publishDate = getDate(new Date(row.rules.publishDate));
                 }
-                if(row.rules.implementDate){
-                    this.form.implementDate = getDate(new Date(row.rules.implementDate));
-                }
                 if(row.rules.orgCategory){
                     this.form.orgCategoryId = row.rules.orgCategory.id;
                 }
-                this.form.area=[row.rules.province,row.rules.city,row.rules.region];
+                this.form.area=[row.rules.province.id,row.rules.city.id,row.rules.region.id];
             },
             // 保存编辑
             saveEdit() {

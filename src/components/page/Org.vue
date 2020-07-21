@@ -33,9 +33,9 @@
                 <el-table-column prop="tel" label="手机号"></el-table-column>
                 <el-table-column prop="addr" label="地址"></el-table-column>
                 <el-table-column prop="legalPerson" label="法人"></el-table-column>
-                <el-table-column prop="province" label="省"></el-table-column>
-                <el-table-column prop="city" label="市"></el-table-column>
-                <el-table-column prop="region" label="区"></el-table-column>
+                <el-table-column prop="province.name" label="省"></el-table-column>
+                <el-table-column prop="city.name" label="市"></el-table-column>
+                <el-table-column prop="region.name" label="区"></el-table-column>
                 <el-table-column prop="note" label="描述"></el-table-column>
                 <el-table-column label="操作" width="120" align="center">
                     <template slot-scope="scope">
@@ -114,7 +114,7 @@
                         <el-form-item label="省市区">
                             <el-cascader  v-model="form.area"
                                          :options="areas"
-                                          :props="{label:'name',value:'name'}"
+                                          :props="{label:'name',value:'id'}"
                                          @change="handleChange"></el-cascader>
                         </el-form-item>
                     </el-col>
@@ -196,7 +196,7 @@
                             <el-cascader
                                     v-model="form.area"
                                     :options="areas"
-                                    :props="{label:'name',value:'name'}"
+                                    :props="{label:'name',value:'id'}"
                                     @change="handleChange"></el-cascader>
                         </el-form-item>
                     </el-col>
@@ -300,9 +300,9 @@
             },
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
-                    this.form.province=this.form.area[0];
-                    this.form.city=this.form.area[1];
-                    this.form.region=this.form.area[2];
+                    this.form.provinceId=this.form.area[0];
+                    this.form.cityId=this.form.area[1];
+                    this.form.regionId=this.form.area[2];
                 }
             },
             closeDialog(){
@@ -353,7 +353,7 @@
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
                 }
-                this.form.area=[row.province,row.city,row.region];
+                this.form.area=[row.province.id,row.city.id,row.region.id];
             },
             // 保存编辑
             saveEdit() {
