@@ -28,6 +28,11 @@ export default new Router({
                   meta:{title:'企业人员资料'}
                 },
                 {
+                  path:'/templates',
+                  component:()=>import('../components/page/Template.vue'),
+                  meta:{title:'模板管理'}
+                },
+            {
                   path:'/law',
                   component:()=>import('../components/page/Law.vue'),
                   meta:{title:'法律法规政策'}
@@ -117,11 +122,6 @@ export default new Router({
                     meta: { title: '403' }
                 }
             ]
-        },
-        {
-            path:'/reg',
-            component:()=>import('../components/page/Register.vue'),
-            meta:{title:'企业用户注册'}
         },
         {
             path: '/login',

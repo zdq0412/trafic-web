@@ -71,7 +71,7 @@ width:500px;text-align: center;height:500px;" stretch>
                                 <el-cascader style="width: 100%;" tabindex="7"
                                              v-model="form.area"
                                              :options="areas"
-                                             :props="{label:'name',value:'name'}"
+                                             :props="{label:'name',value:'id'}"
                                              @change="handleChange"
                                              placeholder="地区">
                                 </el-cascader>
@@ -165,9 +165,9 @@ width:500px;text-align: center;height:500px;" stretch>
             },
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
-                    this.form.province=this.form.area[0];
-                    this.form.city=this.form.area[1];
-                    this.form.region=this.form.area[2];
+                    this.form.provinceId=this.form.area[0];
+                    this.form.cityId=this.form.area[1];
+                    this.form.regionId=this.form.area[2];
                 }
             },
             register(){

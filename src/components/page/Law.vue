@@ -34,27 +34,21 @@
                 </el-table-column>
                 <el-table-column prop="name" label="名称">
                     <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.law.name }}</span>
+                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="law.publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="law.implementDate" label="实施日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="law.publishDepartment" label="发文部门"></el-table-column>
-                <el-table-column prop="law.num" label="发文字号"></el-table-column>
-                <el-table-column prop="law.timeliness" label="时效性"></el-table-column>
-                <el-table-column prop="law.note" label="备注">
+                <el-table-column prop="publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="implementDate" label="实施日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="publishDepartment" label="发文部门"></el-table-column>
+                <el-table-column prop="num" label="发文字号"></el-table-column>
+                <el-table-column prop="timeliness" label="时效性"></el-table-column>
+                <el-table-column prop="note" label="备注">
                     <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.law.note)">{{ scope.row.law.note }}</span>
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
-                        <el-button
-                                type="text"
-                                style="color: #67C23A;"
-                                icon="el-icon-video-play"
-                                @click="handleExecute(scope.$index, scope.row)"
-                        > <span v-if="scope.row.sended">重新发文</span><span v-else>发文执行</span></el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -80,7 +74,6 @@
                 ></el-pagination>
             </div>
         </div>
-
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog" @open="loadData">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
@@ -204,21 +197,26 @@
         <!--显示文本内容-->
         <el-dialog title="文本内容" :visible.sync="showContentVisible" width="30%">
             <div v-html="form.content"></div>
+            <div style="margin-top: 10px;">
+                <el-card shadow="hover" v-if="notices.length>0">
+                    <div slot="header" class="clearfix">
+                        <span style="font-weight: bold;">发文历史</span>
+                    </div>
+                    <el-row v-for="(notice,index) in notices" style="color: red;margin: 5px;">
+                        <el-col :span="1"><div>{{index+1}}</div></el-col>
+                        <el-col :span="23"><div>{{notice.publishDate | formatDate}}</div></el-col>
+                    </el-row>
+                </el-card>
+            </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
+                <el-button type="warning" @click="handleExecute" v-if="form.content">发文执行</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
         <!--编辑文本内容-->
         <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="30%">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
-               <!-- <el-row type="flex" class="row-bg">
-                    <el-col>
-                        <el-form-item label="">
-                            <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
-                        </el-form-item>
-                    </el-col>
-                </el-row>-->
                 <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -249,6 +247,7 @@
                 noteVisible:false,
                 note:'',
                 orgCategories:[],
+                notices:[],
                 tableData: [],
                 delList: [],
                 editVisible: false,
@@ -284,6 +283,15 @@
                 }
             };
         },
+        filters:{
+            formatDate(value){
+                if(value){
+                    return getDate(new Date(value));
+                }else{
+                    return '';
+                }
+            }
+        },
         created() {
             this.getData();
             this.$axios.get("/user/haveOrg").then(res =>{
@@ -294,8 +302,8 @@
             }).catch(error=>console.log(error));
         },
         methods: {
-            handleExecute(index,row){
-                if(!row.law.content){
+            handleExecute(){
+                if(!this.form.content){
                     this.$message.error("该文件内容为空，不能发布!");
                     return false;
                 }
@@ -306,12 +314,13 @@
 
                         this.$axios.get("/law/publishLaw" ,{
                             params:{
-                                id:row.id
+                                id:this.form.id
                             }
                         } ).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('发布成功，请到企业发文通知中查看!');
-                                this.getData();
+                                //this.getData();
+                                this.showContentVisible=false;
                             }else{
                                 this.$message.error(res.data.result.message);
                             }
@@ -334,8 +343,16 @@
                 });
             },
             showContent(row){
-                this.form = row.law;
+                this.form = row;
                 this.showContentVisible=true;
+                this.$axios.get("/notice/notices",{
+                    params:{
+                        lawOrRulesId:row.id,
+                        type:'law'
+                    }
+                }).then(res =>{
+                    this.notices = res.data;
+                }).catch(error=>console.log(error));
             },
             showNote(note){
                 this.note = note;
@@ -366,8 +383,13 @@
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
                     this.form.provinceId=this.form.area[0];
-                    this.form.cityId=this.form.area[1];
-                    this.form.regionId=this.form.area[2];
+                    if(this.form.area.length==2){
+                        this.form.cityId=this.form.area[1];
+                    }
+                    if(this.form.area.length==3){
+                        this.form.cityId=this.form.area[1];
+                        this.form.regionId=this.form.area[2];
+                    }
                 }
             },
             dateFormatter(row, column, cellValue, index){
@@ -400,7 +422,7 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row.law;
+                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
@@ -422,18 +444,18 @@
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
-                this.form = row.law;
+                this.form = row;
                 this.editVisible = true;
-                if(row.law.publishDate){
-                    this.form.publishDate = getDate(new Date(row.law.publishDate));
+                if(row.publishDate){
+                    this.form.publishDate = getDate(new Date(row.publishDate));
                 }
-                if(row.law.implementDate){
-                    this.form.implementDate = getDate(new Date(row.law.implementDate));
+                if(row.implementDate){
+                    this.form.implementDate = getDate(new Date(row.implementDate));
                 }
-                if(row.law.orgCategory){
-                    this.form.orgCategoryId = row.law.orgCategory.id;
+                if(row.orgCategory){
+                    this.form.orgCategoryId = row.orgCategory.id;
                 }
-                this.form.area=[row.law.province.id,row.law.city.id,row.law.region.id];
+                this.form.area=[row.province.id,row.city.id,row.region.id];
             },
             // 保存编辑
             saveEdit() {

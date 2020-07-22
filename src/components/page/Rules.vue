@@ -16,6 +16,12 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
+                <el-button v-if="Object.keys(org).length>0"
+                        type="warning"
+                        icon="el-icon-search"
+                        class="handle-del mr10"
+                        @click="findTemplates"
+                >查找模板</el-button>
             </div>
             <el-table
                     :data="tableData"
@@ -34,26 +40,20 @@
                 </el-table-column>
                 <el-table-column prop="name" label="名称">
                     <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.rules.name }}</span>
+                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="rules.publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="rules.publishDepartment" label="发文部门"></el-table-column>
-                <el-table-column prop="rules.num" label="发文字号"></el-table-column>
-                <el-table-column prop="rules.timeliness" label="时效性"></el-table-column>
-                <el-table-column prop="rules.note" label="备注">
+                <el-table-column prop="publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="publishDepartment" label="发文部门"></el-table-column>
+                <el-table-column prop="num" label="发文字号"></el-table-column>
+                <el-table-column prop="timeliness" label="时效性"></el-table-column>
+                <el-table-column prop="note" label="备注">
                     <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.rules.note)">{{ scope.row.rules.note }}</span>
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
-                        <el-button
-                                type="text"
-                                style="color: #67C23A;"
-                                icon="el-icon-video-play"
-                                @click="handleExecute(scope.$index, scope.row)"
-                        ><span v-if="scope.row.sended">重新发文</span><span v-else>发文执行</span></el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -129,7 +129,61 @@
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
-        <!-- 新增弹出框 -->
+        <!-- 查询系统模板 -->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%"  @close="closeDialog" @open="loadData">
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="publishDate" label="发布日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="publishDepartment"  label="发文部门"></el-table-column>
+                <el-table-column prop="num" label="发文字号"  ></el-table-column>
+                <el-table-column prop="timeliness" label="时效性"  ></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="180" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-view"
+                                @click="checkContent(scope.$index, scope.row)"
+                        >查看内容</el-button>
+                        <el-button
+                                type="text"
+                                icon="el-icon-copy-document"
+                                class="red"
+                                @click="handleDelete(scope.$index, scope.row)"
+                        >引入</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" @open="loadData">
             <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
                 <el-form-item label="名称" prop="name">
@@ -187,21 +241,32 @@
         <!--显示文本内容-->
         <el-dialog title="文本内容" :visible.sync="showContentVisible" width="30%">
             <div v-html="form.content"></div>
+            <div style="margin-top: 10px;">
+                <el-card shadow="hover" v-if="notices.length>0">
+                    <div slot="header" class="clearfix">
+                        <span style="font-weight: bold;">发文历史</span>
+                    </div>
+                    <el-row v-for="(notice,index) in notices" style="color: red;margin: 5px;">
+                        <el-col :span="1"><div>{{index+1}}</div></el-col>
+                        <el-col :span="23"><div>{{notice.publishDate | formatDate}}</div></el-col>
+                    </el-row>
+                </el-card>
+            </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
+                 <el-button type="warning" @click="handleExecute" v-if="form.content && Object.keys(org).length>0">发文执行</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="30%">
+            <div v-html="template.content"></div>
+            <span slot="footer" class="dialog-footer">
+                <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
         <!--编辑文本内容-->
         <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="30%">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
-               <!-- <el-row type="flex" class="row-bg">
-                    <el-col>
-                        <el-form-item label="">
-                            <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
-                        </el-form-item>
-                    </el-col>
-                </el-row>-->
                 <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -229,10 +294,18 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
                 noteVisible:false,
                 note:'',
                 orgCategories:[],
+                notices:[],
                 tableData: [],
+                templatesData:[],
+                templatesVisible:false,
                 delList: [],
                 editVisible: false,
                 addVisible: false,
@@ -242,9 +315,11 @@
                 haveOrg:false,
                 form: {
                 },
+                template:{},
                 idx: -1,
                 org:{},
                 id: -1,
+                showTemplateContentVisible:false,
                 areas:[],
                 rules:{
                     name: [
@@ -264,6 +339,15 @@
                 }
             };
         },
+        filters:{
+            formatDate(value){
+                if(value){
+                    return getDate(new Date(value));
+                }else{
+                    return '';
+                }
+            }
+        },
         created() {
             this.getData();
             this.$axios.get("/user/haveOrg").then(res =>{
@@ -274,8 +358,24 @@
             }).catch(error=>console.log(error));
         },
         methods: {
-            handleExecute(index,row){
-                if(!row.rules.content){
+            checkContent(index,row){//查看模板内容
+               this.showTemplateContentVisible = true;
+               this.template = row;
+            },
+            findTemplates(){
+                this.$axios.get("/rules/templates",{
+                    params:{
+                        page:this.templates.pageIndex,
+                        limit:this.templates.pageSize
+                    }
+                }).then(res => {
+                    this.templatesData = res.data.data;
+                    this.templates.pageTotal = res.data.count;
+                    this.templatesVisible = true;
+                }).catch(error => console.log(error));
+            },
+            handleExecute(){
+                if(!this.form.content){
                     this.$message.error("该文件内容为空，不能发布!");
                     return false;
                 }
@@ -285,12 +385,13 @@
                     .then(() => {
                         this.$axios.get("/rules/publishRules" ,{
                             params:{
-                                id:row.id
+                                id:this.form.id
                             }
                         } ).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('发布成功，请到企业发文通知中查看!');
-                                this.getData();
+                                this.showContentVisible=false;
+                                //this.getData();
                             }else{
                                 this.$message.error(res.data.result.message);
                             }
@@ -313,8 +414,16 @@
                 });
             },
             showContent(row){
-                this.form = row.rules;
+                this.form = row;
                 this.showContentVisible=true;
+                this.$axios.get("/notice/notices",{
+                    params:{
+                        lawOrRulesId:row.id,
+                        type:'rules'
+                    }
+                }).then(res =>{
+                    this.notices = res.data;
+                }).catch(error=>console.log(error));
             },
             showNote(note){
                 this.note = note;
@@ -379,7 +488,7 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row.rules;
+                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
@@ -401,15 +510,15 @@
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
-                this.form = row.rules;
+                this.form = row;
                 this.editVisible = true;
-                if(row.rules.publishDate){
-                    this.form.publishDate = getDate(new Date(row.rules.publishDate));
+                if(row.publishDate){
+                    this.form.publishDate = getDate(new Date(row.publishDate));
                 }
-                if(row.rules.orgCategory){
-                    this.form.orgCategoryId = row.rules.orgCategory.id;
+                if(row.orgCategory){
+                    this.form.orgCategoryId = row.orgCategory.id;
                 }
-                this.form.area=[row.rules.province.id,row.rules.city.id,row.rules.region.id];
+                this.form.area=[row.province.id,row.city.id,row.region.id];
             },
             // 保存编辑
             saveEdit() {
@@ -455,6 +564,11 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageIndex', val);
                 this.getData();
+            },
+            // 分页导航
+            handleTemplatesPageChange(val) {
+                this.$set(this.templates, 'pageIndex', val);
+                this.findTemplates();
             }
         }
     };

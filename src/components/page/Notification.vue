@@ -38,7 +38,6 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="implementDate" label="实施日期" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="publishDepartment" label="发文部门"></el-table-column>
                 <el-table-column prop="num" label="发文字号"></el-table-column>
                 <el-table-column prop="timeliness" label="时效性"></el-table-column>
