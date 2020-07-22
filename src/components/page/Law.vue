@@ -99,14 +99,14 @@
                 <el-form-item label="发文部门">
                     <el-input v-model="form.publishDepartment" ></el-input>
                 </el-form-item>
-                <el-form-item label="区域" v-if="!haveOrg" prop="area">
+                <el-form-item label="区域" v-if="!haveOrg" >
                     <el-cascader
                             v-model="form.area"
                             :options="areas"
                             :props="{label:'name',value:'id'}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
-                <el-form-item label="企业类别" v-if="!haveOrg" prop="orgCategoryId">
+                <el-form-item label="企业类别" v-if="!haveOrg" >
                     <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
                         <el-option
                                 v-for="item in orgCategories"
@@ -156,14 +156,14 @@
                 <el-form-item label="发文部门">
                     <el-input v-model="form.publishDepartment" ></el-input>
                 </el-form-item>
-                <el-form-item label="区域" v-if="!haveOrg" prop="area">
+                <el-form-item label="区域" v-if="!haveOrg">
                     <el-cascader
                             v-model="form.area"
                             :options="areas"
                             :props="{label:'name',value:'id'}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
-                <el-form-item label="企业类别" v-if="!haveOrg" prop="orgCategoryId">
+                <el-form-item label="企业类别" v-if="!haveOrg">
                     <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
                         <el-option
                                 v-for="item in orgCategories"

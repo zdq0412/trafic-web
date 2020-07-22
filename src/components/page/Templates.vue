@@ -13,7 +13,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addVisible=true"
+                        @click="handleAdd"
                 >新增</el-button>
             </div>
             <el-table
@@ -22,10 +22,28 @@
                     class="table"
                     header-cell-class-name="table-header"
             >
-                <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="priority" label="优先级"></el-table-column>
-                <el-table-column prop="note" label="备注"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(query.pageIndex - 1) * query.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="创建人"></el-table-column>
+                <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="note" label="备注">
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
@@ -52,15 +70,11 @@
                 ></el-pagination>
             </div>
         </div>
-
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item label="优先级">
-                    <el-input-number v-model="form.priority" number></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -72,14 +86,10 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
-            <el-form ref="form" :model="form" :rules="rules"  label-width="70px">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" >
+            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
-                    <el-input v-model="form.id" v-show="false"></el-input>
-                </el-form-item>
-                <el-form-item label="优先级">
-                    <el-input-number v-model="form.priority"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -90,39 +100,159 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
+        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
+            {{note}}
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="noteVisible=false">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!--显示文本内容-->
+        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="30%">
+            <div v-html="form.content"></div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
+                <el-button  @click="showContentVisible=false">关闭</el-button>
+            </span>
+        </el-dialog>
+        <!--编辑文本内容-->
+        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="30%">
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                        <el-button  @click="editContentVisible=false">取消</el-button>
+                        <el-button type="primary" @click="saveContent">确 定</el-button>
+                    </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
+    import  {getDate} from "../common/utils";
+    import { VueEditor } from "vue2-editor";
     export default {
+        components:{
+            VueEditor
+        },
         name: 'basetable',
         data() {
             return {
+                customToolbar: [
+                    ["bold", "italic", "underline"]
+                ],
                 query: {
                     pageIndex: 1,
                     pageSize: 10
                 },
+                noteVisible:false,
+                note:'',
+                orgCategories:[],
+                notices:[],
                 tableData: [],
                 delList: [],
                 editVisible: false,
                 addVisible: false,
+                showContentVisible:false,
+                editContentVisible:false,
                 pageTotal: 0,
+                haveOrg:false,
                 form: {
-                    priority:10
                 },
                 idx: -1,
+                org:{},
                 id: -1,
+                areas:[],
                 rules:{
                     name: [
-                        { required: true, message: '请输入模式名称', trigger: 'blur' }
+                        { required: true, message: '请输入名称', trigger: 'blur' }
+                    ],
+                    publishDate:[
+                        { required: true, message: '请选择发布日期', trigger: 'blur' }
+                    ],
+                    area: [{ type:'array', required: true, message: '请选择区域', trigger:['blur','change'] }],
+                    orgCategoryId: [{ required: true, message: '请选择企业类别', trigger: ['blur','change'] }],
+                    timeliness:[
+                        { required: true, message: '请选择时效性', trigger: 'blur' }
+                    ],
+                    content:[
+                        { required: true, message: '请输入文本内容', trigger: 'blur' }
+                    ],
+                    implementDate:[
+                        { required: true, message: '请选择实施日期', trigger: 'blur' }
                     ]
                 }
             };
         },
+        filters:{
+            formatDate(value){
+                if(value){
+                    return getDate(new Date(value));
+                }else{
+                    return '';
+                }
+            }
+        },
         created() {
             this.getData();
+            this.$axios.get("/user/haveOrg").then(res =>{
+                if(res.data.data){
+                    this.haveOrg = true;
+                    this.org = res.data.data;
+                }
+            }).catch(error=>console.log(error));
         },
         methods: {
+            saveContent(){
+                this.$axios.put("/template/content?" + this.$qs.stringify(this.form)).then(res => {
+                    if (res.data.result.resultCode == 200) {
+                        this.editContentVisible = false;
+                        this.getData();
+                    } else {
+                        this.$message.error(res.data.result.message);
+                    }
+                }).catch(err => {
+                    console.log(err);
+                });
+            },
+            showContent(row){
+                this.form = row;
+                this.showContentVisible=true;
+                this.$axios.get("/notice/notices",{
+                    params:{
+                        lawOrRulesId:row.id,
+                        type:'template'
+                    }
+                }).then(res =>{
+                    this.notices = res.data;
+                }).catch(error=>console.log(error));
+            },
+            showNote(note){
+                this.note = note;
+                this.noteVisible=true;
+            },
+            handleAdd(){
+                this.form = {};
+                this.addVisible = true;
+            },
+            handleChange(){
+                if(this.form.area&&this.form.area.length>0){
+                    this.form.provinceId=this.form.area[0];
+                    if(this.form.area.length==2){
+                        this.form.cityId=this.form.area[1];
+                    }
+                    if(this.form.area.length==3){
+                        this.form.cityId=this.form.area[1];
+                        this.form.regionId=this.form.area[2];
+                    }
+                }
+            },
+            dateFormatter(row, column, cellValue, index){
+                if(cellValue){
+                    return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
+            },
             closeDialog(){
                 this.$refs["form"].clearValidate();
             },
@@ -152,7 +282,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/template/template/" + this.form.id).then(res => {
+                        this.$axios.delete("/template/template/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -170,19 +300,27 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                this.$refs["form"].clearValidate();
+                if(row.publishDate){
+                    this.form.publishDate = getDate(new Date(row.publishDate));
+                }
+                if(row.implementDate){
+                    this.form.implementDate = getDate(new Date(row.implementDate));
+                }
+                if(row.orgCategory){
+                    this.form.orgCategoryId = row.orgCategory.id;
+                }
+                this.form.area=[row.province.id,row.city.id,row.region.id];
             },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
-                    console.log(this.form);
                     if (validate) {
                         this.$axios.put("/template/template?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
                             } else {
-                                this.$message.error("编辑失败：模式名称已被使用!");
+                                this.$message.error(res.data.result.message);
                             }
                         }).catch(err => {
                             console.log(err);
@@ -201,8 +339,9 @@
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
+                                this.form = {};
                             }else{
-                                this.$message.error("添加失败：模式名称已被使用!");
+                                this.$message.error(res.data.result.message);
                             }
                         }).catch(err =>{
                             console.log(err);
@@ -226,14 +365,6 @@
         margin-bottom: 20px;
     }
 
-    .handle-select {
-        width: 120px;
-    }
-
-    .handle-input {
-        width: 300px;
-        display: inline-block;
-    }
     .table {
         width: 100%;
         font-size: 14px;
@@ -243,11 +374,5 @@
     }
     .mr10 {
         margin-right: 10px;
-    }
-    .table-td-thumb {
-        display: block;
-        margin: auto;
-        width: 40px;
-        height: 40px;
     }
 </style>

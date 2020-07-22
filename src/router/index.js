@@ -28,8 +28,8 @@ export default new Router({
                   meta:{title:'企业人员资料'}
                 },
                 {
-                  path:'/templates',
-                  component:()=>import('../components/page/Template.vue'),
+                  path:'/template',
+                  component:()=>import('../components/page/Templates.vue'),
                   meta:{title:'模板管理'}
                 },
             {

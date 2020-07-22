@@ -145,10 +145,8 @@
                 </el-table-column>
                 <el-table-column prop="name" label="名称">
                 </el-table-column>
-                <el-table-column prop="publishDate" label="发布日期"  :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="publishDepartment"  label="发文部门"></el-table-column>
-                <el-table-column prop="num" label="发文字号"  ></el-table-column>
-                <el-table-column prop="timeliness" label="时效性"  ></el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
                 <el-table-column prop="note" label="备注"  width="150" >
                     <template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
@@ -165,7 +163,7 @@
                                 type="text"
                                 icon="el-icon-copy-document"
                                 class="red"
-                                @click="handleDelete(scope.$index, scope.row)"
+                                @click="importTemplate(scope.$index, scope.row)"
                         >引入</el-button>
                     </template>
                 </el-table-column>
@@ -362,8 +360,23 @@
                this.showTemplateContentVisible = true;
                this.template = row;
             },
+            importTemplate(index,row){//引入模板
+               this.template = row;
+                this.$confirm('确定要引入该模板吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        let formData = new FormData();
+                        formData.append("templateId",row.id);
+                        this.$axios.post("/rules/template",formData)
+                            .then(res=>{
+                                this.getData();
+                            }).catch(error=>console.log(error));
+                    })
+                    .catch(() => {});
+            },
             findTemplates(){
-                this.$axios.get("/rules/templates",{
+                this.$axios.get("/template/templatesByPage",{
                     params:{
                         page:this.templates.pageIndex,
                         limit:this.templates.pageSize
