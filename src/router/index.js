@@ -28,6 +28,11 @@ export default new Router({
                   meta:{title:'企业人员资料'}
                 },
                 {
+                  path:'/safetyAccount',
+                  component:()=>import('../components/page/SafetyAccount.vue'),
+                  meta:{title:'安全投入台账'}
+                },
+                {
                   path:'/template',
                   component:()=>import('../components/page/Templates.vue'),
                   meta:{title:'模板管理'}
