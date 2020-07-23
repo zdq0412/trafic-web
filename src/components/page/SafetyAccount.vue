@@ -160,7 +160,11 @@
         <el-dialog title="" :visible.sync="usePlanVisible" width="70%"   @open="findPlan">
             <form :model="safetyProductionCost">
                 <table style="width: 100%;">
-                    <caption v-model="safetyProductionCost.title"></caption>
+                    <caption>{{safetyProductionCost.title}}</caption>
+                    <div style="float: right;">单位：元</div>
+                    <tr>
+
+                    </tr>
                 </table>
             </form>
             <span slot="footer" class="dialog-footer">
@@ -213,13 +217,18 @@
             this.getData();
         },
         methods: {
+            saveUsePlan(){
+
+            },
             //显示或编辑安全生产费用使用计划
             usePlan(){
                 this.usePlanVisible = true;
             },
             findPlan(){
                 this.$axios.get("/safetyProductionCost/safetyProductionCost").then(res =>{
-
+                    this.safetyProductionCost = res.data;
+                    this.safetyProductionCost.title=res.data.safetyYear+"年度安全生产费用提取和使用计划";
+                    this.safetyProductionCostPlans = res.data.plans;
                 }).catch(error => console.log(error));
             },
             handleAdd(){
