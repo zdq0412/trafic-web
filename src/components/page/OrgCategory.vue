@@ -28,6 +28,11 @@
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="name" label="名称"></el-table-column>
                 <el-table-column prop="createDate" label="创建日期" :formatter="formatDate"></el-table-column>
+                <el-table-column prop="safetyCostRatio" label="安全生产费用提取标准">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.safetyCostRatio}}%</div>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -65,9 +70,12 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="提取标准%" prop="safetyCostRatio">
+                    <el-input v-model="form.safetyCostRatio" placeholder="安全生产费用提取标准"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -80,9 +88,12 @@
         </el-dialog>
         <!-- 新增弹出框 -->
         <el-dialog title="新增" :visible.sync="addVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="提取标准%" prop="safetyCostRatio">
+                    <el-input v-model="form.safetyCostRatio" placeholder="安全生产费用提取标准"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -136,6 +147,9 @@
                 rules:{
                     name:[{
                         required:true,message:'请输入企业类别名称',trigger:'blur'
+                    }],
+                    safetyCostRatio:[{
+                        required:true,message:'请输入安全生产费用提取标准',trigger:'blur'
                     }]
                 }
             };

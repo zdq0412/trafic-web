@@ -50,6 +50,10 @@ width:500px;text-align: center;height:500px;" stretch>
                                 <el-input v-model="form.shortName" tabindex="2" placeholder="企业简称">
                                 </el-input>
                             </el-form-item>
+                            <el-form-item label=" " prop="legalPerson">
+                                <el-input v-model="form.legalPerson" tabindex="2" placeholder="企业法人">
+                                </el-input>
+                            </el-form-item>
                             <el-form-item label=" ">
                                 <el-input v-model="form.contact" tabindex="3" placeholder="联系人">
                                 </el-input>
@@ -135,6 +139,7 @@ width:500px;text-align: center;height:500px;" stretch>
                     name: [{ required: true, message: '请输入企业名称', trigger: 'blur' }],
                     code: [{ required: true, message: '请输入企业代码', trigger: 'blur' }],
                     shortName: [{ required: true, message: '请输入企业简称', trigger: 'blur' }],
+                    legalPerson: [{ required: true, message: '请输入企业法人', trigger: 'blur' }],
                     tel: [{ required: true, message: '请输入手机号码', trigger: 'blur' },{
                         validator:checkTel,trigger:'blur'
                     }],

@@ -185,7 +185,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col>
-                        <el-form-item label="法人">
+                        <el-form-item label="法人" prop="legalPerson">
                             <el-input v-model="form.legalPerson"></el-input>
                         </el-form-item>
                     </el-col>
@@ -268,7 +268,10 @@
                         required:true,message:'请输入企业代码',trigger:'blur'
                     }],
                     shortName:[{
-                        required:true,message:'请输入企业见吗',trigger:'blur'
+                        required:true,message:'请输入企业简码',trigger:'blur'
+                    }],
+                    legalPerson:[{
+                        required:true,message:'请输入企业法人',trigger:'blur'
                     }],
                     tel:[{
                         required:true,message:'请输入手机号',trigger:'blur'

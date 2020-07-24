@@ -21,6 +21,18 @@
                         class="handle-del mr10"
                         @click="usePlan"
                 >安全生产费用使用计划</el-button>
+                <el-button
+                        type="success"
+                        icon="el-icon-s-data"
+                        class="handle-del mr10"
+                        @click="statisticsVisible=true"
+                >统计报表</el-button>
+                <el-button
+                        type="success"
+                        icon="el-icon-s-data"
+                        class="handle-del mr10"
+                        @click="totalVisible=true"
+                >汇总报表</el-button>
             </div>
             <el-table
                     :data="tableData"
@@ -157,19 +169,176 @@
             </span>
         </el-dialog>
         <!-- 安全生产费用使用计划 -->
-        <el-dialog title="" :visible.sync="usePlanVisible" width="70%"   @open="findPlan">
-            <form :model="safetyProductionCost">
-                <table style="width: 100%;">
+        <el-dialog title="" :visible.sync="usePlanVisible" width="50%"   @open="findPlan">
+            <el-form :model="safetyProductionCost">
+                <div class="handle-box">
+                    <el-form-item label="年份" label-width="60">
+                    <el-date-picker
+                            v-model="year"
+                            type="year"
+                            value-format="yyyy"
+                            placeholder="选择年份">
+                    </el-date-picker>
+                    <el-button style="margin-left:10px;"
+                            type="primary"
+                            icon="el-icon-search"
+                            class="handle-del mr10"
+                            @click="findPlan"
+                    >查找</el-button>
+                    </el-form-item>
+                </div>
+                <table style="width: 100%;" cellspacing="0" cellpadding="0">
                     <caption>{{safetyProductionCost.title}}</caption>
-                    <div style="float: right;">单位：元</div>
                     <tr>
-
+                        <td colspan="4" style="border: none;">
+                            <div style="float: right;">单位:元</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per30">上年度实际营业收入</td>
+                        <td class="per20">
+                            <input v-if="!safetyProductionCost.fillIn" v-model="safetyProductionCost.lastYearActualIncome" ref="lastYearActualIncome" @blur="checkMoney('lastYearActualIncome')"></input>
+                            <div v-else>{{safetyProductionCost.lastYearActualIncome}}</div>
+                        </td>
+                        <td class="per30">本年度应提取的安全费用</td>
+                        <td class="per20">
+                            <input v-if="!safetyProductionCost.fillIn" v-model="safetyProductionCost.currentYearCost" ref="currentYearCost" @blur="checkMoney('currentYearCost')"></input>
+                            <div v-else>{{safetyProductionCost.currentYearCost}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per30">上年度结转安全费用</td>
+                        <td class="per20">
+                            <input v-if="!safetyProductionCost.fillIn" v-model="safetyProductionCost.lastYearCarryCost" ref="lastYearCarryCost" @blur="checkMoney('lastYearCarryCost')" ></input>
+                            <div v-else>{{safetyProductionCost.lastYearCarryCost}}</div>
+                        </td>
+                        <td class="per30">本年度实际可用安全费用</td>
+                        <td class="per20">
+                            <input v-if="!safetyProductionCost.fillIn" v-model="safetyProductionCost.currentYearActualCost" ref="currentYearActualCost" @blur="checkMoney('currentYearActualCost')"></input>
+                            <div v-else>{{safetyProductionCost.currentYearActualCost}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            本年度各类安全生产费用使用计划
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <table class="plan" cellspacing="0" cellpadding="0" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 70%;text-align: center;">安全生产费用支出类别</td>
+                                    <td style="width: 30%;text-align: center;">计划使用金额</td>
+                                </tr>
+                                <tr v-for="(plan,index) in safetyProductionCostPlans">
+                                    <td style="width: 70%;">{{plan.name}}</td>
+                                    <td style="width: 30%;">
+                                        <input v-if="!safetyProductionCost.fillIn" v-model="safetyProductionCostPlans[index].planCost" :ref="'plan'+index" @blur="checkMoney('plan',index)"></input>
+                                        <div v-else>{{safetyProductionCostPlans[index].planCost}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
                     </tr>
                 </table>
-            </form>
+            </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="usePlanVisible=false">取 消</el-button>
-                <el-button type="primary" @click="saveUsePlan">保存</el-button>
+                <el-button v-if="!safetyProductionCost.fillIn" type="primary" @click="saveUsePlan">保存</el-button>
+            </span>
+        </el-dialog>
+        <!--道路运输企业安全生产费用提取和使用情况统计表-->
+        <el-dialog title="" :visible.sync="statisticsVisible" width="50%"   @open="statistics">
+            <el-form :model="safetyProductionCost">
+                <div class="handle-box">
+                    <el-form-item label="日期" label-width="60">
+                        <el-date-picker v-if="query.type=='year'"
+                                        v-model="query.date"
+                                        type="year"
+                                        value-format="yyyy-MM-dd"
+                                        placeholder="选择日期">
+                        </el-date-picker>
+                    <el-date-picker v-else
+                            v-model="query.date"
+                            type="month"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                        <el-radio v-model="query.type" label="year" style="margin-left:10px;">按年</el-radio>
+                        <el-radio v-model="query.type" label="month">按月</el-radio>
+                    <el-button style="margin-left:10px;"
+                            type="primary"
+                            icon="el-icon-search"
+                            class="handle-del mr10"
+                            @click="statistics"
+                    >查找</el-button>
+                    </el-form-item>
+                </div>
+                <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                    <caption>{{safetyProductionCost.title}}</caption>
+                    <tr>
+                        <td colspan="4" style="border: none;">
+                            <div style="float: right;">单位:元</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td style="width:20%;">企业名称（公 章）</td>
+                                    <td style="width:45%;">{{org.name}} </td>
+                                    <td style="width:15%;">法定代表人</td>
+                                    <td style="width:20%;">{{org.legalPerson}}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per30">上年度实际营业收入</td>
+                        <td class="per20">
+                            <div>{{safetyProductionCost.lastYearActualIncome}}</div>
+                        </td>
+                        <td class="per30">本年度应提取的安全费用</td>
+                        <td class="per20">
+                            <div>{{safetyProductionCost.currentYearCost}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per30">上年度结转安全费用</td>
+                        <td class="per20">
+                            <div>{{safetyProductionCost.lastYearCarryCost}}</div>
+                        </td>
+                        <td class="per30">本年度实际可用安全费用</td>
+                        <td class="per20">
+                            <div>{{safetyProductionCost.currentYearActualCost}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            本年度截止月日已投入使用的各类安全生产费用合计
+                        </td>
+                        <td>{{safetyProductionCost.total}} </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <table class="plan" cellspacing="0" cellpadding="0" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 70%;text-align: center;">安全生产费用支出类别</td>
+                                    <td style="width: 30%;text-align: center;">支出金额</td>
+                                </tr>
+                                <tr v-for="(plan,index) in safetyProductionCostPlans">
+                                    <td style="width: 70%;">{{plan.name}}</td>
+                                    <td style="width: 30%;">
+                                        <div>{{safetyProductionCostPlans[index].planCost}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="usePlanVisible=false">关闭</el-button>
             </span>
         </el-dialog>
     </div>
@@ -177,14 +346,15 @@
 
 <script>
     import {getDate} from "../common/utils";
-
     export default {
         name: 'basetable',
         data() {
             return {
                 query: {
                     pageIndex: 1,
-                    pageSize: 10
+                    pageSize: 10,
+                    date:'',
+                    type:'year'
                 },
                 tableData: [],
                 safetyProductionCostPlans:[],
@@ -193,6 +363,9 @@
                 editVisible: false,
                 addVisible: false,
                 usePlanVisible:false,
+                statisticsVisible:false,
+                year:'',
+                org:{},
                 pageTotal: 0,
                 form: {},
                 idx: -1,
@@ -214,18 +387,103 @@
             };
         },
         created() {
+            this.$axios.get("/user/haveOrg").then(res =>{
+                if(res.data.data){
+                    this.org = res.data.data;
+                }
+            }).catch(error=>console.log(error));
             this.getData();
         },
         methods: {
+            //道路运输企业安全生产费用提取和使用情况统计表
+            statistics(){
+                this.$axios.get("/safetyProductionCost/statistics",{
+                    params:{
+                        date:this.query.date,
+                        type:this.query.type
+                    }
+                }).then(res=>{
+                    this.safetyProductionCost = res.data;
+                    this.safetyProductionCostPlans = this.safetyProductionCost.plans;
+                }).catch(error=>console.log(error));
+            },
+            checkMoney(ref,index){
+                let reg =/^[0-9]*$/;
+                switch (ref) {
+                    case 'lastYearActualIncome':{
+                        if(!reg.test(this.safetyProductionCost.lastYearActualIncome)){
+                            this.$message.error("上年度实际营业收入必须为数值!");
+                            this.$refs.lastYearActualIncome.focus();
+                            this.safetyProductionCost.lastYearActualIncome=0;
+                        }else{
+                            this.safetyProductionCost.currentYearCost=this.safetyProductionCost.lastYearActualIncome*this.safetyProductionCost.org.orgCategory.safetyCostRatio/100 ;
+                            this.safetyProductionCost.currentYearActualCost= this.safetyProductionCost.currentYearCost + this.safetyProductionCost.lastYearCarryCost;
+                        }
+                        break;
+                    }
+                    case 'currentYearCost':{
+                        if(!reg.test(this.safetyProductionCost.currentYearCost)){
+                            this.$message.error("本年度应提取的安全费用必须为数值!");
+                            this.$refs.currentYearCost.focus();
+                            this.safetyProductionCost.currentYearCost=this.safetyProductionCost.lastYearActualIncome*this.safetyProductionCost.org.orgCategory.safetyCostRatio/100;
+                        }
+                        break;
+                    }
+                    case 'lastYearCarryCost':{
+                        if(!reg.test(this.safetyProductionCost.lastYearCarryCost)){
+                            this.$message.error("上年度结转安全费用必须为数值!");
+                            this.$refs.lastYearCarryCost.focus();
+                            this.safetyProductionCost.lastYearCarryCost=0;
+                        }else{
+                            this.safetyProductionCost.currentYearActualCost= parseFloat(this.safetyProductionCost.currentYearCost) + parseFloat(this.safetyProductionCost.lastYearCarryCost);
+                        }
+                        break;
+                    }
+                    case 'currentYearActualCost':{
+                        if(!reg.test(this.safetyProductionCost.currentYearActualCost)){
+                            this.$message.error("本年度实际可用安全费用必须为数值!");
+                            this.$refs.currentYearActualCost.focus();
+                            this.safetyProductionCost.currentYearActualCost=0;
+                        }
+                        break;
+                    }
+                    case 'plan':{
+                        if(!reg.test(this.safetyProductionCostPlans[index].planCost)){
+                            this.$message.error("计划使用金额必须为数值!");
+                            //this.$refs.plan+index.focus();
+                            this.safetyProductionCostPlans[index]=0;
+                        }
+                        break;
+                    }
+                }
+            },
             saveUsePlan(){
-
+                let plans = '';
+                for(let i = 0;i<this.safetyProductionCostPlans.length;i++){
+                    let plan = this.safetyProductionCostPlans[i];
+                    plans += plan.id + ":" + plan.planCost;
+                    if(i<this.safetyProductionCostPlans.length-1){
+                        plans+=","
+                    }
+                }
+                this.safetyProductionCost.plans=plans;
+                this.$axios.post("/safetyProductionCost/safetyProductionCost",this.$qs.stringify(this.safetyProductionCost)).then(res=>{
+                        if(res.data.result.resultCode==200){
+                            this.$message.success("已保存!");
+                            this.findPlan();
+                        }
+                }).catch(error=>console.log(error));
             },
             //显示或编辑安全生产费用使用计划
             usePlan(){
                 this.usePlanVisible = true;
             },
             findPlan(){
-                this.$axios.get("/safetyProductionCost/safetyProductionCost").then(res =>{
+                this.$axios.get("/safetyProductionCost/safetyProductionCost",{
+                    params:{
+                        year:this.year
+                    }
+                }).then(res =>{
                     this.safetyProductionCost = res.data;
                     this.safetyProductionCost.title=res.data.safetyYear+"年度安全生产费用提取和使用计划";
                     this.safetyProductionCostPlans = res.data.plans;
@@ -362,5 +620,27 @@
     }
     .mr10 {
         margin-right: 10px;
+    }
+
+    .per20{
+        width:20%;
+    }
+    .per30{
+        width:30%;
+    }
+
+    table tr td{
+        border: black solid 1px;
+        text-align: center;
+        height:30px;
+        line-height: 30px;
+    }
+    .plan tr td{
+        text-align: left;
+        padding-left: 10px;
+    }
+    td input{
+        border: none;
+        font-size: 16px;
     }
 </style>
