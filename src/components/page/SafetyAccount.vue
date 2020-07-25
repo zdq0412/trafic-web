@@ -89,10 +89,10 @@
             <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
                 <el-form-item label="开票日期" prop="billingDate">
                     <el-date-picker style="width: 100%;"
-                            v-model="form.billingDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
+                                    v-model="form.billingDate"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="类别" prop="safetyProductionCostPlanId">
@@ -131,10 +131,10 @@
             <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
                 <el-form-item label="开票日期" prop="billingDate">
                     <el-date-picker style="width: 100%;"
-                            v-model="form.billingDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
+                                    v-model="form.billingDate"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="类别" prop="safetyProductionCostPlanId">
@@ -173,18 +173,18 @@
             <el-form :model="safetyProductionCost">
                 <div class="handle-box">
                     <el-form-item label="年份" label-width="60">
-                    <el-date-picker
-                            v-model="year"
-                            type="year"
-                            value-format="yyyy"
-                            placeholder="选择年份">
-                    </el-date-picker>
-                    <el-button style="margin-left:10px;"
-                            type="primary"
-                            icon="el-icon-search"
-                            class="handle-del mr10"
-                            @click="findPlan"
-                    >查找</el-button>
+                        <el-date-picker
+                                v-model="year"
+                                type="year"
+                                value-format="yyyy"
+                                placeholder="选择年份">
+                        </el-date-picker>
+                        <el-button style="margin-left:10px;"
+                                   type="primary"
+                                   icon="el-icon-search"
+                                   class="handle-del mr10"
+                                   @click="findPlan"
+                        >查找</el-button>
                     </el-form-item>
                 </div>
                 <table style="width: 100%;" cellspacing="0" cellpadding="0">
@@ -258,20 +258,20 @@
                                         value-format="yyyy-MM-dd"
                                         placeholder="选择日期">
                         </el-date-picker>
-                    <el-date-picker v-else
-                            v-model="query.date"
-                            type="month"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
+                        <el-date-picker v-else
+                                        v-model="query.date"
+                                        type="month"
+                                        value-format="yyyy-MM-dd"
+                                        placeholder="选择日期">
+                        </el-date-picker>
                         <el-radio v-model="query.type" label="year" style="margin-left:10px;">按年</el-radio>
                         <el-radio v-model="query.type" label="month">按月</el-radio>
-                    <el-button style="margin-left:10px;"
-                            type="primary"
-                            icon="el-icon-search"
-                            class="handle-del mr10"
-                            @click="statistics"
-                    >查找</el-button>
+                        <el-button style="margin-left:10px;"
+                                   type="primary"
+                                   icon="el-icon-search"
+                                   class="handle-del mr10"
+                                   @click="statistics"
+                        >查找</el-button>
                     </el-form-item>
                 </div>
                 <table style="width: 100%;" cellspacing="0" cellpadding="0">
@@ -335,10 +335,145 @@
                             </table>
                         </td>
                     </tr>
+                    <tr>
+                        <td colspan="4">
+                            备注：1、财政部、国家安全生产监督管理总局制定的《企业安全生产经费提取和使用管理办法》（财企〔2012〕16号）第九条规定，交通运输企业以上年度实际营业收入为计提依据，按照以下标准平均逐月提取：（一）普通货运业务按照1%提取；（二）客运业务、管道运输、危险品等特殊货运业务按照1.5%提取。
+                        </td>
+                    </tr>
                 </table>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="usePlanVisible=false">关闭</el-button>
+                <el-button @click="statisticsVisible=false">关闭</el-button>
+            </span>
+        </el-dialog>
+        <!--年度安全生产费用提取和使用情况汇总表-->
+        <el-dialog title="" :visible.sync="totalVisible" width="80%"   @open="total">
+            <el-form :model="safetyProductionCost">
+                <div class="handle-box">
+                    <el-form-item label="年份" label-width="60">
+                        <el-date-picker
+                                v-model="safetyYear"
+                                type="year"
+                                value-format="yyyy"
+                                placeholder="选择年份">
+                        </el-date-picker>
+                        <el-button style="margin-left:10px;"
+                                   type="primary"
+                                   icon="el-icon-search"
+                                   class="handle-del mr10"
+                                   @click="total"
+                        >查找</el-button>
+                    </el-form-item>
+                </div>
+                <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                    <caption>{{safetyProductionCost.title}}</caption>
+                    <tr>
+                        <td style="border: none;">
+                            <div style="float: right;">单位:元</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td style="width:20%;">上年度实际营业收入</td>
+                                    <td style="width:15%;">
+                                        <div>{{safetyProductionCost.lastYearActualIncome}}</div>
+                                    </td>
+                                    <td style="width:20%;">本年度应提取的安全费用</td>
+                                    <td style="width:15%;">
+                                        <div>{{safetyProductionCost.currentYearCost}}</div>
+                                    </td>
+                                    <td style="width:15%;">上年度结转</td>
+                                    <td style="width:15%;">
+                                        <div>{{safetyProductionCost.lastYearCarryCost}}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width:20%;">本年度实际可用安全费用</td>
+                                    <td style="width:15%;">
+                                        <div>{{safetyProductionCost.currentYearActualCost}}</div>
+                                    </td>
+                                    <td style="width:20%;">本年度实际使用支出的安全费用</td>
+                                    <td style="width:15%;">
+                                        <div>{{safetyProductionCost.currentYearActualUsed}}</div>
+                                    </td>
+                                    <td style="width:15%;">年度结余资金</td>
+                                    <td style="width:15%;">
+                                        <div>{{safetyProductionCost.costLeft}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table class="plan" cellspacing="0" cellpadding="0" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 40%;text-align: center;">安全生产费用支出类别（每月）</td>
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                    <td>5</td>
+                                    <td>6</td>
+                                    <td>7</td>
+                                    <td>8</td>
+                                    <td>9</td>
+                                    <td>10</td>
+                                    <td>11</td>
+                                    <td>12</td>
+                                    <td>小计</td>
+                                </tr>
+                                <tr v-for="(plan,index) in plans">
+                                    <td>{{plan.name}}</td>
+                                    <td>
+                                        <div>{{plan.oneMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.twoMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.threeMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.fourMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.fiveMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.sixMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.sevenMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.eightMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.nineMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.tenMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.elevenMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.twelveMonth}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{plan.total}}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="totalVisible=false">关闭</el-button>
             </span>
         </el-dialog>
     </div>
@@ -360,10 +495,13 @@
                 safetyProductionCostPlans:[],
                 safetyProductionCost:{},
                 delList: [],
+                plans:[],
                 editVisible: false,
                 addVisible: false,
                 usePlanVisible:false,
                 statisticsVisible:false,
+                totalVisible:false,
+                safetyYear:'',
                 year:'',
                 org:{},
                 pageTotal: 0,
@@ -395,6 +533,58 @@
             this.getData();
         },
         methods: {
+            //年度安全生产费用提取和使用情况汇总表
+            total(){
+                //道路运输企业安全生产费用提取和使用情况统计表
+                this.$axios.get("/safetyProductionCost/total",{
+                    params:{
+                        year:this.safetyYear
+                    }
+                }).then(res=>{
+                    this.safetyProductionCost = res.data;
+                    this.safetyProductionCost.title=res.data.safetyYear + "年度安全生产费用提取和使用情况汇总表";
+                    this.plans = this.safetyProductionCost.plans;
+                    if(this.plans && this.plans.length>0){
+                        let oneMonth=0,
+                            twoMonth=0,
+                            threeMonth=0,
+                            fourMonth=0,
+                            fiveMonth=0,
+                            sixMonth=0,
+                            sevenMonth=0,
+                            eightMonth=0,
+                            nineMonth=0,
+                            tenMonth=0,
+                            elevenMonth=0,
+                            twelveMonth=0,
+                            total=0;//小计
+                        for(let i = 0;i<this.plans.length;i++){
+                            let plan = this.plans[i];
+                            plan.total = plan.oneMonth + plan.twoMonth + plan.threeMonth +
+                                    plan.fourMonth + plan.fiveMonth + plan.sixMonth + plan.sevenMonth +
+                                    plan.eightMonth + plan.nineMonth + plan.tenMonth + plan.elevenMonth + plan.twelveMonth;
+                            oneMonth += plan.oneMonth;
+                            twoMonth += plan.twoMonth;
+                            threeMonth += plan.threeMonth;
+                            fourMonth += plan.fourMonth;
+                            fiveMonth += plan.fiveMonth;
+                            sixMonth += plan.sixMonth;
+                            sevenMonth += plan.sevenMonth;
+                            eightMonth += plan.eightMonth;
+                            nineMonth += plan.nineMonth;
+                            tenMonth += plan.tenMonth;
+                            elevenMonth += plan.elevenMonth;
+                            twelveMonth += plan.twelveMonth;
+                            total += plan.total;
+                        }
+                        this.plans.push({name:"合  计",oneMonth:oneMonth,twoMonth:twoMonth,threeMonth:threeMonth,fourMonth:fourMonth,
+                            fiveMonth:fiveMonth,sixMonth:sixMonth,sevenMonth:sevenMonth,eightMonth:eightMonth,nineMonth:nineMonth,tenMonth:tenMonth,
+                            elevenMonth:elevenMonth,twelveMonth:twelveMonth,total:total})
+                    }else{
+                        this.plans.push({name:"合  计",oneMonth:"",twoMonth:"",threeMonth:"",fourMonth:"",fiveMonth:"",sixMonth:"",sevenMonth:"",eightMonth:"",nineMonth:"",tenMonth:"",elevenMonth:"",twelveMonth:"",total:""});
+                    }
+                }).catch(error=>console.log(error));
+            },
             //道路运输企业安全生产费用提取和使用情况统计表
             statistics(){
                 this.$axios.get("/safetyProductionCost/statistics",{
@@ -468,10 +658,10 @@
                 }
                 this.safetyProductionCost.plans=plans;
                 this.$axios.post("/safetyProductionCost/safetyProductionCost",this.$qs.stringify(this.safetyProductionCost)).then(res=>{
-                        if(res.data.result.resultCode==200){
-                            this.$message.success("已保存!");
-                            this.findPlan();
-                        }
+                    if(res.data.result.resultCode==200){
+                        this.$message.success("已保存!");
+                        this.findPlan();
+                    }
                 }).catch(error=>console.log(error));
             },
             //显示或编辑安全生产费用使用计划
