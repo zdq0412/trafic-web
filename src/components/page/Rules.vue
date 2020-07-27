@@ -415,7 +415,7 @@
                     .catch(() => {});
             },
             saveContent(){
-                this.$axios.put("/rules/content?" + this.$qs.stringify(this.form)).then(res => {
+                this.$axios.post("/rules/content" , this.$qs.stringify(this.form)).then(res => {
                     if (res.data.result.resultCode == 200) {
                         this.editContentVisible = false;
                         this.getData();
@@ -537,6 +537,7 @@
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
+                        this.form.content='';
                         this.$axios.put("/rules/rules?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;

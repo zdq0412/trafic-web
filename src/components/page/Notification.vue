@@ -288,7 +288,7 @@
         },
         methods: {
             saveContent(){
-                this.$axios.put("/notice/content?" + this.$qs.stringify(this.form)).then(res => {
+                this.$axios.post("/notice/content" , this.$qs.stringify(this.form)).then(res => {
                     if (res.data.result.resultCode == 200) {
                         this.editContentVisible = false;
                         this.getData();
@@ -405,8 +405,8 @@
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
-                    console.log(this.form);
                     if (validate) {
+                        this.form.content='';
                         this.$axios.put("/notice/notice?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;

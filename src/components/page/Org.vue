@@ -356,7 +356,13 @@
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
                 }
-                this.form.area=[row.province.id,row.city.id,row.region.id];
+                if(row.province && row.city && row.region){
+                    this.form.area=[row.province.id,row.city.id,row.region.id];
+                }else if(row.province && row.city){
+                    this.form.area=[row.province.id,row.city.id];
+                }else if(row.province){
+                    this.form.area=[row.province.id];
+                }
             },
             // 保存编辑
             saveEdit() {

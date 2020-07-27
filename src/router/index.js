@@ -33,9 +33,44 @@ export default new Router({
                   meta:{title:'安全投入台账'}
                 },
                 {
-                  path:'/template',
-                  component:()=>import('../components/page/Templates.vue'),
-                  meta:{title:'模板管理'}
+                  path:'/rulesTemplate',
+                  component:()=>import('../components/page/RuleTemplate.vue'),
+                  meta:{title:'安全规章制度'}
+                },
+                {
+                  path:'/securityCheckTemplate',
+                  component:()=>import('../components/page/SecurityCheckTemplate.vue'),
+                  meta:{title:'安全检查模板'}
+                },
+                {
+                  path:'/deviceCheckTemplate',
+                  component:()=>import('../components/page/DeviceCheckTemplate.vue'),
+                  meta:{title:'设备点检模板'}
+                },
+                {
+                  path:'/hiddenDangerCheckTemplate',
+                  component:()=>import('../components/page/HiddenDangerCheckTemplate.vue'),
+                  meta:{title:'隐患排查模板'}
+                },
+                {
+                  path:'/riskCheckTemplate',
+                  component:()=>import('../components/page/RiskCheckTemplate.vue'),
+                  meta:{title:'风险排查模板'}
+                },
+                {
+                  path:'/meetingTemplate',
+                  component:()=>import('../components/page/MeetingTemplate.vue'),
+                  meta:{title:'会议模板'}
+                },
+                {
+                  path:'/trainingTemplate',
+                  component:()=>import('../components/page/TrainingTemplate.vue'),
+                  meta:{title:'培训模板'}
+                },
+                {
+                  path:'/responsibilityTemplate',
+                  component:()=>import('../components/page/ResponsibilityTemplate.vue'),
+                  meta:{title:'责任书模板'}
                 },
             {
                   path:'/law',

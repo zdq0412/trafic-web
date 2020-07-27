@@ -3,8 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 法律法规政策-<span style="color:red;">{{(org.province==null?'':org.province.name)+(org.city==null?'':org.city.name)+(org.region==null?'':org.region.name)}}
-                    {{org.orgCategory==null?'':org.orgCategory.name}}类</span>
+                    <i class="el-icon-lx-cascades"></i> 安全规章制度模板
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -37,11 +36,12 @@
                         <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="publishDate" label="发布日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="implementDate" label="实施日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="publishDepartment" label="发文部门"></el-table-column>
-                <el-table-column prop="num" label="发文字号"></el-table-column>
-                <el-table-column prop="timeliness" label="时效性"></el-table-column>
+                <el-table-column prop="creator" label="创建人"></el-table-column>
+                <el-table-column prop="orgCategory.name" label="企业类别"></el-table-column>
+                <el-table-column prop="province.name" label="省"></el-table-column>
+                <el-table-column prop="city.name" label="市"></el-table-column>
+                <el-table-column prop="region.name" label="区"></el-table-column>
+                <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
@@ -75,55 +75,38 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog" @open="loadData">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item label="发布日期" prop="publishDate">
-                    <el-date-picker
-                            v-model="form.publishDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="实施日期" prop="implementDate">
-                    <el-date-picker
-                            v-model="form.implementDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="发文部门">
-                    <el-input v-model="form.publishDepartment" ></el-input>
-                </el-form-item>
-                <el-form-item label="区域" v-if="!haveOrg" >
-                    <el-cascader
-                            v-model="form.area"
-                            :options="areas"
-                            :props="{label:'name',value:'id'}"
-                            @change="handleChange"></el-cascader>
-                </el-form-item>
-                <el-form-item label="企业类别" v-if="!haveOrg" >
-                    <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
-                        <el-option
-                                v-for="item in orgCategories"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+                <el-row type="flex" class="row-bg" >
+                    <el-col >
+                        <el-form-item label="省市区">
+                            <el-cascader
+                                    v-model="form.area"
+                                    :options="areas"
+                                    :props="{label:'name',value:'id'}"
+                                    @change="handleChange"></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <el-form-item label="企业类别">
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                                <el-option
+                                        v-for="item in orgCategories"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
-                </el-form-item>
-                <el-form-item label="时效性" prop="timeliness">
-                    <el-select v-model="form.timeliness">
-                        <el-option label="有效"  value="有效"></el-option>
-                        <el-option label="无效"  value="无效"></el-option>
-                    </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -132,55 +115,38 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" @open="loadData">
-            <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @open="loadSelectData" @close="closeDialog" >
+            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item label="发布日期" prop="publishDate">
-                    <el-date-picker
-                            v-model="form.publishDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="实施日期" prop="implementDate">
-                    <el-date-picker
-                            v-model="form.implementDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="发文部门">
-                    <el-input v-model="form.publishDepartment" ></el-input>
-                </el-form-item>
-                <el-form-item label="区域" v-if="!haveOrg">
-                    <el-cascader
-                            v-model="form.area"
-                            :options="areas"
-                            :props="{label:'name',value:'id'}"
-                            @change="handleChange"></el-cascader>
-                </el-form-item>
-                <el-form-item label="企业类别" v-if="!haveOrg">
-                    <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
-                        <el-option
-                                v-for="item in orgCategories"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+                <el-row type="flex" class="row-bg" >
+                    <el-col >
+                        <el-form-item label="省市区">
+                            <el-cascader
+                                    v-model="form.area"
+                                    :options="areas"
+                                    :props="{label:'name',value:'id'}"
+                                    @change="handleChange"></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <el-form-item label="企业类别">
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                                <el-option
+                                        v-for="item in orgCategories"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
-                </el-form-item>
-                <el-form-item label="时效性" prop="timeliness">
-                    <el-select v-model="form.timeliness">
-                        <el-option label="有效"  value="有效"></el-option>
-                        <el-option label="无效"  value="无效"></el-option>
-                    </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -197,20 +163,8 @@
         <!--显示文本内容-->
         <el-dialog title="文本内容" :visible.sync="showContentVisible" width="30%">
             <div v-html="form.content"></div>
-            <div style="margin-top: 10px;">
-                <el-card shadow="hover" v-if="notices.length>0">
-                    <div slot="header" class="clearfix">
-                        <span style="font-weight: bold;">发文历史</span>
-                    </div>
-                    <el-row v-for="(notice,index) in notices" style="color: red;margin: 5px;">
-                        <el-col :span="1"><div>{{index+1}}</div></el-col>
-                        <el-col :span="23"><div>{{notice.publishDate | formatDate}}</div></el-col>
-                    </el-row>
-                </el-card>
-            </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
-                <el-button type="warning" @click="handleExecute" v-if="form.content">发文执行</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
@@ -247,6 +201,7 @@
                 noteVisible:false,
                 note:'',
                 orgCategories:[],
+                areas:[],
                 notices:[],
                 tableData: [],
                 delList: [],
@@ -257,28 +212,18 @@
                 pageTotal: 0,
                 haveOrg:false,
                 form: {
+                    area:[]
                 },
                 idx: -1,
                 org:{},
                 id: -1,
-                areas:[],
                 rules:{
+
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' }
                     ],
-                    publishDate:[
-                        { required: true, message: '请选择发布日期', trigger: 'blur' }
-                    ],
-                    area: [{ type:'array', required: true, message: '请选择区域', trigger:['blur','change'] }],
-                    orgCategoryId: [{ required: true, message: '请选择企业类别', trigger: ['blur','change'] }],
-                    timeliness:[
-                        { required: true, message: '请选择时效性', trigger: 'blur' }
-                    ],
                     content:[
                         { required: true, message: '请输入文本内容', trigger: 'blur' }
-                    ],
-                    implementDate:[
-                        { required: true, message: '请选择实施日期', trigger: 'blur' }
                     ]
                 }
             };
@@ -302,36 +247,24 @@
             }).catch(error=>console.log(error));
         },
         methods: {
-            handleExecute(){
-                if(!this.form.content){
-                    this.$message.error("该文件内容为空，不能发布!");
-                    return false;
-                }
-                this.$confirm('确定要发布该通知吗？', '提示', {
-                    type: 'warning'
-                })
-                    .then(() => {
-
-                        this.$axios.get("/law/publishLaw" ,{
-                            params:{
-                                id:this.form.id
-                            }
-                        } ).then(res => {
-                            if(res.data.result.resultCode==200){
-                                this.$message.success('发布成功，请到企业发文通知中查看!');
-                                //this.getData();
-                                this.showContentVisible=false;
-                            }else{
-                                this.$message.error(res.data.result.message);
-                            }
-                        }) .catch(error =>{
-                            console.log(error);
-                        });
-                    })
-                    .catch(() => {});
+            loadSelectData(){
+                this.$axios.get("/orgCategory/orgCategorys").then(res => {
+                    this.orgCategories = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+                this.$axios.get("/category/categorys",{
+                    params:{
+                        type:'区域'
+                    }
+                }).then(res => {
+                    this.areas = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             saveContent(){
-                this.$axios.post("/law/content", this.$qs.stringify(this.form)).then(res => {
+                this.$axios.post("/template/content" , this.$qs.stringify(this.form)).then(res => {
                     if (res.data.result.resultCode == 200) {
                         this.editContentVisible = false;
                         this.getData();
@@ -345,36 +278,18 @@
             showContent(row){
                 this.form = row;
                 this.showContentVisible=true;
-                this.$axios.get("/notice/notices",{
+               /* this.$axios.get("/notice/notices",{
                     params:{
                         lawOrRulesId:row.id,
-                        type:'law'
+                        type:'template'
                     }
                 }).then(res =>{
                     this.notices = res.data;
-                }).catch(error=>console.log(error));
+                }).catch(error=>console.log(error));*/
             },
             showNote(note){
                 this.note = note;
                 this.noteVisible=true;
-            },
-            loadData(){
-                if(!this.haveOrg){
-                    this.$axios.get("/orgCategory/orgCategorys").then(res => {
-                        this.orgCategories = res.data.data;
-                    }).catch(error => {
-                        console.log(error);
-                    });
-                    this.$axios.get("/category/categorys",{
-                        params:{
-                            type:'区域'
-                        }
-                    }).then(res => {
-                        this.areas = res.data.data;
-                    }).catch(error => {
-                        console.log(error);
-                    });
-                }
             },
             handleAdd(){
                 this.form = {};
@@ -404,7 +319,7 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/law/lawsByPage",{
+                this.$axios.get("/template/templatesByPage",{
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize
@@ -428,7 +343,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/law/law/" + row.id).then(res => {
+                        this.$axios.delete("/template/template/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -446,23 +361,23 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                if(row.publishDate){
-                    this.form.publishDate = getDate(new Date(row.publishDate));
-                }
-                if(row.implementDate){
-                    this.form.implementDate = getDate(new Date(row.implementDate));
-                }
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
                 }
-                this.form.area=[row.province.id,row.city.id,row.region.id];
+                if(row.province && row.city && row.region){
+                    this.form.area=[row.province.id,row.city.id,row.region.id];
+                }else if(row.province && row.city){
+                    this.form.area=[row.province.id,row.city.id];
+                }else if(row.province){
+                    this.form.area=[row.province.id];
+                }
             },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.content='';
-                        this.$axios.put("/law/law?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/template/template?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -482,7 +397,7 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.$axios.post("/law/law",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/template/template",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
@@ -512,14 +427,6 @@
         margin-bottom: 20px;
     }
 
-    .handle-select {
-        width: 120px;
-    }
-
-    .handle-input {
-        width: 300px;
-        display: inline-block;
-    }
     .table {
         width: 100%;
         font-size: 14px;
@@ -529,11 +436,5 @@
     }
     .mr10 {
         margin-right: 10px;
-    }
-    .table-td-thumb {
-        display: block;
-        margin: auto;
-        width: 40px;
-        height: 40px;
     }
 </style>

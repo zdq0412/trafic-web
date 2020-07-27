@@ -1,0 +1,570 @@
+<template>
+    <div>
+        <div class="crumbs">
+            <el-breadcrumb separator="/">
+                <el-breadcrumb-item>
+                    <i class="el-icon-lx-cascades"></i> 会议模板
+                </el-breadcrumb-item>
+            </el-breadcrumb>
+        </div>
+        <div class="container">
+            <div class="handle-box">
+                <el-button
+                        type="primary"
+                        icon="el-icon-plus"
+                        class="handle-del mr10"
+                        @click="handleAdd"
+                >新增</el-button>
+            </div>
+            <el-table
+                    :data="tableData"
+                    border
+                    class="table"
+                    header-cell-class-name="table-header"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(query.pageIndex - 1) * query.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="creator" label="创建人"></el-table-column>
+                <el-table-column prop="orgCategory.name" label="企业类别"></el-table-column>
+                <el-table-column prop="province.name" label="省"></el-table-column>
+                <el-table-column prop="city.name" label="市"></el-table-column>
+                <el-table-column prop="region.name" label="区"></el-table-column>
+                <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="note" label="备注">
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-edit"
+                                @click="handleEdit(scope.$index, scope.row)"
+                        >编辑</el-button>
+                        <el-button
+                                type="text"
+                                icon="el-icon-delete"
+                                class="red"
+                                @click="handleDelete(scope.$index, scope.row)"
+                        >删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="query.pageIndex"
+                        :page-size="query.pageSize"
+                        :total="pageTotal"
+                        @current-change="handlePageChange"
+                ></el-pagination>
+            </div>
+        </div>
+        <!-- 编辑弹出框 -->
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @open="loadSelectData" @close="closeDialog">
+            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-row type="flex" class="row-bg" >
+                    <el-col >
+                        <el-form-item label="省市区">
+                            <el-cascader
+                                    v-model="form.area"
+                                    :options="areas"
+                                    :props="{label:'name',value:'id'}"
+                                    @change="handleChange"></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <el-form-item label="企业类别">
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                                <el-option
+                                        v-for="item in orgCategories"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item label="备注">
+                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!-- 新增弹出框 -->
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @open="loadSelectData" @close="closeDialog" >
+            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-row type="flex" class="row-bg" >
+                    <el-col >
+                        <el-form-item label="省市区">
+                            <el-cascader
+                                    v-model="form.area"
+                                    :options="areas"
+                                    :props="{label:'name',value:'id'}"
+                                    @change="handleChange"></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col>
+                        <el-form-item label="企业类别">
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                                <el-option
+                                        v-for="item in orgCategories"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item label="备注">
+                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="cancelAdd()">取 消</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
+            {{note}}
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="noteVisible=false">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!--显示模板内容-->
+        <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
+            <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                <caption>{{meetingTemplate.name}}</caption>
+                <tr>
+                    <td colspan="4" style="border: none;">
+                        <div style="float: right;margin-right: 10px;">会议日期</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">会议名称</td>
+                    <td colspan="3">
+                        <input v-if="editable" v-model="meetingTemplate.meetingName" placeholder="会议名称"/>
+                        <div v-else>{{meetingTemplate.meetingName}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">会议时间</td>
+                    <td class="per20">
+
+                    </td>
+                    <td class="per30">会议地点</td>
+                    <td class="per20">
+                        <input v-if="editable" v-model="meetingTemplate.meetingPlace" placeholder="会议地点" />
+                        <div v-else>{{meetingTemplate.meetingPlace}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">会议主持人</td>
+                    <td class="per20">
+                        <input v-if="editable" v-model="meetingTemplate.president"  placeholder="主持人"/>
+                        <div v-else>{{meetingTemplate.president}}</div>
+                    </td>
+                    <td class="per30">会议记录人</td>
+                    <td class="per20">
+                        <input v-if="editable" v-model="meetingTemplate.recorder" placeholder="记录人"/>
+                        <div v-else>{{meetingTemplate.recorder}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">到场人员</td>
+                    <td colspan="3">
+                        <input v-if="editable" v-model="meetingTemplate.attendants" placeholder="到场人员"/>
+                        <div v-else>{{meetingTemplate.attendants}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">到场人数</td>
+                    <td class="per20">
+                        <input v-if="editable" v-model="meetingTemplate.attendance" placeholder="到场人数"/>
+                        <div v-else>{{meetingTemplate.attendance}}</div>
+                    </td>
+                    <td class="per30">缺席人数</td>
+                    <td class="per20">
+                        <input v-if="editable" v-model="meetingTemplate.absent" placeholder="缺席人数"/>
+                        <div v-else>{{meetingTemplate.absent}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">会议主题</td>
+                    <td colspan="3">
+                        <input v-if="editable" v-model="meetingTemplate.theme" placeholder="会议主题" />
+                        <div v-else>{{meetingTemplate.theme}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">会议内容</td>
+                    <td colspan="3">
+                        <textarea v-if="editable" v-model="meetingTemplate.content" rows="5" placeholder="会议内容"></textarea>
+                        <div v-else v-html="meetingTemplate.content"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">需解决问题</td>
+                    <td colspan="3">
+                        <textarea v-if="editable" v-model="meetingTemplate.problems" rows="5" placeholder="需解决问题"></textarea>
+                        <div v-else v-html="meetingTemplate.problems"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">解决办法与工作安排</td>
+                    <td colspan="3">
+                        <textarea v-if="editable" v-model="meetingTemplate.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
+                        <div v-else v-html="meetingTemplate.methods"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per30">备注</td>
+                    <td colspan="3">
+                        <textarea v-if="editable" v-model="meetingTemplate.templateNote" rows="5" placeholder="备注"></textarea>
+                        <div v-else v-html="meetingTemplate.templateNote"></div>
+                    </td>
+                </tr>
+            </table>
+            <span slot="footer" class="dialog-footer">
+                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
+                <el-button v-else type="primary" @click="saveContent">保存</el-button>
+                <el-button  @click="showContentVisible=false">关闭</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+    import  {getDate} from "../common/utils";
+    import { VueEditor } from "vue2-editor";
+    export default {
+        components:{
+            VueEditor
+        },
+        name: 'basetable',
+        data() {
+            return {
+                customToolbar: [
+                    ["bold", "italic", "underline"]
+                ],
+                query: {
+                    pageIndex: 1,
+                    pageSize: 10
+                },
+                noteVisible:false,
+                note:'',
+                orgCategories:[],
+                areas:[],
+                editable:false,
+                notices:[],
+                tableData: [],
+                delList: [],
+                editVisible: false,
+                addVisible: false,
+                showContentVisible:false,
+                pageTotal: 0,
+                haveOrg:false,
+                meetingTemplate:{},
+                form: {
+                    area:[]
+                },
+                idx: -1,
+                org:{},
+                id: -1,
+                rules:{
+                    name: [
+                        { required: true, message: '请输入名称', trigger: 'blur' }
+                    ],
+                    content:[
+                        { required: true, message: '请输入文本内容', trigger: 'blur' }
+                    ]
+                }
+            };
+        },
+        filters:{
+            formatDate(value){
+                if(value){
+                    return getDate(new Date(value));
+                }else{
+                    return '';
+                }
+            }
+        },
+        created() {
+            this.getData();
+            this.$axios.get("/user/haveOrg").then(res =>{
+                if(res.data.data){
+                    this.haveOrg = true;
+                    this.org = res.data.data;
+                }
+            }).catch(error=>console.log(error));
+        },
+        methods: {
+            loadSelectData(){
+                this.$axios.get("/orgCategory/orgCategorys").then(res => {
+                    this.orgCategories = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+                this.$axios.get("/category/categorys",{
+                    params:{
+                        type:'区域'
+                    }
+                }).then(res => {
+                    this.areas = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            editContent(){
+              this.editable=true;
+                if(this.meetingTemplate.content){
+                    this.meetingTemplate.content = this.meetingTemplate.content.replace(/<br>/g,"\n");
+                }
+                if(this.meetingTemplate.problems){
+                    this.meetingTemplate.problems = this.meetingTemplate.problems.replace(/<br>/g,"\n");
+                }
+                if(this.meetingTemplate.templateNote){
+                    this.meetingTemplate.templateNote = this.meetingTemplate.templateNote.replace(/<br>/g,"\n");
+                }
+                if(this.meetingTemplate.methods){
+                    this.meetingTemplate.methods = this.meetingTemplate.methods.replace(/<br>/g,"\n");
+                }
+            },
+            saveContent(){
+                if(this.meetingTemplate.content){
+                    this.meetingTemplate.content = this.meetingTemplate.content.replace(/\n/g,"<br>");
+                }
+                if(this.meetingTemplate.problems){
+                    this.meetingTemplate.problems = this.meetingTemplate.problems.replace(/\n/g,"<br>");
+                }
+                if(this.meetingTemplate.templateNote){
+                    this.meetingTemplate.templateNote = this.meetingTemplate.templateNote.replace(/\n/g,"<br>");
+                }
+                if(this.meetingTemplate.methods){
+                    this.meetingTemplate.methods = this.meetingTemplate.methods.replace(/\n/g,"<br>");
+                }
+                this.$axios.post("/meetingTemplate/content", this.$qs.stringify(this.meetingTemplate)).then(res => {
+                    if (res.data.result.resultCode == 200) {
+                        this.showContentVisible = false;
+                        this.getData();
+                    } else {
+                        this.$message.error(res.data.result.message);
+                    }
+                }).catch(err => {
+                    console.log(err);
+                });
+            },
+            showContent(row){
+                this.form = row;
+                this.meetingTemplate=row;
+                this.showContentVisible=true;
+                this.editable = false;
+            },
+            showNote(note){
+                this.note = note;
+                this.noteVisible=true;
+            },
+            handleAdd(){
+                this.form = {};
+                this.addVisible = true;
+            },
+            handleChange(){
+                if(this.form.area&&this.form.area.length>0){
+                    this.form.provinceId=this.form.area[0];
+                    if(this.form.area.length==2){
+                        this.form.cityId=this.form.area[1];
+                    }
+                    if(this.form.area.length==3){
+                        this.form.cityId=this.form.area[1];
+                        this.form.regionId=this.form.area[2];
+                    }
+                }
+            },
+            dateFormatter(row, column, cellValue, index){
+                if(cellValue){
+                    return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
+            },
+            closeDialog(){
+                this.$refs["form"].clearValidate();
+            },
+            // 获取 easy-mock 的模拟数据
+            getData() {
+                this.$axios.get("/meetingTemplate/meetingTemplatesByPage",{
+                    params:{
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize,
+                        type:'meeting'
+                    }
+                }).then(res => {
+                    this.tableData = res.data.data;
+                    this.pageTotal = res.data.count;
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            cancelAdd(){
+                this.addVisible=false;
+                this.$refs["form"].clearValidate();
+            },
+            // 删除操作
+            handleDelete(index, row) {
+                this.form=row;
+                // 二次确认删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        this.$axios.delete("/meetingTemplate/meetingTemplate/" + row.id).then(res => {
+                            if(res.data.result.resultCode==200){
+                                this.$message.success('删除成功');
+                                this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }) .catch(error =>{
+                            console.log(error);
+                        });
+                    })
+                    .catch(() => {});
+            },
+            // 编辑操作
+            handleEdit(index, row) {
+                this.idx = index;
+                this.form = row;
+                this.editVisible = true;
+                if(row.orgCategory){
+                    this.form.orgCategoryId = row.orgCategory.id;
+                }
+                if(row.province && row.city && row.region){
+                    this.form.area=[row.province.id,row.city.id,row.region.id];
+                }else if(row.province && row.city){
+                    this.form.area=[row.province.id,row.city.id];
+                }else if(row.province){
+                    this.form.area=[row.province.id];
+                }
+            },
+            // 保存编辑
+            saveEdit() {
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        this.form.content='';
+                        this.$axios.put("/meetingTemplate/meetingTemplate?" + this.$qs.stringify(this.form)).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.editVisible = false;
+                                this.getData();
+                            } else {
+                                this.$message.error(res.data.result.message);
+                            }
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 保存新增
+            saveAdd(){
+                this.$refs["form"].clearValidate();
+                this.$refs.form.validate(validate =>{
+                    if(validate){
+                        this.form.type='meeting';
+                        this.$axios.post("/meetingTemplate/meetingTemplate",this.$qs.stringify(this.form)).then(res=>{
+                            if(res.data.result.resultCode==200){
+                                this.addVisible = false;
+                                this.getData();
+                                this.form = {};
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
+                        }).catch(err =>{
+                            console.log(err);
+                        });
+                    }else{
+                        return false;
+                    }
+                });
+            },
+            // 分页导航
+            handlePageChange(val) {
+                this.$set(this.query, 'pageIndex', val);
+                this.getData();
+            }
+        }
+    };
+</script>
+
+<style scoped>
+    .handle-box {
+        margin-bottom: 20px;
+    }
+
+    .table {
+        width: 100%;
+        font-size: 14px;
+    }
+    .red {
+        color: #ff0000;
+    }
+    .mr10 {
+        margin-right: 10px;
+    }
+
+    .per20{
+        width:20%;
+    }
+    .per30{
+        width:30%;
+    }
+
+    table tr td{
+        border: black solid 1px;
+        text-align: center;
+        height:30px;
+        line-height: 30px;
+    }
+    td input,td textarea{
+        border: none;
+        font-size: 16px;
+        width: 90%;
+        padding: 3px;
+    }
+
+    td div{
+        text-align: left;
+        padding-left: 5px;
+    }
+</style>
