@@ -48,9 +48,14 @@ export default new Router({
                   meta:{title:'设备点检模板'}
                 },
                 {
-                  path:'/hiddenDangerCheckTemplate',
-                  component:()=>import('../components/page/HiddenDangerCheckTemplate.vue'),
-                  meta:{title:'隐患排查模板'}
+                  path:'/tankVehicleTemplate',
+                  component:()=>import('../components/page/TankVehicleTemplate.vue'),
+                  meta:{title:'罐式车辆检查模板'}
+                },
+                {
+                  path:'/dangerGoodsCheckTemplate',
+                  component:()=>import('../components/page/DangerGoodsCheckTemplate.vue'),
+                  meta:{title:'危险货物自查模板'}
                 },
                 {
                   path:'/riskCheckTemplate',

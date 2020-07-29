@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 安全检查模板
+                    <i class="el-icon-lx-cascades"></i> 危险货物自查模板
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -161,60 +161,127 @@
             </span>
         </el-dialog>
         <!--显示模板内容-->
-        <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
+        <el-dialog title="模板内容" :visible.sync="showContentVisible" width="70%">
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                <caption>{{securityCheckTemplate.name}}</caption>
-                <tr>
-                    <td colspan="2" style="border: none;">
-                        <div style="float: right;margin-right: 10px;">检查日期</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">检查对象</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.checkObject"  placeholder="检查对象"></textarea>
-                        <div v-else>{{securityCheckTemplate.checkObject}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">监督检查的部门及人员</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.deptAndEmp" placeholder="监督检查的部门及人员" ></textarea>
-                        <div v-else>{{securityCheckTemplate.deptAndEmp}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">检查主要内容</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.content"  placeholder="检查主要内容"></textarea>
-                        <div v-else v-html="securityCheckTemplate.content"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">提出问题</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.problems" placeholder="提出问题" rows="5"></textarea>
-                        <div v-else v-html="securityCheckTemplate.problems"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">整改结果</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.result" placeholder="整改结果" rows="5"></textarea>
-                        <div v-else v-html="securityCheckTemplate.result"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">监察人员签字</td>
-                    <td class="per80" style="height:50px;">
+                <caption style="margin-bottom: 20px;font-size: 18px;">{{dangerGoodsCheckTemplate.name}}</caption>
 
+                <thead>
+                <tr>
+                    <th style="width:10%;">检查时间</th>
+                    <th style="width:12%;">被检单位名称</th>
+                    <th style="width:17%;">存在的安全隐患</th>
+                    <th style="width:17%;">整改措施</th>
+                    <th style="width:8%;">整改时限</th>
+                    <th style="width:8%;">责任人</th>
+                    <th style="width:8%;">整改到位时间</th>
+                    <th style="width:8%;">销号时间</th>
+                    <th style="width:12%;">备注</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="detail in details">
+                    <td>
+                        <span v-if="editable">
+                            <el-date-picker
+                                    style="width: 150px;"
+                                    v-model="detail.checkDate"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
+                             </el-date-picker>
+                        </span>
+                        <span v-else>
+                            {{detail.checkDate | formatDate}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <textarea type="text" v-model="detail.checkedOrg"></textarea>
+                        </span>
+                        <span v-else>
+                            {{detail.checkedOrg}}
+                        </span>
+                    </td>
+                    <td style="text-align: left;padding-left:3px;">
+                        <span v-if="editable">
+                            <textarea type="text" v-model="detail.hiddenDanger" rows="5"></textarea>
+                        </span>
+                        <span v-else v-html="detail.hiddenDanger" >
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <textarea type="text" v-model="detail.correctiveAction" rows="5"></textarea>
+                        </span>
+                        <span v-else v-html="detail.correctiveAction">
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <input type="text" v-model="detail.timelimit" />
+                        </span>
+                        <span v-else>
+                            {{detail.timelimit}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <input type="text" v-model="detail.person" />
+                        </span>
+                        <span v-else>
+                            {{detail.person}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <el-date-picker
+                                    style="width: 150px;"
+                                    v-model="detail.endTime"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
+                             </el-date-picker>
+                        </span>
+                        <span v-else>
+                            {{detail.endTime | formatDate}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <el-date-picker
+                                    style="width: 150px;"
+                                    v-model="detail.cancelDate"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
+                             </el-date-picker>
+                        </span>
+                        <span v-else>
+                            {{detail.cancelDate | formatDate}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <textarea type="text" v-model="detail.detailNote" rows="5"></textarea>
+                        </span>
+                        <span v-else v-html="detail.detailNote">
+                        </span>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per20">受检对象签字</td>
-                    <td class="per80"  style="height:50px;">
+                    <td colspan="9" style="border: none;text-align: left;">
+                        <span>企业负责人签字：</span> <div style="width:200px;display: inline-block;">&nbsp;</div>
+                        <span>安全检查组人员签字：</span>
                     </td>
                 </tr>
+                <tr v-if="editable">
+                    <td colspan="9" style="border: none;">
+                        <div style="width: 100%;text-align: center;">
+                            <el-button type="text" @click="addLine">新增一行</el-button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
             </table>
             <span slot="footer" class="dialog-footer">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
@@ -255,7 +322,8 @@
                 showContentVisible:false,
                 pageTotal: 0,
                 haveOrg:false,
-                securityCheckTemplate:{},
+                details:[],
+                dangerGoodsCheckTemplate:{},
                 form: {
                     area:[]
                 },
@@ -291,6 +359,9 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            addLine(){
+              this.details.push({id:'',checkDate:'',checkedOrg:'',hiddenDanger:'',correctiveAction:'',timelimit:'',person:'',endTime:'',cancelDate:'',note:''})
+            },
             loadSelectData(){
                 this.$axios.get("/orgCategory/orgCategorys").then(res => {
                     this.orgCategories = res.data.data;
@@ -309,27 +380,54 @@
             },
             editContent(){
                 this.editable=true;
-                if(this.securityCheckTemplate.content){
-                    this.securityCheckTemplate.content = this.securityCheckTemplate.content.replace(/<br>/g,"\n");
-                }
-                if(this.securityCheckTemplate.problems){
-                    this.securityCheckTemplate.problems = this.securityCheckTemplate.problems.replace(/<br>/g,"\n");
-                }
-                if(this.securityCheckTemplate.result){
-                    this.securityCheckTemplate.result = this.securityCheckTemplate.result.replace(/<br>/g,"\n");
+                if(this.details && this.details.length>0){
+                    for(let i = 0;i<this.details.length;i++){
+                        let detail = this.details[i];
+                        detail.cancelDate = getDate(new Date(detail.cancelDate));
+                        detail.checkDate = getDate(new Date(detail.checkDate));
+                        detail.endTime = getDate(new Date(detail.endTime));
+                        if(detail.hiddenDanger){
+                            detail.hiddenDanger = detail.hiddenDanger.replace(/<br>/g,"\n");
+                        }
+                        if(detail.correctiveAction){
+                            detail.correctiveAction = detail.correctiveAction.replace(/<br>/g,"\n");
+                        }
+                        if(detail.detailNote){
+                            detail.detailNote = detail.detailNote.replace(/<br>/g,"\n");
+                        }
+                    }
                 }
             },
             saveContent(){
-                if(this.securityCheckTemplate.content){
-                    this.securityCheckTemplate.content = this.securityCheckTemplate.content.replace(/\n/g,"<br>");
+                let details = '';
+                if(this.details && this.details.length>0){
+                    for(let i = 0;i<this.details.length;i++){
+                        let detail = this.details[i];
+                        if(!detail.checkDate &&!detail.person&&!detail.cancelDate&&!detail.checkedOrg&&!detail.hiddenDanger
+                        &&!detail.correctiveAction&&!detail.timelimit&&!detail.endTime&&!detail.detailNote){
+
+                        }else{
+                            if(detail.hiddenDanger){
+                                detail.hiddenDanger = detail.hiddenDanger.replace(/\n/g,"<br>");
+                            }
+                            if(detail.correctiveAction){
+                                detail.correctiveAction = detail.correctiveAction.replace(/\n/g,"<br>");
+                            }
+                            if(detail.detailNote){
+                                detail.detailNote = detail.detailNote.replace(/\n/g,"<br>");
+                            }
+                            details+=detail.checkDate + "|" + detail.person + "|" + detail.cancelDate + "|" + detail.checkedOrg + "|" +
+                                    detail.hiddenDanger + "|" + detail.correctiveAction + "|" + detail.timelimit + "|" + detail.endTime + "|" + detail.detailNote;
+                            if(i<this.details.length-1){
+                                details+="#";
+                            }
+                        }
+                    }
                 }
-                if(this.securityCheckTemplate.problems){
-                    this.securityCheckTemplate.problems = this.securityCheckTemplate.problems.replace(/\n/g,"<br>");
-                }
-                if(this.securityCheckTemplate.result){
-                    this.securityCheckTemplate.result = this.securityCheckTemplate.result.replace(/\n/g,"<br>");
-                }
-                this.$axios.post("/securityCheckTemplate/content", this.$qs.stringify(this.securityCheckTemplate)).then(res => {
+                let formData = new FormData();
+                formData.append("id",this.dangerGoodsCheckTemplate.id);
+                formData.append("details",details);
+                this.$axios.post("/dangerGoodsCheckTemplate/content", formData).then(res => {
                     if (res.data.result.resultCode == 200) {
                         this.showContentVisible = false;
                         this.getData();
@@ -342,9 +440,18 @@
             },
             showContent(row){
                 this.form = row;
-                this.securityCheckTemplate=row;
+                this.dangerGoodsCheckTemplate=row;
                 this.showContentVisible=true;
                 this.editable = false;
+                this.$axios.get("dangerGoodsCheckDetail/dangerGoodsCheckDetail",{
+                    params:{
+                        id:row.id
+                    }
+                }).then(res=>{
+                    this.details = res.data;
+                }).catch(error=>{
+                    console.log(error);
+                });
             },
             showNote(note){
                 this.note = note;
@@ -378,7 +485,7 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/securityCheckTemplate/securityCheckTemplatesByPage",{
+                this.$axios.get("/dangerGoodsCheckTemplate/dangerGoodsCheckTemplatesByPage",{
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
@@ -403,7 +510,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/securityCheckTemplate/securityCheckTemplate/" + row.id).then(res => {
+                        this.$axios.delete("/dangerGoodsCheckTemplate/dangerGoodsCheckTemplate/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -437,7 +544,7 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.content='';
-                        this.$axios.put("/securityCheckTemplate/securityCheckTemplate?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/dangerGoodsCheckTemplate/dangerGoodsCheckTemplate?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -458,7 +565,7 @@
                 this.$refs.form.validate(validate =>{
                     if(validate){
                         this.form.type='training';
-                        this.$axios.post("/securityCheckTemplate/securityCheckTemplate",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/dangerGoodsCheckTemplate/dangerGoodsCheckTemplate",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
@@ -506,7 +613,7 @@
         width:80%;
     }
 
-    table tr td{
+    tr td,tr th{
         border: black solid 1px;
         text-align: center;
         height:30px;
@@ -514,8 +621,8 @@
     }
     td input,td textarea{
         border: none;
-        font-size: 20px;
-        width: 99%;
+        font-size: 14px;
+        width: 93%;
         padding: 3px;
     }
 

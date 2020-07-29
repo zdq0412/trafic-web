@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 安全检查模板
+                    <i class="el-icon-lx-cascades"></i> 罐式车辆检查模板
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -163,56 +163,192 @@
         <!--显示模板内容-->
         <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                <caption>{{securityCheckTemplate.name}}</caption>
+                <caption>{{tankVehicleTemplate.name}}</caption>
                 <tr>
-                    <td colspan="2" style="border: none;">
-                        <div style="float: right;margin-right: 10px;">检查日期</div>
+                    <td class="per20" style="text-align: center;">车 号</td>
+                    <td colspan="2">
+                        <input v-if="editable" v-model="tankVehicleTemplate.carNo" placeholder="车号"/>
+                        <div v-else>{{tankVehicleTemplate.carNo}}</div>
                     </td>
+                    <td class="per20" style="text-align: center;">检查时间</td>
+                    <td class="per20">  年 月 日</td>
                 </tr>
                 <tr>
-                    <td class="per20">检查对象</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.checkObject"  placeholder="检查对象"></textarea>
-                        <div v-else>{{securityCheckTemplate.checkObject}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">监督检查的部门及人员</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.deptAndEmp" placeholder="监督检查的部门及人员" ></textarea>
-                        <div v-else>{{securityCheckTemplate.deptAndEmp}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">检查主要内容</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.content"  placeholder="检查主要内容"></textarea>
-                        <div v-else v-html="securityCheckTemplate.content"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">提出问题</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.problems" placeholder="提出问题" rows="5"></textarea>
-                        <div v-else v-html="securityCheckTemplate.problems"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">整改结果</td>
-                    <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.result" placeholder="整改结果" rows="5"></textarea>
-                        <div v-else v-html="securityCheckTemplate.result"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per20">监察人员签字</td>
-                    <td class="per80" style="height:50px;">
+                    <td colspan="3">罐体有无破损、罐体是否整洁、罐体灯光是否完整</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem1" style="display: inline-block;">
+                                <input v-if="!tankVehicleTemplate.checkItem1" v-model="tankVehicleTemplate.checkItem1Msg" :placeholder="placeholderTxt"/>
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem1" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem1"> {{tankVehicleTemplate.checkItem1Msg}}</span>
+                            </el-checkbox>
 
+                        </div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per20">受检对象签字</td>
-                    <td class="per80"  style="height:50px;">
+                    <td colspan="3">反光条是否完整、反光标示是否完整、反光牌是否有</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem2">
+                                <input v-if="!tankVehicleTemplate.checkItem2" v-model="tankVehicleTemplate.checkItem2Msg" :placeholder="placeholderTxt"/>
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem2" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem2"> {{tankVehicleTemplate.checkItem2Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">后保险杠是否合格</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem3">
+                                <input v-if="!tankVehicleTemplate.checkItem3" v-model="tankVehicleTemplate.checkItem3Msg" :placeholder="placeholderTxt"/>
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem3" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem3"> {{tankVehicleTemplate.checkItem3Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">静电接地带是否有效</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem4">
+                                <input v-if="!tankVehicleTemplate.checkItem4" v-model="tankVehicleTemplate.checkItem4Msg" :placeholder="placeholderTxt" />
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem4" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem4"> {{tankVehicleTemplate.checkItem4Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">罐体两边防护网是否完整</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem5">
+                                <input v-if="!tankVehicleTemplate.checkItem5" v-model="tankVehicleTemplate.checkItem5Msg" :placeholder="placeholderTxt"/>
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem5" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem5"> {{tankVehicleTemplate.checkItem5Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">轮胎是否符合行车安全要求</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem6">
+                                <input v-if="!tankVehicleTemplate.checkItem6" v-model="tankVehicleTemplate.checkItem6Msg" :placeholder="placeholderTxt" />
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem6" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem6"> {{tankVehicleTemplate.checkItem6Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">灭火器是否合格</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem7">
+                                <input v-if="!tankVehicleTemplate.checkItem7" v-model="tankVehicleTemplate.checkItem7Msg" :placeholder="placeholderTxt"/>
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem7" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem7"> {{tankVehicleTemplate.checkItem7Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">确认罐体上喷涂的介质名称是否与《公告》、《合格证》上记载的一致</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem8">
+                                <input v-if="!tankVehicleTemplate.checkItem8" v-model="tankVehicleTemplate.checkItem8Msg" :placeholder="placeholderTxt" />
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem8" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem8"> {{tankVehicleTemplate.checkItem8Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">喷涂的介质与记载的内容一致，运输介质属于国家安监总局等五部委文件《关于明确在用液体危险货物罐车加装紧急切断装置液体介质范围的通知》（安监总管三〔2014〕135号）中列举的17种介质范围。检查其卸料口处是否安装有紧急切断阀、紧急切断阀是否有远程控制系统。</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem9">
+                                <input v-if="!tankVehicleTemplate.checkItem9" v-model="tankVehicleTemplate.checkItem9Msg" :placeholder="placeholderTxt" />
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem9" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem9"> {{tankVehicleTemplate.checkItem9Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">检查紧急切断阀有无腐蚀、生锈、裂纹等缺陷，有无松脱、渗漏等现象，检查紧急切断阀控制按钮是否完好。</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem10">
+                                <input v-if="!tankVehicleTemplate.checkItem10" v-model="tankVehicleTemplate.checkItem10Msg" :placeholder="placeholderTxt"/>
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem10" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem10"> {{tankVehicleTemplate.checkItem10Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">检查紧急切断阀是否处于关闭状态，没有关闭的要求当场关闭，并对驾驶人进行一次面对面的教育提示。</td>
+                    <td colspan="2">
+                        <div v-if="editable">
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem11">
+                                <input v-if="!tankVehicleTemplate.checkItem11" v-model="tankVehicleTemplate.checkItem11Msg" :placeholder="placeholderTxt"/>
+                            </el-checkbox>
+                        </div>
+                        <div v-else>
+                            <el-checkbox v-model="tankVehicleTemplate.checkItem11" disabled>
+                                <span v-if="!tankVehicleTemplate.checkItem11"> {{tankVehicleTemplate.checkItem11Msg}}</span>
+                            </el-checkbox>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20" style="text-align: center;">处理意见</td>
+                    <td colspan="4">
+                        <textarea v-if="editable" v-model="tankVehicleTemplate.suggestion" rows="5"></textarea>
+                        <div v-else v-html="tankVehicleTemplate.suggestion"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center;">检查人员签字（必须两人以上）</td>
+                    <td colspan="3" style="width: 60%;">
                     </td>
                 </tr>
             </table>
@@ -242,6 +378,7 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+                placeholderTxt:'请输入原因',
                 noteVisible:false,
                 note:'',
                 orgCategories:[],
@@ -255,7 +392,7 @@
                 showContentVisible:false,
                 pageTotal: 0,
                 haveOrg:false,
-                securityCheckTemplate:{},
+                tankVehicleTemplate:{},
                 form: {
                     area:[]
                 },
@@ -309,27 +446,15 @@
             },
             editContent(){
                 this.editable=true;
-                if(this.securityCheckTemplate.content){
-                    this.securityCheckTemplate.content = this.securityCheckTemplate.content.replace(/<br>/g,"\n");
-                }
-                if(this.securityCheckTemplate.problems){
-                    this.securityCheckTemplate.problems = this.securityCheckTemplate.problems.replace(/<br>/g,"\n");
-                }
-                if(this.securityCheckTemplate.result){
-                    this.securityCheckTemplate.result = this.securityCheckTemplate.result.replace(/<br>/g,"\n");
+                if(this.tankVehicleTemplate.suggestion){
+                    this.tankVehicleTemplate.suggestion = this.tankVehicleTemplate.suggestion.replace(/<br>/g,"\n");
                 }
             },
             saveContent(){
-                if(this.securityCheckTemplate.content){
-                    this.securityCheckTemplate.content = this.securityCheckTemplate.content.replace(/\n/g,"<br>");
+                if(this.tankVehicleTemplate.suggestion){
+                    this.tankVehicleTemplate.suggestion = this.tankVehicleTemplate.suggestion.replace(/\n/g,"<br>");
                 }
-                if(this.securityCheckTemplate.problems){
-                    this.securityCheckTemplate.problems = this.securityCheckTemplate.problems.replace(/\n/g,"<br>");
-                }
-                if(this.securityCheckTemplate.result){
-                    this.securityCheckTemplate.result = this.securityCheckTemplate.result.replace(/\n/g,"<br>");
-                }
-                this.$axios.post("/securityCheckTemplate/content", this.$qs.stringify(this.securityCheckTemplate)).then(res => {
+                this.$axios.post("/tankVehicleTemplate/content", this.$qs.stringify(this.tankVehicleTemplate)).then(res => {
                     if (res.data.result.resultCode == 200) {
                         this.showContentVisible = false;
                         this.getData();
@@ -342,7 +467,7 @@
             },
             showContent(row){
                 this.form = row;
-                this.securityCheckTemplate=row;
+                this.tankVehicleTemplate=row;
                 this.showContentVisible=true;
                 this.editable = false;
             },
@@ -378,7 +503,7 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/securityCheckTemplate/securityCheckTemplatesByPage",{
+                this.$axios.get("/tankVehicleTemplate/tankVehicleTemplatesByPage",{
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
@@ -403,7 +528,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/securityCheckTemplate/securityCheckTemplate/" + row.id).then(res => {
+                        this.$axios.delete("/tankVehicleTemplate/tankVehicleTemplate/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -437,7 +562,7 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.content='';
-                        this.$axios.put("/securityCheckTemplate/securityCheckTemplate?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/tankVehicleTemplate/tankVehicleTemplate?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -457,8 +582,7 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.form.type='training';
-                        this.$axios.post("/securityCheckTemplate/securityCheckTemplate",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/tankVehicleTemplate/tankVehicleTemplate",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
@@ -502,20 +626,21 @@
     .per20{
         width:20%;
     }
-    .per80{
-        width:80%;
+    .per30{
+        width:30%;
     }
 
     table tr td{
         border: black solid 1px;
-        text-align: center;
+        text-align: left;
         height:30px;
         line-height: 30px;
+        padding-left: 5px;
     }
     td input,td textarea{
         border: none;
-        font-size: 20px;
-        width: 99%;
+        font-size: 16px;
+        width: 98%;
         padding: 3px;
     }
 
