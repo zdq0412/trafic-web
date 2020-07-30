@@ -237,7 +237,7 @@
             </span>
         </el-dialog>
         <!--显示文本内容-->
-        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="30%">
+        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="60%">
             <div v-html="form.content"></div>
             <div style="margin-top: 10px;">
                 <el-card shadow="hover" v-if="notices.length>0">
@@ -256,14 +256,14 @@
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="30%">
+        <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="60%">
             <div v-html="template.content"></div>
             <span slot="footer" class="dialog-footer">
                 <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
         <!--编辑文本内容-->
-        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="30%">
+        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="60%">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
             </el-form>

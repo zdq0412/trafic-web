@@ -47,8 +47,32 @@
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
+                <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
+                        <el-upload style="display: none;"
+                                   :action="uploadUrl"
+                                   :limit="1"
+                                   :auto-upload="true"
+                                   ref="uploadFile"
+                                   :data="param"
+                                   accept=".doc,.docx"
+                                   :on-success="handleAvatarSuccess"
+                                   :before-upload="beforeAvatarUpload"
+                                   :headers="headers">
+                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                        </el-upload>
+                        <el-button
+                                type="text"
+                                icon="el-icon-upload2"
+                                class="upload"
+                                @click="uploadTemplate(scope.$index, scope.row)"
+                        >上传模板</el-button>
+                        <el-button v-if="scope.row.realPath"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   class="download"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载模板</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -80,7 +104,7 @@
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-row type="flex" class="row-bg" >
+                <el-row type="flex" class="row-bg" v-if="!haveOrg">
                     <el-col >
                         <el-form-item label="省市区">
                             <el-cascader
@@ -91,7 +115,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row>
+                <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
                             <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
@@ -120,7 +144,7 @@
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-row type="flex" class="row-bg" >
+                <el-row type="flex" class="row-bg" v-if="!haveOrg">
                     <el-col >
                         <el-form-item label="省市区">
                             <el-cascader
@@ -131,7 +155,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row>
+                <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
                             <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
@@ -161,7 +185,7 @@
             </span>
         </el-dialog>
         <!--显示文本内容-->
-        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="30%">
+        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="60%">
             <div v-html="form.content"></div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
@@ -169,7 +193,7 @@
             </span>
         </el-dialog>
         <!--编辑文本内容-->
-        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="30%">
+        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="60%">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
             </el-form>
@@ -206,6 +230,11 @@
                 tableData: [],
                 delList: [],
                 editVisible: false,
+                uploadUrl:'',
+                param:{type:'ruleTemplate'},
+                headers:{
+                    token : localStorage.getItem("token")
+                },
                 addVisible: false,
                 showContentVisible:false,
                 editContentVisible:false,
@@ -239,6 +268,7 @@
         },
         created() {
             this.getData();
+            this.uploadUrl = this.$baseURL + "/templateUpload";
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
@@ -247,6 +277,31 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            uploadTemplate(index,row){
+                this.$refs.uploadFile.clearFiles();
+                this.param.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
+            downloadTemplate(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
+            },
+            handleAvatarSuccess(res, file) {
+                this.$message.success("上传成功!");
+                this.getData();
+            },
+            beforeAvatarUpload(file) {
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                const isWord = file.type==='application/msword';
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false
+                }
+                if(!isWord){
+                    this.$message.error('只能上传work文档!');
+                    return false;
+                }
+                return  isWord&isLt5M;
+            },
             loadSelectData(){
                 this.$axios.get("/orgCategory/orgCategorys").then(res => {
                     this.orgCategories = res.data.data;
@@ -436,5 +491,12 @@
     }
     .mr10 {
         margin-right: 10px;
+    }
+    .upload{
+        color:#E6A23C;
+    }
+
+    .download{
+        color:#67C23A;
     }
 </style>

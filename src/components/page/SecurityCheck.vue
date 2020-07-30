@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 责任书模板
+                    <i class="el-icon-lx-cascades"></i> 安全检查
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -47,32 +47,8 @@
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="280" align="center">
+                <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   accept=".doc,.docx"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
-                        <el-button
-                                type="text"
-                                icon="el-icon-upload2"
-                                class="upload"
-                                @click="uploadTemplate(scope.$index, scope.row)"
-                        >上传模板</el-button>
-                        <el-button v-if="scope.row.realPath"
-                                   type="text"
-                                   icon="el-icon-download"
-                                   class="download"
-                                   @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载模板</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -104,7 +80,7 @@
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-row type="flex" class="row-bg" v-if="!haveOrg">
+                <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="省市区">
                             <el-cascader
@@ -115,7 +91,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="!haveOrg">
+                <el-row>
                     <el-col>
                         <el-form-item label="企业类别">
                             <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
@@ -144,7 +120,7 @@
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-row type="flex" class="row-bg" v-if="!haveOrg">
+                <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="省市区">
                             <el-cascader
@@ -155,7 +131,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="!haveOrg">
+                <el-row>
                     <el-col>
                         <el-form-item label="企业类别">
                             <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
@@ -184,23 +160,67 @@
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
             </span>
         </el-dialog>
-        <!--显示文本内容-->
-        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="50%">
-            <div v-html="form.content"></div>
+        <!--显示模板内容-->
+        <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
+            <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                <caption>{{securityCheck.name}}</caption>
+                <tr>
+                    <td colspan="2" style="border: none;">
+                        <div style="float: right;margin-right: 10px;">检查日期</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20">检查对象</td>
+                    <td class="per80">
+                        <textarea v-if="editable" v-model="securityCheck.checkObject"  placeholder="检查对象"></textarea>
+                        <div v-else>{{securityCheck.checkObject}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20">监督检查的部门及人员</td>
+                    <td class="per80">
+                        <textarea v-if="editable" v-model="securityCheck.deptAndEmp" placeholder="监督检查的部门及人员" ></textarea>
+                        <div v-else>{{securityCheck.deptAndEmp}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20">检查主要内容</td>
+                    <td class="per80">
+                        <textarea v-if="editable" v-model="securityCheck.content"  placeholder="检查主要内容"></textarea>
+                        <div v-else v-html="securityCheck.content"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20">提出问题</td>
+                    <td class="per80">
+                        <textarea v-if="editable" v-model="securityCheck.problems" placeholder="提出问题" rows="5"></textarea>
+                        <div v-else v-html="securityCheck.problems"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20">整改结果</td>
+                    <td class="per80">
+                        <textarea v-if="editable" v-model="securityCheck.result" placeholder="整改结果" rows="5"></textarea>
+                        <div v-else v-html="securityCheck.result"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20">监察人员签字</td>
+                    <td class="per80" style="height:50px;">
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20">受检对象签字</td>
+                    <td class="per80"  style="height:50px;">
+                    </td>
+                </tr>
+            </table>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
+                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
+                <el-button v-else type="primary" @click="saveContent">保存</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
-        </el-dialog>
-        <!--编辑文本内容-->
-        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="50%">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
-                <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                        <el-button  @click="editContentVisible=false">取消</el-button>
-                        <el-button type="primary" @click="saveContent">确 定</el-button>
-                    </span>
         </el-dialog>
     </div>
 </template>
@@ -226,20 +246,16 @@
                 note:'',
                 orgCategories:[],
                 areas:[],
+                editable:false,
                 notices:[],
                 tableData: [],
                 delList: [],
                 editVisible: false,
-                uploadUrl:'',
-                param:{type:'responsibilityTemplate'},
-                headers:{
-                    token : localStorage.getItem("token")
-                },
                 addVisible: false,
                 showContentVisible:false,
-                editContentVisible:false,
                 pageTotal: 0,
                 haveOrg:false,
+                securityCheck:{},
                 form: {
                     area:[]
                 },
@@ -247,7 +263,6 @@
                 org:{},
                 id: -1,
                 rules:{
-
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' }
                     ],
@@ -268,7 +283,6 @@
         },
         created() {
             this.getData();
-            this.uploadUrl = this.$baseURL + "/templateUpload";
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
@@ -277,31 +291,6 @@
             }).catch(error=>console.log(error));
         },
         methods: {
-            uploadTemplate(index,row){
-                this.$refs.uploadFile.clearFiles();
-                this.param.id=row.id;
-                this.$refs.fileUploadBtn.$el.click();
-            },
-            downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
-            },
-            handleAvatarSuccess(res, file) {
-                this.$message.success("上传成功!");
-                this.getData();
-            },
-            beforeAvatarUpload(file) {
-                const isLt5M = file.size / 1024 / 1024 < 5;
-                const isWord = file.type==='application/msword';
-                if (!isLt5M) {
-                    this.$message.error('上传文件大小不能超过 5MB!');
-                    return false
-                }
-                if(!isWord){
-                    this.$message.error('只能上传work文档!');
-                    return false;
-                }
-                return  isWord&isLt5M;
-            },
             loadSelectData(){
                 this.$axios.get("/orgCategory/orgCategorys").then(res => {
                     this.orgCategories = res.data.data;
@@ -318,10 +307,31 @@
                     console.log(error);
                 });
             },
+            editContent(){
+                this.editable=true;
+                if(this.securityCheck.content){
+                    this.securityCheck.content = this.securityCheck.content.replace(/<br>/g,"\n");
+                }
+                if(this.securityCheck.problems){
+                    this.securityCheck.problems = this.securityCheck.problems.replace(/<br>/g,"\n");
+                }
+                if(this.securityCheck.result){
+                    this.securityCheck.result = this.securityCheck.result.replace(/<br>/g,"\n");
+                }
+            },
             saveContent(){
-                this.$axios.post("/responsibilityTemplate/content", this.$qs.stringify(this.form)).then(res => {
+                if(this.securityCheck.content){
+                    this.securityCheck.content = this.securityCheck.content.replace(/\n/g,"<br>");
+                }
+                if(this.securityCheck.problems){
+                    this.securityCheck.problems = this.securityCheck.problems.replace(/\n/g,"<br>");
+                }
+                if(this.securityCheck.result){
+                    this.securityCheck.result = this.securityCheck.result.replace(/\n/g,"<br>");
+                }
+                this.$axios.post("/securityCheck/content", this.$qs.stringify(this.securityCheck)).then(res => {
                     if (res.data.result.resultCode == 200) {
-                        this.editContentVisible = false;
+                        this.showContentVisible = false;
                         this.getData();
                     } else {
                         this.$message.error(res.data.result.message);
@@ -332,7 +342,9 @@
             },
             showContent(row){
                 this.form = row;
+                this.securityCheck=row;
                 this.showContentVisible=true;
+                this.editable = false;
             },
             showNote(note){
                 this.note = note;
@@ -366,10 +378,11 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/responsibilityTemplate/responsibilityTemplatesByPage",{
+                this.$axios.get("/securityCheck/securityChecksByPage",{
                     params:{
                         page:this.query.pageIndex,
-                        limit:this.query.pageSize
+                        limit:this.query.pageSize,
+                        type:'training'
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -390,7 +403,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/responsibilityTemplate/responsibilityTemplate/" + row.id).then(res => {
+                        this.$axios.delete("/securityCheck/securityCheck/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -424,7 +437,7 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.content='';
-                        this.$axios.put("/responsibilityTemplate/responsibilityTemplate?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/securityCheck/securityCheck?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -444,7 +457,8 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.$axios.post("/responsibilityTemplate/responsibilityTemplate",this.$qs.stringify(this.form)).then(res=>{
+                        this.form.type='training';
+                        this.$axios.post("/securityCheck/securityCheck",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
@@ -485,11 +499,28 @@
         margin-right: 10px;
     }
 
-    .upload{
-        color:#E6A23C;
+    .per20{
+        width:20%;
+    }
+    .per80{
+        width:80%;
     }
 
-    .download{
-        color:#67C23A;
+    table tr td{
+        border: black solid 1px;
+        text-align: center;
+        height:30px;
+        line-height: 30px;
+    }
+    td input,td textarea{
+        border: none;
+        font-size: 20px;
+        width: 99%;
+        padding: 3px;
+    }
+
+    td div{
+        text-align: left;
+        padding-left: 5px;
     }
 </style>

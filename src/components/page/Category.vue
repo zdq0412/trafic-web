@@ -188,8 +188,6 @@
                 const isExcel1 = file.type === 'application/vnd.ms-excel';
                 const isExcel2 = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-                file.type
-
                 if (!isExcel1 && !isExcel2) {
                     this.$message.error("只能上传Excel文件!");
                     return false;

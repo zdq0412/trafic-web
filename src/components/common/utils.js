@@ -72,4 +72,4 @@ function getSubstractYears(subtrahendDate,minuendDate){
         return years+'年';
      }
 }
-export {getDate,getDateTime}
+export {getDate,getDateTime,getTime}

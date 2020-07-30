@@ -43,6 +43,11 @@ export default new Router({
                   meta:{title:'安全检查模板'}
                 },
                 {
+                  path:'/securityCheck',
+                  component:()=>import('../components/page/SecurityCheck.vue'),
+                  meta:{title:'安全检查管理'}
+                },
+                {
                   path:'/deviceCheckTemplate',
                   component:()=>import('../components/page/DeviceCheckTemplate.vue'),
                   meta:{title:'设备点检模板'}
@@ -58,6 +63,16 @@ export default new Router({
                   meta:{title:'危险货物自查模板'}
                 },
                 {
+                  path:'/tankVehicle',
+                  component:()=>import('../components/page/TankVehicle.vue'),
+                  meta:{title:'罐式车辆检查'}
+                },
+                {
+                  path:'/dangerGoodsCheck',
+                  component:()=>import('../components/page/DangerGoodsCheck.vue'),
+                  meta:{title:'危险货物自查'}
+                },
+                {
                   path:'/riskCheckTemplate',
                   component:()=>import('../components/page/RiskCheckTemplate.vue'),
                   meta:{title:'风险排查模板'}
@@ -68,9 +83,19 @@ export default new Router({
                   meta:{title:'会议模板'}
                 },
                 {
+                  path:'/meeting',
+                  component:()=>import('../components/page/Meeting.vue'),
+                  meta:{title:'会议管理'}
+                },
+                {
                   path:'/trainingTemplate',
                   component:()=>import('../components/page/TrainingTemplate.vue'),
                   meta:{title:'培训模板'}
+                },
+                {
+                  path:'/training',
+                  component:()=>import('../components/page/Training.vue'),
+                  meta:{title:'培训管理'}
                 },
                 {
                   path:'/responsibilityTemplate',
