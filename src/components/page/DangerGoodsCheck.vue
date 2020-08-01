@@ -15,6 +15,12 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
+                <el-button v-if="Object.keys(org).length>0"
+                           type="warning"
+                           icon="el-icon-search"
+                           class="handle-del mr10"
+                           @click="findTemplates"
+                >查找模板</el-button>
             </div>
             <el-table
                     :data="tableData"
@@ -43,8 +49,32 @@
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
+                <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
+                        <el-upload style="display: none;"
+                                   :action="uploadUrl"
+                                   :limit="1"
+                                   :auto-upload="true"
+                                   ref="uploadFile"
+                                   :data="param"
+                                   accept=".doc,.docx"
+                                   :on-success="handleAvatarSuccess"
+                                   :before-upload="beforeAvatarUpload"
+                                   :headers="headers">
+                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                        </el-upload>
+                        <el-button
+                                type="text"
+                                icon="el-icon-upload2"
+                                class="upload"
+                                @click="uploadTemplate(scope.$index, scope.row)"
+                        >上传文件</el-button>
+                        <el-button v-if="scope.row.realPath"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   class="download"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载文件</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -71,33 +101,20 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @open="loadSelectData" @close="closeDialog">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
-                        <el-form-item label="省市区">
-                            <el-cascader
-                                    v-model="form.area"
-                                    :options="areas"
-                                    :props="{label:'name',value:'id'}"
-                                    @change="handleChange"></el-cascader>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
-                                <el-option
-                                        v-for="item in orgCategories"
-                                        :key="item.id"
-                                        :label="item.name"
-                                        :value="item.id">
-                                </el-option>
-                            </el-select>
+                        <el-form-item label="检查时间" prop="checkDate">
+                            <el-date-picker
+                                    v-model="form.checkDate"
+                                    type="datetime"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    placeholder="选择检查时间">
+                            </el-date-picker>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -111,33 +128,20 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @open="loadSelectData" @close="closeDialog" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" >
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
-                        <el-form-item label="省市区">
-                            <el-cascader
-                                    v-model="form.area"
-                                    :options="areas"
-                                    :props="{label:'name',value:'id'}"
-                                    @change="handleChange"></el-cascader>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
-                                <el-option
-                                        v-for="item in orgCategories"
-                                        :key="item.id"
-                                        :label="item.name"
-                                        :value="item.id">
-                                </el-option>
-                            </el-select>
+                        <el-form-item label="检查时间" prop="checkDate">
+                            <el-date-picker
+                                    v-model="form.checkDate"
+                                    type="datetime"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    placeholder="选择检查时间">
+                            </el-date-picker>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -157,7 +161,197 @@
             </span>
         </el-dialog>
         <!--显示模板内容-->
-        <el-dialog title="模板内容" :visible.sync="showContentVisible" width="70%">
+        <el-dialog title="检查内容" :visible.sync="showContentVisible" width="70%">
+            <div id="printContent">
+                <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{dangerGoodsCheck.name}}</div>
+            <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                <thead>
+                <tr>
+                    <th style="width:10%;">检查时间</th>
+                    <th style="width:12%;">被检单位名称</th>
+                    <th style="width:17%;">存在的安全隐患</th>
+                    <th style="width:17%;">整改措施</th>
+                    <th style="width:8%;">整改时限</th>
+                    <th style="width:8%;">责任人</th>
+                    <th style="width:8%;">整改到位时间</th>
+                    <th style="width:8%;">销号时间</th>
+                    <th style="width:12%;">备注</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="detail in details">
+                    <td>
+                        <span v-if="editable">
+                            <el-date-picker
+                                    style="width: 150px;"
+                                    v-model="detail.checkDate"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
+                             </el-date-picker>
+                        </span>
+                        <span v-else>
+                            {{detail.checkDate | formatDate}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <textarea type="text" v-model="detail.checkedOrg"></textarea>
+                        </span>
+                        <span v-else>
+                            {{detail.checkedOrg}}
+                        </span>
+                    </td>
+                    <td style="text-align: left;padding-left:3px;">
+                        <span v-if="editable">
+                            <textarea type="text" v-model="detail.hiddenDanger" rows="5"></textarea>
+                        </span>
+                        <span v-else v-html="detail.hiddenDanger" >
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <textarea type="text" v-model="detail.correctiveAction" rows="5"></textarea>
+                        </span>
+                        <span v-else v-html="detail.correctiveAction">
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <input type="text" v-model="detail.timelimit" />
+                        </span>
+                        <span v-else>
+                            {{detail.timelimit}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <input type="text" v-model="detail.person" />
+                        </span>
+                        <span v-else>
+                            {{detail.person}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <el-date-picker
+                                    style="width: 150px;"
+                                    v-model="detail.endTime"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
+                             </el-date-picker>
+                        </span>
+                        <span v-else>
+                            {{detail.endTime | formatDate}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <el-date-picker
+                                    style="width: 150px;"
+                                    v-model="detail.cancelDate"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
+                             </el-date-picker>
+                        </span>
+                        <span v-else>
+                            {{detail.cancelDate | formatDate}}
+                        </span>
+                    </td>
+                    <td>
+                        <span v-if="editable">
+                            <textarea type="text" v-model="detail.detailNote" rows="5"></textarea>
+                        </span>
+                        <span v-else v-html="detail.detailNote">
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="border: none;text-align: left;">
+                        <span>企业负责人签字：</span> <div style="width:200px;display: inline-block;">&nbsp;</div>
+                        <span>安全检查组人员签字：</span>
+                    </td>
+                </tr>
+                <tr v-if="editable">
+                    <td colspan="9" style="border: none;">
+                        <div style="width: 100%;text-align: center;">
+                            <el-button type="text" @click="addLine">新增一行</el-button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
+                 <el-button v-if="!editable" type="warning" v-print="printObj">打印</el-button>
+                <el-button v-else type="primary" @click="saveContent">保存</el-button>
+                <el-button  @click="showContentVisible=false">关闭</el-button>
+            </span>
+        </el-dialog>
+        <!--查看系统模板-->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-view"
+                                @click="checkContent(scope.$index, scope.row)"
+                        >查看内容</el-button>
+                        <el-button
+                                type="text"
+                                icon="el-icon-copy-document"
+                                class="red"
+                                @click="importTemplate(scope.$index, scope.row)"
+                        >引入</el-button>
+                        <el-button v-if="scope.row.url"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   style="color:#67C23A"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!--模板内容-->
+        <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="60%">
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
                 <caption style="margin-bottom: 20px;font-size: 18px;">{{dangerGoodsCheck.name}}</caption>
 
@@ -280,16 +474,14 @@
                 </tbody>
             </table>
             <span slot="footer" class="dialog-footer">
-                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
-                <el-button v-else type="primary" @click="saveContent">保存</el-button>
-                <el-button  @click="showContentVisible=false">关闭</el-button>
+                <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import  {getDate} from "../common/utils";
+    import  {getDate,getDateTime,getTime} from "../common/utils";
     import { VueEditor } from "vue2-editor";
     export default {
         components:{
@@ -298,6 +490,9 @@
         name: 'basetable',
         data() {
             return {
+                printObj:{
+                    id:'printContent'
+                },
                 customToolbar: [
                     ["bold", "italic", "underline"]
                 ],
@@ -305,6 +500,22 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+
+                headers:{
+                    token : localStorage.getItem("token")
+                },
+                param:{type:'dangerGoodsCheck'},
+                templatesData:[],
+                templateVisible:false,
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
+                showTemplateContentVisible:false,
+                template:{},
+                templatesVisible:false,
+                
                 noteVisible:false,
                 note:'',
                 orgCategories:[],
@@ -347,6 +558,7 @@
         },
         created() {
             this.getData();
+            this.uploadUrl = this.$baseURL + "/templateUpload";
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
@@ -355,6 +567,66 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            importTemplate(index,row){//引入模板
+                this.template = row;
+                this.$confirm('确定要引入该模板吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        let formData = new FormData();
+                        formData.append("templateId",row.id);
+                        this.$axios.post("/dangerGoodsCheck/template",formData)
+                            .then(res=>{
+                                this.getData();
+                                this.templatesVisible=false;
+                                this.showContentVisible = true;
+                                this.editable=true;
+                            }).catch(error=>console.log(error));
+                    })
+                    .catch(() => {});
+            },
+            checkContent(index,row){//查看模板内容
+                this.showTemplateContentVisible = true;
+                this.template = row;
+            },
+            uploadTemplate(index,row){
+                this.$refs.uploadFile.clearFiles();
+                this.param.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
+            downloadTemplate(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
+            },
+            handleAvatarSuccess(res, file) {
+                this.$message.success("上传成功!");
+                this.getData();
+            },
+            beforeAvatarUpload(file) {
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                const isWord = (file.type==='application/msword' | file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false
+                }
+                if(!isWord){
+                    this.$message.error('只能上传work文档!');
+                    return false;
+                }
+                return  isWord&isLt5M;
+            },
+            //查找模板
+            findTemplates(){
+                this.$axios.get("/dangerGoodsCheckTemplate/dangerGoodsCheckTemplatesByPage",{
+                    params:{
+                        page:this.templates.pageIndex,
+                        limit:this.templates.pageSize
+                    }
+                }).then(res => {
+                    this.templatesData = res.data.data;
+                    this.templates.pageTotal = res.data.count;
+                    this.templatesVisible = true;
+                }).catch(error => console.log(error));
+            },
             addLine(){
               this.details.push({id:'',checkDate:'',checkedOrg:'',hiddenDanger:'',correctiveAction:'',timelimit:'',person:'',endTime:'',cancelDate:'',note:''})
             },
@@ -587,6 +859,7 @@
 </script>
 
 <style scoped>
+    @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
     }

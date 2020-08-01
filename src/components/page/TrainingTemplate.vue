@@ -187,7 +187,7 @@
         <!--显示模板内容-->
         <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                <caption>{{meetingTemplate.name}}</caption>
+                <caption>{{trainingTemplate.name}}</caption>
                 <tr>
                     <td colspan="4" style="border: none;">
                         <div style="float: right;margin-right: 10px;">会议日期</div>
@@ -196,8 +196,8 @@
                 <tr>
                     <td class="per30">会议名称</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="meetingTemplate.meetingName" placeholder="会议名称"/>
-                        <div v-else>{{meetingTemplate.meetingName}}</div>
+                        <input v-if="editable" v-model="trainingTemplate.trainingName" placeholder="会议名称"/>
+                        <div v-else>{{trainingTemplate.trainingName}}</div>
                     </td>
                 </tr>
                 <tr>
@@ -207,74 +207,74 @@
                     </td>
                     <td class="per30">会议地点</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.meetingPlace" placeholder="会议地点" />
-                        <div v-else>{{meetingTemplate.meetingPlace}}</div>
+                        <input v-if="editable" v-model="trainingTemplate.trainingPlace" placeholder="会议地点" />
+                        <div v-else>{{trainingTemplate.trainingPlace}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议主持人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.president"  placeholder="主持人"/>
-                        <div v-else>{{meetingTemplate.president}}</div>
+                        <input v-if="editable" v-model="trainingTemplate.president"  placeholder="主持人"/>
+                        <div v-else>{{trainingTemplate.president}}</div>
                     </td>
                     <td class="per30">会议记录人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.recorder" placeholder="记录人"/>
-                        <div v-else>{{meetingTemplate.recorder}}</div>
+                        <input v-if="editable" v-model="trainingTemplate.recorder" placeholder="记录人"/>
+                        <div v-else>{{trainingTemplate.recorder}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">到场人员</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="meetingTemplate.attendants" placeholder="到场人员"/>
-                        <div v-else>{{meetingTemplate.attendants}}</div>
+                        <input v-if="editable" v-model="trainingTemplate.attendants" placeholder="到场人员"/>
+                        <div v-else>{{trainingTemplate.attendants}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">到场人数</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.attendance" placeholder="到场人数"/>
-                        <div v-else>{{meetingTemplate.attendance}}</div>
+                        <input v-if="editable" v-model="trainingTemplate.attendance" placeholder="到场人数"/>
+                        <div v-else>{{trainingTemplate.attendance}}</div>
                     </td>
                     <td class="per30">缺席人数</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.absent" placeholder="缺席人数"/>
-                        <div v-else>{{meetingTemplate.absent}}</div>
+                        <input v-if="editable" v-model="trainingTemplate.absent" placeholder="缺席人数"/>
+                        <div v-else>{{trainingTemplate.absent}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议主题</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="meetingTemplate.theme" placeholder="会议主题" />
-                        <div v-else>{{meetingTemplate.theme}}</div>
+                        <input v-if="editable" v-model="trainingTemplate.theme" placeholder="会议主题" />
+                        <div v-else>{{trainingTemplate.theme}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议内容</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="meetingTemplate.content" rows="5" placeholder="会议内容"></textarea>
-                        <div v-else v-html="meetingTemplate.content"></div>
+                        <textarea v-if="editable" v-model="trainingTemplate.content" rows="5" placeholder="会议内容"></textarea>
+                        <div v-else v-html="trainingTemplate.content"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">需解决问题</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="meetingTemplate.problems" rows="5" placeholder="需解决问题"></textarea>
-                        <div v-else v-html="meetingTemplate.problems"></div>
+                        <textarea v-if="editable" v-model="trainingTemplate.problems" rows="5" placeholder="需解决问题"></textarea>
+                        <div v-else v-html="trainingTemplate.problems"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">解决办法与工作安排</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="meetingTemplate.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
-                        <div v-else v-html="meetingTemplate.methods"></div>
+                        <textarea v-if="editable" v-model="trainingTemplate.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
+                        <div v-else v-html="trainingTemplate.methods"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">备注</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="meetingTemplate.templateNote" rows="5" placeholder="备注"></textarea>
-                        <div v-else v-html="meetingTemplate.templateNote"></div>
+                        <textarea v-if="editable" v-model="trainingTemplate.templateNote" rows="5" placeholder="备注"></textarea>
+                        <div v-else v-html="trainingTemplate.templateNote"></div>
                     </td>
                 </tr>
             </table>
@@ -310,7 +310,7 @@
                 areas:[],
                 editable:false,
                 uploadUrl:'',
-                param:{type:'meetingTemplate'},
+                param:{type:'trainingTemplate'},
                 headers:{
                     token : localStorage.getItem("token")
                 },
@@ -322,7 +322,7 @@
                 showContentVisible:false,
                 pageTotal: 0,
                 haveOrg:false,
-                meetingTemplate:{},
+                trainingTemplate:{},
                 form: {
                     area:[]
                 },
@@ -402,33 +402,33 @@
             },
             editContent(){
                 this.editable=true;
-                if(this.meetingTemplate.content){
-                    this.meetingTemplate.content = this.meetingTemplate.content.replace(/<br>/g,"\n");
+                if(this.trainingTemplate.content){
+                    this.trainingTemplate.content = this.trainingTemplate.content.replace(/<br>/g,"\n");
                 }
-                if(this.meetingTemplate.problems){
-                    this.meetingTemplate.problems = this.meetingTemplate.problems.replace(/<br>/g,"\n");
+                if(this.trainingTemplate.problems){
+                    this.trainingTemplate.problems = this.trainingTemplate.problems.replace(/<br>/g,"\n");
                 }
-                if(this.meetingTemplate.templateNote){
-                    this.meetingTemplate.templateNote = this.meetingTemplate.templateNote.replace(/<br>/g,"\n");
+                if(this.trainingTemplate.templateNote){
+                    this.trainingTemplate.templateNote = this.trainingTemplate.templateNote.replace(/<br>/g,"\n");
                 }
-                if(this.meetingTemplate.methods){
-                    this.meetingTemplate.methods = this.meetingTemplate.methods.replace(/<br>/g,"\n");
+                if(this.trainingTemplate.methods){
+                    this.trainingTemplate.methods = this.trainingTemplate.methods.replace(/<br>/g,"\n");
                 }
             },
             saveContent(){
-                if(this.meetingTemplate.content){
-                    this.meetingTemplate.content = this.meetingTemplate.content.replace(/\n/g,"<br>");
+                if(this.trainingTemplate.content){
+                    this.trainingTemplate.content = this.trainingTemplate.content.replace(/\n/g,"<br>");
                 }
-                if(this.meetingTemplate.problems){
-                    this.meetingTemplate.problems = this.meetingTemplate.problems.replace(/\n/g,"<br>");
+                if(this.trainingTemplate.problems){
+                    this.trainingTemplate.problems = this.trainingTemplate.problems.replace(/\n/g,"<br>");
                 }
-                if(this.meetingTemplate.templateNote){
-                    this.meetingTemplate.templateNote = this.meetingTemplate.templateNote.replace(/\n/g,"<br>");
+                if(this.trainingTemplate.templateNote){
+                    this.trainingTemplate.templateNote = this.trainingTemplate.templateNote.replace(/\n/g,"<br>");
                 }
-                if(this.meetingTemplate.methods){
-                    this.meetingTemplate.methods = this.meetingTemplate.methods.replace(/\n/g,"<br>");
+                if(this.trainingTemplate.methods){
+                    this.trainingTemplate.methods = this.trainingTemplate.methods.replace(/\n/g,"<br>");
                 }
-                this.$axios.post("/meetingTemplate/content", this.$qs.stringify(this.meetingTemplate)).then(res => {
+                this.$axios.post("/trainingTemplate/content", this.$qs.stringify(this.trainingTemplate)).then(res => {
                     if (res.data.result.resultCode == 200) {
                         this.showContentVisible = false;
                         this.getData();
@@ -441,7 +441,7 @@
             },
             showContent(row){
                 this.form = row;
-                this.meetingTemplate=row;
+                this.trainingTemplate=row;
                 this.showContentVisible=true;
                 this.editable = false;
             },
@@ -477,11 +477,10 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/meetingTemplate/meetingTemplatesByPage",{
+                this.$axios.get("/trainingTemplate/trainingTemplatesByPage",{
                     params:{
                         page:this.query.pageIndex,
-                        limit:this.query.pageSize,
-                        type:'training'
+                        limit:this.query.pageSize
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -502,7 +501,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/meetingTemplate/meetingTemplate/" + row.id).then(res => {
+                        this.$axios.delete("/trainingTemplate/trainingTemplate/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -536,7 +535,7 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.content='';
-                        this.$axios.put("/meetingTemplate/meetingTemplate?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/trainingTemplate/trainingTemplate?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -557,7 +556,7 @@
                 this.$refs.form.validate(validate =>{
                     if(validate){
                         this.form.type='training';
-                        this.$axios.post("/meetingTemplate/meetingTemplate",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/trainingTemplate/trainingTemplate",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
@@ -583,6 +582,7 @@
 </script>
 
 <style scoped>
+    @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
     }
@@ -621,12 +621,5 @@
     td div{
         text-align: left;
         padding-left: 5px;
-    }
-    .upload{
-        color:#E6A23C;
-    }
-
-    .download{
-        color:#67C23A;
     }
 </style>

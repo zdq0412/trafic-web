@@ -52,8 +52,32 @@
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
+                <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
+                        <el-upload style="display: none;"
+                                   :action="uploadUrl"
+                                   :limit="1"
+                                   :auto-upload="true"
+                                   ref="uploadFile"
+                                   :data="param"
+                                   accept=".doc,.docx"
+                                   :on-success="handleAvatarSuccess"
+                                   :before-upload="beforeAvatarUpload"
+                                   :headers="headers">
+                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                        </el-upload>
+                        <el-button
+                                type="text"
+                                icon="el-icon-upload2"
+                                class="upload"
+                                @click="uploadTemplate(scope.$index, scope.row)"
+                        >上传文件</el-button>
+                        <el-button v-if="scope.row.realPath"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   class="download"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载文件</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -152,7 +176,7 @@
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
@@ -165,6 +189,12 @@
                                 class="red"
                                 @click="importTemplate(scope.$index, scope.row)"
                         >引入</el-button>
+                        <el-button v-if="scope.row.url"
+                                type="text"
+                                icon="el-icon-download"
+                                style="color:#67C23A"
+                                @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -238,7 +268,9 @@
         </el-dialog>
         <!--显示文本内容-->
         <el-dialog title="文本内容" :visible.sync="showContentVisible" width="60%">
-            <div v-html="form.content"></div>
+            <div id="printContent">
+                <div v-html="form.content"></div>
+            </div>
             <div style="margin-top: 10px;">
                 <el-card shadow="hover" v-if="notices.length>0">
                     <div slot="header" class="clearfix">
@@ -252,7 +284,8 @@
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
-                 <el-button type="warning" @click="handleExecute" v-if="form.content && Object.keys(org).length>0">发文执行</el-button>
+                 <el-button type="warning" v-print="printObj">打印</el-button>
+                 <el-button type="success" @click="handleExecute" v-if="form.content && Object.keys(org).length>0">发文执行</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
@@ -285,6 +318,9 @@
         name: 'basetable',
         data() {
             return {
+                printObj:{
+                    id:'printContent'
+                },
                 customToolbar: [
                     ["bold", "italic", "underline"]
                 ],
@@ -296,6 +332,11 @@
                     pageIndex: 1,
                     pageSize: 10,
                     pageTotal:0
+                },
+                param:{type:'rule'},
+                uploadUrl:'',
+                headers:{
+                    token : localStorage.getItem("token")
                 },
                 noteVisible:false,
                 note:'',
@@ -348,6 +389,7 @@
         },
         created() {
             this.getData();
+            this.uploadUrl = this.$baseURL + "/templateUpload";
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
@@ -356,6 +398,31 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            handleAvatarSuccess(res, file) {
+                this.$message.success("上传成功!");
+                this.getData();
+            },
+            beforeAvatarUpload(file) {
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                const isWord = (file.type==='application/msword' | file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false
+                }
+                if(!isWord){
+                    this.$message.error('只能上传work文档!');
+                    return false;
+                }
+                return  isWord&isLt5M;
+            },
+            uploadTemplate(index,row){
+                this.$refs.uploadFile.clearFiles();
+                this.param.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
+            downloadTemplate(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
+            },
             checkContent(index,row){//查看模板内容
                this.showTemplateContentVisible = true;
                this.template = row;
@@ -371,6 +438,9 @@
                         this.$axios.post("/rules/template",formData)
                             .then(res=>{
                                 this.getData();
+                                this.templatesVisible=false;
+                                this.showContentVisible = true;
+                                this.editable=true;
                             }).catch(error=>console.log(error));
                     })
                     .catch(() => {});
@@ -588,6 +658,7 @@
     };
 </script>
 <style scoped>
+    @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
     }

@@ -102,6 +102,11 @@ export default new Router({
                   component:()=>import('../components/page/ResponsibilityTemplate.vue'),
                   meta:{title:'责任书模板'}
                 },
+                {
+                  path:'/examination',
+                  component:()=>import('../components/page/Responsibility.vue'),
+                  meta:{title:'安全责任考核'}
+                },
             {
                   path:'/law',
                   component:()=>import('../components/page/Law.vue'),

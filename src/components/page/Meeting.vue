@@ -49,8 +49,32 @@
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
+                <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
+                        <el-upload style="display: none;"
+                                   :action="uploadUrl"
+                                   :limit="1"
+                                   :auto-upload="true"
+                                   ref="uploadFile"
+                                   :data="param"
+                                   accept=".doc,.docx"
+                                   :on-success="handleAvatarSuccess"
+                                   :before-upload="beforeAvatarUpload"
+                                   :headers="headers">
+                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                        </el-upload>
+                        <el-button
+                                type="text"
+                                icon="el-icon-upload2"
+                                class="upload"
+                                @click="uploadTemplate(scope.$index, scope.row)"
+                        >上传文件</el-button>
+                        <el-button v-if="scope.row.realPath"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   class="download"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载文件</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -128,104 +152,287 @@
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
             </span>
         </el-dialog>
-        <!--显示模板内容-->
-        <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
+        <!--显示会议内容-->
+        <el-dialog title="" :visible.sync="showContentVisible" width="50%">
+            <div id="printContent">
+                <div style="height: 297mm;width:210mm;page-break-after:always">
+                    <div style="margin-top: 50mm;font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">安全生产会议记录</div>
+                    <div style="margin-top:50mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                        <label>企业名称:</label>
+                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                            {{org.name}}
+                        </div>
+                    </div>
+                    <div style="margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                        <label>地&nbsp;&nbsp;&nbsp;&nbsp;址:</label>
+                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                            {{org.addr}}
+                        </div>
+                    </div>
+                </div>
+                <div style="page-break-after:always">
+                    <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{meeting.name}}</div>
+                    <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td colspan="6" style="border: none;">
+                                <div style="float: right;margin-right: 10px;">
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                                    <label>年</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                                    <label>月</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                                    <label>日</label>
+                                    <label style="margin-left:20px;">星期</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 15%;">会议时间</td>
+                            <td class="per20">
+                                <table style="width:100%;" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td>  &nbsp;&nbsp;&nbsp;&nbsp;点&nbsp;&nbsp;&nbsp;  &nbsp;  分开会</td>
+                                    </tr>
+                                    <tr>
+                                        <td>  &nbsp;&nbsp;&nbsp;&nbsp;点&nbsp;&nbsp;&nbsp;    &nbsp;分闭会</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="width:10%">会议地点</td>
+                            <td class="per25">
+                                <input v-if="editable" v-model="meeting.meetingPlace"  />
+                                <div v-else>{{meeting.meetingPlace}}</div>
+                            </td>
+                            <td style="width:10%">主持人</td>
+                            <td class="per20">
+                                <input v-if="editable" v-model="meeting.president"  />
+                                <div v-else>{{meeting.president}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 15%;">会议名称或主要议题</td>
+                            <td colspan="3">
+                                <input v-if="editable" v-model="meeting.meetingName" />
+                                <div v-else>{{meeting.meetingName}}</div>
+                            </td>
+                            <td style="width:10%">记录人</td>
+                            <td class="per20">
+                                <input v-if="editable" v-model="meeting.recorder" />
+                                <div v-else>{{meeting.recorder}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>出席人</td>
+                            <td colspan="5">
+                                <input v-if="editable" v-model="meeting.attendants" />
+                                <div v-else>{{meeting.attendants}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">会议主要内容</td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <textarea v-if="editable" v-model="meeting.content" rows="8" ></textarea>
+                                <div v-else v-html="meeting.content"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">最后形成意见或决定</td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <textarea v-if="editable" v-model="meeting.finalDecision" rows="8" ></textarea>
+                                <div v-else v-html="meeting.finalDecision"></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="page-break-after:always">
+                    <table style="width: 100%;margin-top:50px;" cellspacing="0" cellpadding="0">
+                        <caption style="font-size: 18px;letter-spacing: 10px;">会议签到表</caption>
+                        <tr>
+                            <td colspan="4" style="border: none;text-align: left;">
+                                会议名称：{{meeting.meetingName}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" style="border: none;text-align: left;">
+                                会议时间：{{meeting.meetingDate | datetimeFormat}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>姓名</td>
+                            <td>单位(部门)</td>
+                            <td>职务</td>
+                            <td>联系电话</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
+                <el-button v-if="!editable" type="warning" v-print="'#printContent'">打印</el-button>
+                <el-button v-else type="primary" @click="saveContent">保存</el-button>
+                <el-button  @click="showContentVisible=false">关闭</el-button>
+            </span>
+        </el-dialog>
+        <!--查看系统模板-->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-view"
+                                @click="checkContent(scope.$index, scope.row)"
+                        >查看内容</el-button>
+                        <el-button
+                                type="text"
+                                icon="el-icon-copy-document"
+                                class="red"
+                                @click="importTemplate(scope.$index, scope.row)"
+                        >引入</el-button>
+                        <el-button v-if="scope.row.url"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   style="color:#67C23A"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!--模板内容-->
+        <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="60%">
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                <caption>{{meeting.name}}</caption>
+                <caption>{{template.name}}</caption>
                 <tr>
                     <td colspan="4" style="border: none;">
-                        <div style="float: right;margin-right: 10px;">{{meeting.meetingDate | formatDate}}</div>
+                        <div style="float: right;margin-right: 10px;">{{template.meetingDate | formatDate}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议名称</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="meeting.meetingName" placeholder="会议名称"/>
-                        <div v-else>{{meeting.meetingName}}</div>
+                        <input v-if="editable" v-model="template.meetingName" placeholder="会议名称"/>
+                        <div v-else>{{template.meetingName}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议时间</td>
                     <td class="per20" style="text-align: left;">
-                        {{meeting.meetingDate | formatTime}}
+                        {{template.meetingDate | formatTime}}
                     </td>
                     <td class="per30">会议地点</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meeting.meetingPlace" placeholder="会议地点" />
-                        <div v-else>{{meeting.meetingPlace}}</div>
+                        <input v-if="editable" v-model="template.meetingPlace" placeholder="会议地点" />
+                        <div v-else>{{template.meetingPlace}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议主持人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meeting.president"  placeholder="主持人"/>
-                        <div v-else>{{meeting.president}}</div>
+                        <input v-if="editable" v-model="template.president"  placeholder="主持人"/>
+                        <div v-else>{{template.president}}</div>
                     </td>
                     <td class="per30">会议记录人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meeting.recorder" placeholder="记录人"/>
-                        <div v-else>{{meeting.recorder}}</div>
+                        <input v-if="editable" v-model="template.recorder" placeholder="记录人"/>
+                        <div v-else>{{template.recorder}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">到场人员</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="meeting.attendants" placeholder="到场人员"/>
-                        <div v-else>{{meeting.attendants}}</div>
+                        <input v-if="editable" v-model="template.attendants" placeholder="到场人员"/>
+                        <div v-else>{{template.attendants}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">到场人数</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meeting.attendance" placeholder="到场人数"/>
-                        <div v-else>{{meeting.attendance}}</div>
+                        <input v-if="editable" v-model="template.attendance" placeholder="到场人数"/>
+                        <div v-else>{{template.attendance}}</div>
                     </td>
                     <td class="per30">缺席人数</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meeting.absent" placeholder="缺席人数"/>
-                        <div v-else>{{meeting.absent}}</div>
+                        <input v-if="editable" v-model="template.absent" placeholder="缺席人数"/>
+                        <div v-else>{{template.absent}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议主题</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="meeting.theme" placeholder="会议主题" />
-                        <div v-else>{{meeting.theme}}</div>
+                        <input v-if="editable" v-model="template.theme" placeholder="会议主题" />
+                        <div v-else>{{template.theme}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议内容</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="meeting.content" rows="5" placeholder="会议内容"></textarea>
-                        <div v-else v-html="meeting.content"></div>
+                        <textarea v-if="editable" v-model="template.content" rows="5" placeholder="会议内容"></textarea>
+                        <div v-else v-html="template.content"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">需解决问题</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="meeting.problems" rows="5" placeholder="需解决问题"></textarea>
-                        <div v-else v-html="meeting.problems"></div>
+                        <textarea v-if="editable" v-model="template.problems" rows="5" placeholder="需解决问题"></textarea>
+                        <div v-else v-html="template.problems"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">解决办法与工作安排</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="meeting.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
-                        <div v-else v-html="meeting.methods"></div>
+                        <textarea v-if="editable" v-model="template.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
+                        <div v-else v-html="template.methods"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">备注</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="meeting.templateNote" rows="5" placeholder="备注"></textarea>
-                        <div v-else v-html="meeting.templateNote"></div>
+                        <textarea v-if="editable" v-model="template.templateNote" rows="5" placeholder="备注"></textarea>
+                        <div v-else v-html="template.templateNote"></div>
                     </td>
                 </tr>
             </table>
             <span slot="footer" class="dialog-footer">
-                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
-                <el-button v-else type="primary" @click="saveContent">保存</el-button>
-                <el-button  @click="showContentVisible=false">关闭</el-button>
+                <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
     </div>
@@ -241,6 +448,9 @@
         name: 'basetable',
         data() {
             return {
+                printObj:{
+                    id:'printContent'
+                },
                 customToolbar: [
                     ["bold", "italic", "underline"]
                 ],
@@ -248,6 +458,14 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
+                showTemplateContentVisible:false,
+                template:{},
+
                 noteVisible:false,
                 note:'',
                 orgCategories:[],
@@ -267,6 +485,10 @@
                 },
                 idx: -1,
                 org:{},
+                headers:{
+                    token : localStorage.getItem("token")
+                },
+                param:{type:'meeting'},
                 templatesData:[],
                 templatesVisible:false,
                 id: -1,
@@ -293,6 +515,13 @@
                     return '';
                 }
             },
+            datetimeFormat(value){
+                if(value){
+                    return getDateTime(new Date(value));
+                }else{
+                    return '';
+                }
+            },
             formatTime(value){
                 if(value){
                     return getTime(new Date(value));
@@ -303,6 +532,7 @@
         },
         created() {
             this.getData();
+            this.uploadUrl = this.$baseURL + "/templateUpload";
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
@@ -311,13 +541,62 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            uploadTemplate(index,row){
+                this.$refs.uploadFile.clearFiles();
+                this.param.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
+            downloadTemplate(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
+            },
+            handleAvatarSuccess(res, file) {
+                this.$message.success("上传成功!");
+                this.getData();
+            },
+            beforeAvatarUpload(file) {
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                const isWord = (file.type==='application/msword' | file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false
+                }
+                if(!isWord){
+                    this.$message.error('只能上传work文档!');
+                    return false;
+                }
+                return  isWord&isLt5M;
+            },
+            importTemplate(index,row){//引入模板
+                this.template = row;
+                this.$confirm('确定要引入该模板吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        let formData = new FormData();
+                        formData.append("templateId",row.id);
+                        this.$axios.post("/meeting/template",formData)
+                            .then(res=>{
+                                this.getData();
+                                this.templatesVisible=false;
+                                this.showContentVisible = true;
+                                this.editable=true;
+                            }).catch(error=>console.log(error));
+                    })
+                    .catch(() => {});
+            },
+            downloadTemplate(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
+            },
+            checkContent(index,row){//查看模板内容
+                this.showTemplateContentVisible = true;
+                this.template = row;
+            },
             //查找模板
             findTemplates(){
                 this.$axios.get("/meetingTemplate/meetingTemplatesByPage",{
                     params:{
                         page:this.templates.pageIndex,
-                        limit:this.templates.pageSize,
-                        type:"meeting"
+                        limit:this.templates.pageSize
                     }
                 }).then(res => {
                     this.templatesData = res.data.data;
@@ -342,7 +621,7 @@
                 });
             },
             editContent(){
-              this.editable=true;
+                this.editable=true;
                 if(this.meeting.content){
                     this.meeting.content = this.meeting.content.replace(/<br>/g,"\n");
                 }
@@ -413,6 +692,13 @@
                     return '';
                 }
             },
+            timeFormatter(row, column, cellValue, index){
+                if(cellValue){
+                    return getTime(new Date(cellValue));
+                }else{
+                    return '';
+                }
+            },
             closeDialog(){
                 this.$refs["form"].clearValidate();
             },
@@ -421,8 +707,7 @@
                 this.$axios.get("/meeting/meetingsByPage",{
                     params:{
                         page:this.query.pageIndex,
-                        limit:this.query.pageSize,
-                        type:'meeting'
+                        limit:this.query.pageSize
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -522,12 +807,19 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageIndex', val);
                 this.getData();
+            },
+            // 分页导航
+            handleTemplatesPageChange(val) {
+                this.$set(this.templates, 'pageIndex', val);
+                this.findTemplates();
             }
         }
     };
 </script>
 
 <style scoped>
+    @import "../../assets/css/common.css";
+
     .handle-box {
         margin-bottom: 20px;
     }
@@ -568,3 +860,4 @@
         padding-left: 5px;
     }
 </style>
+

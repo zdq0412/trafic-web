@@ -1,0 +1,25 @@
+/**文件上传下载按钮样式*/
+.upload{
+    color:#E6A23C;
+}
+
+.download{
+    color:#67C23A;
+}
+/**打印样式*/
+@media print{
+    #printContent{
+        margin-top:10mm!important;
+        height:100%!important;
+    }
+}
+#printContent{
+    padding-left:3mm;
+    padding-right:3mm;
+    margin-top:-10mm;
+}
+@page
+{
+    size:  auto;   /* auto is the initial value */
+    margin: 0mm;  /* this affects the margin in the printer settings */
+}

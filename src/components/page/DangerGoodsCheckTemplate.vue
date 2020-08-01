@@ -646,6 +646,7 @@
 </script>
 
 <style scoped>
+    @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
     }
@@ -684,12 +685,5 @@
     td div{
         text-align: left;
         padding-left: 5px;
-    }
-    .upload{
-        color:#E6A23C;
-    }
-
-    .download{
-        color:#67C23A;
     }
 </style>

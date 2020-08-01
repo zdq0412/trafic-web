@@ -185,96 +185,96 @@
             </span>
         </el-dialog>
         <!--显示模板内容-->
-        <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
+        <el-dialog title="" :visible.sync="showContentVisible" width="50%">
+            <div style="height: 250mm;width:210mm;">
+                <div style="margin-top: 50mm;font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">安全生产会议记录</div>
+                <div style="margin-top:50mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                    <label>企业名称:</label>
+                    <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                        {{org.name}}
+                    </div>
+                </div>
+                <div style="margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                    <label>地&nbsp;&nbsp;&nbsp;&nbsp;址:</label>
+                    <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                        {{org.addr}}
+                    </div>
+                </div>
+            </div>
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                <caption>{{meetingTemplate.name}}</caption>
+                <caption style="font-size: 18px;letter-spacing: 10px;">{{meetingTemplate.name}}</caption>
                 <tr>
-                    <td colspan="4" style="border: none;">
-                        <div style="float: right;margin-right: 10px;">会议日期</div>
+                    <td colspan="6" style="border: none;">
+                        <div style="float: right;margin-right: 10px;">
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>年</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>月</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>日</label>
+                            <label style="margin-left:20px;">星期</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                        </div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per30">会议名称</td>
-                    <td colspan="3">
-                        <input v-if="editable" v-model="meetingTemplate.meetingName" placeholder="会议名称"/>
-                        <div v-else>{{meetingTemplate.meetingName}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">会议时间</td>
+                    <td style="width: 15%;">会议时间</td>
                     <td class="per20">
-
+                        <table style="width:100%;" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td>  &nbsp;&nbsp;&nbsp;&nbsp;点&nbsp;&nbsp;&nbsp;  &nbsp;  分开会</td>
+                            </tr>
+                            <tr>
+                                <td>  &nbsp;&nbsp;&nbsp;&nbsp;点&nbsp;&nbsp;&nbsp;    &nbsp;分闭会</td>
+                            </tr>
+                        </table>
                     </td>
-                    <td class="per30">会议地点</td>
-                    <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.meetingPlace" placeholder="会议地点" />
+                    <td style="width:10%">会议地点</td>
+                    <td class="per25">
+                        <input v-if="editable" v-model="meetingTemplate.meetingPlace"  />
                         <div v-else>{{meetingTemplate.meetingPlace}}</div>
                     </td>
-                </tr>
-                <tr>
-                    <td class="per30">会议主持人</td>
+                    <td style="width:10%">主持人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.president"  placeholder="主持人"/>
+                        <input v-if="editable" v-model="meetingTemplate.president"  />
                         <div v-else>{{meetingTemplate.president}}</div>
                     </td>
-                    <td class="per30">会议记录人</td>
+                </tr>
+                <tr>
+                    <td style="width: 15%;">会议名称或主要议题</td>
+                    <td colspan="3">
+                        <input v-if="editable" v-model="meetingTemplate.meetingName" />
+                        <div v-else>{{meetingTemplate.meetingName}}</div>
+                    </td>
+                    <td style="width:10%">记录人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.recorder" placeholder="记录人"/>
+                        <input v-if="editable" v-model="meetingTemplate.recorder" />
                         <div v-else>{{meetingTemplate.recorder}}</div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per30">到场人员</td>
-                    <td colspan="3">
-                        <input v-if="editable" v-model="meetingTemplate.attendants" placeholder="到场人员"/>
+                    <td>出席人</td>
+                    <td colspan="5">
+                        <input v-if="editable" v-model="meetingTemplate.attendants" />
                         <div v-else>{{meetingTemplate.attendants}}</div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per30">到场人数</td>
-                    <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.attendance" placeholder="到场人数"/>
-                        <div v-else>{{meetingTemplate.attendance}}</div>
-                    </td>
-                    <td class="per30">缺席人数</td>
-                    <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.absent" placeholder="缺席人数"/>
-                        <div v-else>{{meetingTemplate.absent}}</div>
-                    </td>
+                    <td colspan="6">会议主要内容</td>
                 </tr>
                 <tr>
-                    <td class="per30">会议主题</td>
-                    <td colspan="3">
-                        <input v-if="editable" v-model="meetingTemplate.theme" placeholder="会议主题" />
-                        <div v-else>{{meetingTemplate.theme}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">会议内容</td>
-                    <td colspan="3">
-                        <textarea v-if="editable" v-model="meetingTemplate.content" rows="5" placeholder="会议内容"></textarea>
+                    <td colspan="6">
+                        <textarea v-if="editable" v-model="meetingTemplate.content" rows="8" ></textarea>
                         <div v-else v-html="meetingTemplate.content"></div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per30">需解决问题</td>
-                    <td colspan="3">
-                        <textarea v-if="editable" v-model="meetingTemplate.problems" rows="5" placeholder="需解决问题"></textarea>
-                        <div v-else v-html="meetingTemplate.problems"></div>
-                    </td>
+                    <td colspan="6">最后形成意见或决定</td>
                 </tr>
                 <tr>
-                    <td class="per30">解决办法与工作安排</td>
-                    <td colspan="3">
-                        <textarea v-if="editable" v-model="meetingTemplate.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
-                        <div v-else v-html="meetingTemplate.methods"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">备注</td>
-                    <td colspan="3">
-                        <textarea v-if="editable" v-model="meetingTemplate.templateNote" rows="5" placeholder="备注"></textarea>
-                        <div v-else v-html="meetingTemplate.templateNote"></div>
+                    <td colspan="6">
+                        <textarea v-if="editable" v-model="meetingTemplate.finalDecision" rows="8" ></textarea>
+                        <div v-else v-html="meetingTemplate.finalDecision"></div>
                     </td>
                 </tr>
             </table>
@@ -345,6 +345,13 @@
             formatDate(value){
                 if(value){
                     return getDate(new Date(value));
+                }else{
+                    return '';
+                }
+            },
+            datetimeFormat(value){
+                if(value){
+                    return getDateTime(new Date(value));
                 }else{
                     return '';
                 }
@@ -482,8 +489,7 @@
                 this.$axios.get("/meetingTemplate/meetingTemplatesByPage",{
                     params:{
                         page:this.query.pageIndex,
-                        limit:this.query.pageSize,
-                        type:'meeting'
+                        limit:this.query.pageSize
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -585,6 +591,7 @@
 </script>
 
 <style scoped>
+    @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
     }
@@ -616,20 +623,12 @@
     td input,td textarea{
         border: none;
         font-size: 16px;
-        width: 90%;
+        width: 95%;
         padding: 3px;
     }
 
     td div{
         text-align: left;
         padding-left: 5px;
-    }
-
-    .upload{
-        color:#E6A23C;
-    }
-
-    .download{
-        color:#67C23A;
     }
 </style>

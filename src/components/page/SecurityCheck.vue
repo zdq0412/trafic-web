@@ -15,6 +15,12 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
+                <el-button v-if="Object.keys(org).length>0"
+                           type="warning"
+                           icon="el-icon-search"
+                           class="handle-del mr10"
+                           @click="findTemplates"
+                >查找模板</el-button>
             </div>
             <el-table
                     :data="tableData"
@@ -37,18 +43,38 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="creator" label="创建人"></el-table-column>
-                <el-table-column prop="orgCategory.name" label="企业类别"></el-table-column>
-                <el-table-column prop="province.name" label="省"></el-table-column>
-                <el-table-column prop="city.name" label="市"></el-table-column>
-                <el-table-column prop="region.name" label="区"></el-table-column>
                 <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
+                <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
+                        <el-upload style="display: none;"
+                                   :action="uploadUrl"
+                                   :limit="1"
+                                   :auto-upload="true"
+                                   ref="uploadFile"
+                                   :data="param"
+                                   accept=".doc,.docx"
+                                   :on-success="handleAvatarSuccess"
+                                   :before-upload="beforeAvatarUpload"
+                                   :headers="headers">
+                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                        </el-upload>
+                        <el-button
+                                type="text"
+                                icon="el-icon-upload2"
+                                class="upload"
+                                @click="uploadTemplate(scope.$index, scope.row)"
+                        >上传文件</el-button>
+                        <el-button v-if="scope.row.realPath"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   class="download"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载文件</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -75,36 +101,19 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @open="loadSelectData" @close="closeDialog">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"   @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-row type="flex" class="row-bg" >
-                    <el-col >
-                        <el-form-item label="省市区">
-                            <el-cascader
-                                    v-model="form.area"
-                                    :options="areas"
-                                    :props="{label:'name',value:'id'}"
-                                    @change="handleChange"></el-cascader>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
-                                <el-option
-                                        v-for="item in orgCategories"
-                                        :key="item.id"
-                                        :label="item.name"
-                                        :value="item.id">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <el-form-item label="检查时间" prop="meetingDate">
+                    <el-date-picker
+                            v-model="form.checkDate"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            placeholder="选择检查时间">
+                    </el-date-picker>
+                </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
                 </el-form-item>
@@ -115,36 +124,19 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @open="loadSelectData" @close="closeDialog" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @close="closeDialog" >
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-row type="flex" class="row-bg" >
-                    <el-col >
-                        <el-form-item label="省市区">
-                            <el-cascader
-                                    v-model="form.area"
-                                    :options="areas"
-                                    :props="{label:'name',value:'id'}"
-                                    @change="handleChange"></el-cascader>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col>
-                        <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
-                                <el-option
-                                        v-for="item in orgCategories"
-                                        :key="item.id"
-                                        :label="item.name"
-                                        :value="item.id">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <el-form-item label="检查时间" prop="meetingDate">
+                    <el-date-picker
+                            v-model="form.checkDate"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            placeholder="选择检查时间">
+                    </el-date-picker>
+                </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
                 </el-form-item>
@@ -161,7 +153,131 @@
             </span>
         </el-dialog>
         <!--显示模板内容-->
-        <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
+        <el-dialog title="检查内容" :visible.sync="showContentVisible" width="50%">
+            <div id="printContent">
+                <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{securityCheck.name}}</div>
+                <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td colspan="2" style="border: none;">
+                            <div style="float: right;margin-right: 10px;">检查日期</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per20">检查对象</td>
+                        <td class="per80">
+                            <textarea v-if="editable" v-model="securityCheck.checkObject"  placeholder="检查对象"></textarea>
+                            <div v-else>{{securityCheck.checkObject}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per20">监督检查的部门及人员</td>
+                        <td class="per80">
+                            <textarea v-if="editable" v-model="securityCheck.deptAndEmp" placeholder="监督检查的部门及人员" ></textarea>
+                            <div v-else>{{securityCheck.deptAndEmp}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per20">检查主要内容</td>
+                        <td class="per80">
+                            <textarea v-if="editable" v-model="securityCheck.content"  placeholder="检查主要内容"></textarea>
+                            <div v-else v-html="securityCheck.content"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per20">提出问题</td>
+                        <td class="per80">
+                            <textarea v-if="editable" v-model="securityCheck.problems" placeholder="提出问题" rows="5"></textarea>
+                            <div v-else v-html="securityCheck.problems"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per20">整改结果</td>
+                        <td class="per80">
+                            <textarea v-if="editable" v-model="securityCheck.result" placeholder="整改结果" rows="5"></textarea>
+                            <div v-else v-html="securityCheck.result"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per20">监察人员签字</td>
+                        <td class="per80" style="height:50px;">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="per20">受检对象签字</td>
+                        <td class="per80"  style="height:50px;">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
+                <el-button v-if="!editable" type="warning" v-print="printObj">打印</el-button>
+                <el-button v-else type="primary" @click="saveContent">保存</el-button>
+                <el-button  @click="showContentVisible=false">关闭</el-button>
+            </span>
+        </el-dialog>
+        <!--查看系统模板-->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-view"
+                                @click="checkContent(scope.$index, scope.row)"
+                        >查看内容</el-button>
+                        <el-button
+                                type="text"
+                                icon="el-icon-copy-document"
+                                class="red"
+                                @click="importTemplate(scope.$index, scope.row)"
+                        >引入</el-button>
+                        <el-button v-if="scope.row.url"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   style="color:#67C23A"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!--模板内容-->
+        <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="60%">
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
                 <caption>{{securityCheck.name}}</caption>
                 <tr>
@@ -217,16 +333,14 @@
                 </tr>
             </table>
             <span slot="footer" class="dialog-footer">
-                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
-                <el-button v-else type="primary" @click="saveContent">保存</el-button>
-                <el-button  @click="showContentVisible=false">关闭</el-button>
+                <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import  {getDate} from "../common/utils";
+    import  {getDate,getDateTime,getTime} from "../common/utils";
     import { VueEditor } from "vue2-editor";
     export default {
         components:{
@@ -235,6 +349,9 @@
         name: 'basetable',
         data() {
             return {
+                printObj:{
+                    id:'printContent'
+                },
                 customToolbar: [
                     ["bold", "italic", "underline"]
                 ],
@@ -242,6 +359,23 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+
+                headers:{
+                    token : localStorage.getItem("token")
+                },
+                param:{type:'securityCheck'},
+                templatesData:[],
+                templateVisible:false,
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
+                showTemplateContentVisible:false,
+                template:{},
+                templatesVisible:false,
+
+
                 noteVisible:false,
                 note:'',
                 orgCategories:[],
@@ -283,6 +417,7 @@
         },
         created() {
             this.getData();
+            this.uploadUrl = this.$baseURL + "/templateUpload";
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
@@ -291,6 +426,66 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            importTemplate(index,row){//引入模板
+                this.template = row;
+                this.$confirm('确定要引入该模板吗？', '提示', {
+                    type: 'warning'
+                })
+                    .then(() => {
+                        let formData = new FormData();
+                        formData.append("templateId",row.id);
+                        this.$axios.post("/securityCheck/template",formData)
+                            .then(res=>{
+                                this.getData();
+                                this.templatesVisible=false;
+                                this.showContentVisible = true;
+                                this.editable=true;
+                            }).catch(error=>console.log(error));
+                    })
+                    .catch(() => {});
+            },
+            checkContent(index,row){//查看模板内容
+                this.showTemplateContentVisible = true;
+                this.template = row;
+            },
+            uploadTemplate(index,row){
+                this.$refs.uploadFile.clearFiles();
+                this.param.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
+            downloadTemplate(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
+            },
+            handleAvatarSuccess(res, file) {
+                this.$message.success("上传成功!");
+                this.getData();
+            },
+            beforeAvatarUpload(file) {
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                const isWord = (file.type==='application/msword' | file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false
+                }
+                if(!isWord){
+                    this.$message.error('只能上传work文档!');
+                    return false;
+                }
+                return  isWord&isLt5M;
+            },
+            //查找模板
+            findTemplates(){
+                this.$axios.get("/securityCheckTemplate/securityCheckTemplatesByPage",{
+                    params:{
+                        page:this.templates.pageIndex,
+                        limit:this.templates.pageSize
+                    }
+                }).then(res => {
+                    this.templatesData = res.data.data;
+                    this.templates.pageTotal = res.data.count;
+                    this.templatesVisible = true;
+                }).catch(error => console.log(error));
+            },
             loadSelectData(){
                 this.$axios.get("/orgCategory/orgCategorys").then(res => {
                     this.orgCategories = res.data.data;
@@ -478,12 +673,18 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageIndex', val);
                 this.getData();
+            },
+            // 分页导航
+            handleTemplatesPageChange(val) {
+                this.$set(this.templates, 'pageIndex', val);
+                this.findTemplates();
             }
         }
     };
 </script>
 
 <style scoped>
+    @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
     }
@@ -523,4 +724,5 @@
         text-align: left;
         padding-left: 5px;
     }
+
 </style>

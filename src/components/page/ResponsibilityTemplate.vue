@@ -470,6 +470,7 @@
 </script>
 
 <style scoped>
+    @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
     }
@@ -483,13 +484,5 @@
     }
     .mr10 {
         margin-right: 10px;
-    }
-
-    .upload{
-        color:#E6A23C;
-    }
-
-    .download{
-        color:#67C23A;
     }
 </style>
