@@ -248,15 +248,16 @@
                         </tr>
                     </table>
                     <div style="page-break-after: always;"></div>
-                    <div style="width:100%;text-align: center;border: 1px solid black;height:30px;line-height:30px;">最后形成意见或决定</div>
-                    <div style="width:100%;text-align: center;border: 1px solid black;">
+                    <div style="width: 170mm;margin-left:20mm;margin-right:20mm;margin-top:20mm; text-align: center;border: 1px solid black;height:30px;line-height:30px;">
+                        最后形成意见或决定</div>
+                    <div style="width: 170mm;margin-left:20mm;margin-right:20mm;;text-align: center;border: 1px solid black;">
                         <textarea v-if="editable" v-model="meeting.finalDecision" style="height:260mm;width:100%;"></textarea>
                         <div v-else v-html="meeting.finalDecision" style="height:260mm;"></div>
                     </div>
                 </div>
                 <div style="page-break-after: always;">&nbsp;</div>
-                <div>
-                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;margin-top:50px;" cellspacing="0" cellpadding="0">
+                <div style="margin-top: 20mm;">
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
                         <caption style="font-size: 18px;letter-spacing: 10px;">会议签到表</caption>
                         <tr>
                             <td colspan="4" style="border: none;text-align: left;">
@@ -292,7 +293,7 @@
                     </table>
                 </div>
                 <div style="page-break-after: always;"></div>
-                <div style="width:100%;">
+                <div style="width: 170mm;margin-left:20mm;margin-right:20mm;">
                     <div style="font-size: 18px;">
                         会议活动照片粘贴处:
                     </div>

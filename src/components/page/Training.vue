@@ -181,7 +181,7 @@
                 </div>
                 <div>
                     <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{training.name}}</div>
-                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;   " cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="border: none;">
                                 <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
@@ -261,7 +261,7 @@
                 </div>
                 <div style="page-break-after: always;"></div>
                 <div style="width:100%;">
-                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;margin-top:20mm;" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="height:20mm;">
                                 <table style="width: 100%;">
@@ -308,8 +308,8 @@
                     </table>
                 </div>
                 <div style="page-break-after: always;"></div>
-                <div style="width: 100%;">
-                    <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">补课签到表</div>
+                <div>
+                    <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;margin-top:20mm;">补课签到表</div>
                     <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="border: none;">
