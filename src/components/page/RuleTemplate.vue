@@ -333,14 +333,6 @@
             showContent(row){
                 this.form = row;
                 this.showContentVisible=true;
-               /* this.$axios.get("/notice/notices",{
-                    params:{
-                        lawOrRulesId:row.id,
-                        type:'template'
-                    }
-                }).then(res =>{
-                    this.notices = res.data;
-                }).catch(error=>console.log(error));*/
             },
             showNote(note){
                 this.note = note;

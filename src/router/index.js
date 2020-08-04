@@ -28,6 +28,11 @@ export default new Router({
                   meta:{title:'企业人员资料'}
                 },
                 {
+                  path:'/empArchives',
+                  component:()=>import('../components/page/EmpArchives.vue'),
+                  meta:{title:'人员档案'}
+                },
+                {
                   path:'/safetyAccount',
                   component:()=>import('../components/page/SafetyAccount.vue'),
                   meta:{title:'安全投入台账'}
@@ -144,57 +149,63 @@ export default new Router({
                 },
                 {
                     path: '/directory',
-                    component: () => import(/* webpackChunkName: "table" */ '../components/page/Directory.vue'),
+                    component: () => import( '../components/page/Directory.vue'),
                     meta: { title: '目录管理' }
                 },
                 {
                     path: '/user',
-                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/User.vue'),
+                    component: () => import( '../components/page/User.vue'),
                     meta: { title: '用户管理' }
                 },
                 {
                     path: '/areaManager',
-                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/AreaManager.vue'),
+                    component: () => import( '../components/page/AreaManager.vue'),
                     meta: { title: '区域管理员' }
                 },
                 {
                     path: '/role',
-                    component: () => import(/* webpackChunkName: "form" */ '../components/page/Role.vue'),
+                    component: () => import( '../components/page/Role.vue'),
                     meta: { title: '角色管理' }
                 },
                 {
                     // 富文本编辑器组件
                     path: '/org',
-                    component: () => import(/* webpackChunkName: "editor" */ '../components/page/Org.vue'),
+                    component: () => import('../components/page/Org.vue'),
                     meta: { title: '企业管理' }
                 },
                 {
                     // markdown组件
                     path: '/category',
-                    component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Category.vue'),
+                    component: () => import('../components/page/Category.vue'),
                     meta: { title: '数据字典管理' }
                 },
                 {
                     // 图片上传组件
                     path: '/org_category',
-                    component: () => import(/* webpackChunkName: "upload" */ '../components/page/OrgCategory.vue'),
+                    component: () => import('../components/page/OrgCategory.vue'),
                     meta: { title: '企业类别管理' }
                 },
                 {
                     // vue-schart组件
                     path: '/schema',
-                    component: () => import(/* webpackChunkName: "chart" */ '../components/page/Schema.vue'),
+                    component: () => import( '../components/page/Schema.vue'),
                     meta: { title: '模式管理' }
                 },
                 {
                     path: '/404',
-                    component: () => import(/* webpackChunkName: "404" */ '../components/page/404.vue'),
+                    component: () => import('../components/page/404.vue'),
                     meta: { title: '404' }
                 },
                 {
                     path: '/403',
-                    component: () => import(/* webpackChunkName: "403" */ '../components/page/403.vue'),
+                    component: () => import('../components/page/403.vue'),
                     meta: { title: '403' }
+                },
+                {
+                    path: '/resume',
+                    name:'resume',
+                    component: () => import( '../components/page/Resume.vue'),
+                    meta: { title: '人员简历' }
                 }
             ]
         },
