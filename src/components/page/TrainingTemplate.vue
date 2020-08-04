@@ -187,94 +187,72 @@
         <!--显示模板内容-->
         <el-dialog title="模板内容" :visible.sync="showContentVisible" width="50%">
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                <caption>{{trainingTemplate.name}}</caption>
+                <caption style="font-size: 18px;letter-spacing: 10px;">{{trainingTemplate.name}}</caption>
                 <tr>
-                    <td colspan="4" style="border: none;">
-                        <div style="float: right;margin-right: 10px;">会议日期</div>
+                    <td colspan="6" style="border: none;">
+                        <div style="float: right;margin-right: 10px;">
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>年</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>月</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>日</label>
+                            <label style="margin-left:20px;">星期</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                        </div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per30">会议名称</td>
+                    <td>活动名称</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="trainingTemplate.trainingName" placeholder="会议名称"/>
+                        <input v-if="editable" v-model="trainingTemplate.trainingName"  />
                         <div v-else>{{trainingTemplate.trainingName}}</div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per30">会议时间</td>
-                    <td class="per20">
-
-                    </td>
-                    <td class="per30">会议地点</td>
-                    <td class="per20">
-                        <input v-if="editable" v-model="trainingTemplate.trainingPlace" placeholder="会议地点" />
-                        <div v-else>{{trainingTemplate.trainingPlace}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">会议主持人</td>
-                    <td class="per20">
-                        <input v-if="editable" v-model="trainingTemplate.president"  placeholder="主持人"/>
-                        <div v-else>{{trainingTemplate.president}}</div>
-                    </td>
-                    <td class="per30">会议记录人</td>
-                    <td class="per20">
-                        <input v-if="editable" v-model="trainingTemplate.recorder" placeholder="记录人"/>
-                        <div v-else>{{trainingTemplate.recorder}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">到场人员</td>
+                    <td>参加对象</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="trainingTemplate.attendants" placeholder="到场人员"/>
+                        <input v-if="editable" v-model="trainingTemplate.attendants" />
                         <div v-else>{{trainingTemplate.attendants}}</div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per30">到场人数</td>
-                    <td class="per20">
-                        <input v-if="editable" v-model="trainingTemplate.attendance" placeholder="到场人数"/>
-                        <div v-else>{{trainingTemplate.attendance}}</div>
+                    <td style="text-space: 30px;">地点</td>
+                    <td>
+                        <input v-if="editable" v-model="trainingTemplate.trainingPlace" />
+                        <div v-else>{{trainingTemplate.trainingPlace}}</div>
                     </td>
-                    <td class="per30">缺席人数</td>
-                    <td class="per20">
-                        <input v-if="editable" v-model="trainingTemplate.absent" placeholder="缺席人数"/>
-                        <div v-else>{{trainingTemplate.absent}}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">会议主题</td>
-                    <td colspan="3">
-                        <input v-if="editable" v-model="trainingTemplate.theme" placeholder="会议主题" />
-                        <div v-else>{{trainingTemplate.theme}}</div>
+                    <td style="text-space: 30px;">主讲人</td>
+                    <td>
+                        <input v-if="editable" v-model="trainingTemplate.president" />
+                        <div v-else>{{trainingTemplate.president}}</div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per30">会议内容</td>
-                    <td colspan="3">
-                        <textarea v-if="editable" v-model="trainingTemplate.content" rows="5" placeholder="会议内容"></textarea>
+                    <td>参加人数</td>
+                    <td>
+                        <span>应到:</span>
+                        <input v-if="editable" v-model="trainingTemplate.attendance" />
+                        <span v-else>{{trainingTemplate.attendance}}</span>
+                        <span>实到:</span>
+                        <input v-if="editable" v-model="trainingTemplate.realAttendance" />
+                        <span v-else>{{trainingTemplate.realAttendance}}</span>
+                    </td>
+                    <td style="text-space: 30px;">记录人</td>
+                    <td>
+                        <input v-if="editable" v-model="trainingTemplate.recorder" />
+                        <div v-else>{{trainingTemplate.recorder}}</div>
+                    </td>
+                </tr>
+                <tr style="border-bottom: none;">
+                    <td colspan="4" style="text-align: left; border-bottom: none;" >
+                        安全学习及教育培训活动内容和反馈意见（可粘附活动照片）：
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <textarea v-if="editable" v-model="trainingTemplate.content" rows="8" ></textarea>
                         <div v-else v-html="trainingTemplate.content"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">需解决问题</td>
-                    <td colspan="3">
-                        <textarea v-if="editable" v-model="trainingTemplate.problems" rows="5" placeholder="需解决问题"></textarea>
-                        <div v-else v-html="trainingTemplate.problems"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">解决办法与工作安排</td>
-                    <td colspan="3">
-                        <textarea v-if="editable" v-model="trainingTemplate.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
-                        <div v-else v-html="trainingTemplate.methods"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="per30">备注</td>
-                    <td colspan="3">
-                        <textarea v-if="editable" v-model="trainingTemplate.templateNote" rows="5" placeholder="备注"></textarea>
-                        <div v-else v-html="trainingTemplate.templateNote"></div>
                     </td>
                 </tr>
             </table>

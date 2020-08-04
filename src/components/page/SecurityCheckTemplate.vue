@@ -190,53 +190,83 @@
                 <caption>{{securityCheckTemplate.name}}</caption>
                 <tr>
                     <td colspan="2" style="border: none;">
-                        <div style="float: right;margin-right: 10px;">检查日期</div>
+                        <div style="float: right;margin-right: 10px;">
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>年</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>月</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                            <label>日</label>
+                            <label style="margin-left:20px;">星期</label>
+                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                        </div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per20">检查对象</td>
+                    <td class="per20">受检单位(部门、车辆)</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.checkObject"  placeholder="检查对象"></textarea>
+                        <textarea v-if="editable" v-model="securityCheckTemplate.checkObject"></textarea>
                         <div v-else>{{securityCheckTemplate.checkObject}}</div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per20">监督检查的部门及人员</td>
+                    <td class="per20">参加监督检查的单位(部门)及人员</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.deptAndEmp" placeholder="监督检查的部门及人员" ></textarea>
+                        <textarea v-if="editable" v-model="securityCheckTemplate.deptAndEmp"></textarea>
                         <div v-else>{{securityCheckTemplate.deptAndEmp}}</div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per20">检查主要内容</td>
+                    <td class="per20">监督检查的主要内容</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.content"  placeholder="检查主要内容"></textarea>
+                        <textarea v-if="editable" v-model="securityCheckTemplate.content" ></textarea>
                         <div v-else v-html="securityCheckTemplate.content"></div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="per20">提出问题</td>
+                    <td class="per20">监督检查中查出的问题</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.problems" placeholder="提出问题" rows="5"></textarea>
+                        <textarea v-if="editable" v-model="securityCheckTemplate.problems"  rows="5"></textarea>
                         <div v-else v-html="securityCheckTemplate.problems"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="per20">检查组处理意见</td>
+                    <td class="per80">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="border: none;">
+                                    <textarea v-if="editable" v-model="securityCheckTemplate.suggestion"  rows="5"></textarea>
+                                    <div v-else v-html="securityCheckTemplate.suggestion"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: none;text-align: left;">检查人员签名:</td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
                 <tr>
                     <td class="per20">整改结果</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.result" placeholder="整改结果" rows="5"></textarea>
-                        <div v-else v-html="securityCheckTemplate.result"></div>
+                        <table style="width:100%;">
+                            <tr>
+                                <td  style="border: none;">
+                                    <textarea v-if="editable" v-model="securityCheckTemplate.result" rows="5"></textarea>
+                                    <div v-else v-html="securityCheckTemplate.result"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right;border: none;">确认人签名:<div style="display: inline-block;width:100px;"></div>
+                                月&nbsp;&nbsp;&nbsp;&nbsp;日</td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
-                <tr>
-                    <td class="per20">监察人员签字</td>
-                    <td class="per80" style="height:50px;">
 
-                    </td>
-                </tr>
                 <tr>
-                    <td class="per20">受检对象签字</td>
-                    <td class="per80"  style="height:50px;">
+                    <td colspan="2" style="border: none;text-align: left;">
+                        受检单位(部门、车辆)代表人签名:
                     </td>
                 </tr>
             </table>
@@ -570,7 +600,6 @@
     }
     td input,td textarea{
         border: none;
-        font-size: 20px;
         width: 99%;
         padding: 3px;
     }

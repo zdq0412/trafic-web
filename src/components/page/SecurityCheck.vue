@@ -152,63 +152,117 @@
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
             </span>
         </el-dialog>
-        <!--显示模板内容-->
-        <el-dialog title="检查内容" :visible.sync="showContentVisible" width="50%">
+        <!--显示内容-->
+        <el-dialog title="" :visible.sync="showContentVisible" width="50%">
             <div id="printContent">
-                <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{securityCheck.name}}</div>
-                <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                    <tr>
-                        <td colspan="2" style="border: none;">
-                            <div style="float: right;margin-right: 10px;">检查日期</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per20">检查对象</td>
-                        <td class="per80">
-                            <textarea v-if="editable" v-model="securityCheck.checkObject"  placeholder="检查对象"></textarea>
-                            <div v-else>{{securityCheck.checkObject}}</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per20">监督检查的部门及人员</td>
-                        <td class="per80">
-                            <textarea v-if="editable" v-model="securityCheck.deptAndEmp" placeholder="监督检查的部门及人员" ></textarea>
-                            <div v-else>{{securityCheck.deptAndEmp}}</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per20">检查主要内容</td>
-                        <td class="per80">
-                            <textarea v-if="editable" v-model="securityCheck.content"  placeholder="检查主要内容"></textarea>
-                            <div v-else v-html="securityCheck.content"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per20">提出问题</td>
-                        <td class="per80">
-                            <textarea v-if="editable" v-model="securityCheck.problems" placeholder="提出问题" rows="5"></textarea>
-                            <div v-else v-html="securityCheck.problems"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per20">整改结果</td>
-                        <td class="per80">
-                            <textarea v-if="editable" v-model="securityCheck.result" placeholder="整改结果" rows="5"></textarea>
-                            <div v-else v-html="securityCheck.result"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per20">监察人员签字</td>
-                        <td class="per80" style="height:50px;">
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per20">受检对象签字</td>
-                        <td class="per80"  style="height:50px;">
-                        </td>
-                    </tr>
-                </table>
+                <div style="height: 232mm;width:210mm;padding-top: 65mm;">
+                    <div style="font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">安全管理监督检查记录</div>
+                    <div style="margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                        <label>企业名称:</label>
+                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                            {{org.name}}
+                        </div>
+                    </div>
+                    <div style="margin-top:30mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                        <label>地&nbsp;&nbsp;&nbsp;&nbsp;址:</label>
+                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                            {{org.addr}}
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-top:30mm;">
+                    <div  style="font-size: 18px;letter-spacing: 10px;text-align: center;width:95%;height:30%;">{{securityCheck.name}}</div>
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td colspan="2" style="border: none;">
+                                <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
+                                    <label style="display: inline-block;border-bottom: black solid 1px;height:22px;width:50px;padding-bottom: 0px;">
+                                        {{securityCheck.checkDate | formatYear}}
+                                    </label>
+                                    <label>年</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                        {{securityCheck.checkDate | formatMonth}}
+                                    </div>
+                                    <label>月</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                        {{securityCheck.checkDate | formatDay}}
+                                    </div>
+                                    <label>日</label>
+                                    <label style="margin-left:20px;">星期</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;height:22px;">
+                                        {{securityCheck.checkDate | formatWeek}}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="per20">受检单位(部门、车辆)</td>
+                            <td class="per80">
+                                <textarea v-if="editable" v-model="securityCheck.checkObject" style="height: 56px;"></textarea>
+                                <div v-else  style="height: 56px;">{{securityCheck.checkObject}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="per20">参加监督检查的单位(部门)及人员</td>
+                            <td class="per80">
+                                <textarea v-if="editable" v-model="securityCheck.deptAndEmp"  style="height: 30mm;"></textarea>
+                                <div v-else  v-html="securityCheck.deptAndEmp"  style="height: 30mm;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="per20">监督检查的主要内容</td>
+                            <td class="per80">
+                                <textarea v-if="editable" v-model="securityCheck.content"  style="height: 40mm;"></textarea>
+                                <div v-else v-html="securityCheck.content"  style="height: 40mm;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="per20">监督检查中查出的问题</td>
+                            <td class="per80">
+                                <textarea v-if="editable" v-model="securityCheck.problems"  style="height: 50mm;"></textarea>
+                                <div v-else v-html="securityCheck.problems"  style="height:50mm;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="per20">检查组处理意见</td>
+                            <td class="per80">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="border: none;">
+                                            <textarea v-if="editable" v-model="securityCheck.suggestion"  style="height: 30mm;"></textarea>
+                                            <div v-else v-html="securityCheck.suggestion"  style="height: 30mm;"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: none;text-align: left;">检查人员签名:</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="per20">整改结果</td>
+                            <td class="per80">
+                                <table style="width:100%;">
+                                    <tr>
+                                        <td  style="border: none;">
+                                            <textarea v-if="editable" v-model="securityCheck.result"  style="height: 20mm;"></textarea>
+                                            <div v-else v-html="securityCheck.result"  style="height: 20mm;"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right;border: none;">确认人签名:<div style="display: inline-block;width:100px;"></div>
+                                            月&nbsp;&nbsp;&nbsp;&nbsp;日</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="border: none;text-align: left;">
+                                受检单位(部门、车辆)代表人签名:
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
@@ -407,6 +461,35 @@
             };
         },
         filters:{
+            formatYear(value){
+                if(value) {
+                    return new Date(value).getFullYear();
+                }else{
+                    return '';
+                }
+            },
+            formatMonth(value){
+                if(value) {
+                    return new Date(value).getMonth()+1;
+                }else{
+                    return '';
+                }
+            },
+            formatDay(value){
+                if(value) {
+                    return new Date(value).getDate();
+                }else{
+                    return '';
+                }
+            },
+            formatWeek(value){
+                let weeks = ['日','一','二','三','四','五','六'];
+                if(value) {
+                    return weeks[new Date(value).getDay()];
+                }else{
+                    return '';
+                }
+            },
             formatDate(value){
                 if(value){
                     return getDate(new Date(value));

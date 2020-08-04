@@ -155,9 +155,9 @@
         <!--显示会议内容-->
         <el-dialog title="" :visible.sync="showContentVisible" width="50%">
             <div id="printContent">
-                <div style="height: 297mm;width:210mm;page-break-after:always">
-                    <div style="margin-top: 50mm;font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">安全生产会议记录</div>
-                    <div style="margin-top:50mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                <div style="height: 232mm;width:210mm;padding-top: 65mm;">
+                    <div style="font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">安全生产会议记录</div>
+                    <div style="margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
                         <label>企业名称:</label>
                         <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
                             {{org.name}}
@@ -170,20 +170,28 @@
                         </div>
                     </div>
                 </div>
-                <div style="page-break-after:always">
-                    <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{meeting.name}}</div>
-                    <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                <div>
+                    <div  style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;height:30%;">{{meeting.name}}</div>
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="border: none;">
-                                <div style="float: right;margin-right: 10px;">
-                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                                <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
+                                    <label style="display: inline-block;border-bottom: black solid 1px;height:22px;width:50px;padding-bottom: 0px;">
+                                        {{meeting.meetingDate | formatYear}}
+                                    </label>
                                     <label>年</label>
-                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                        {{meeting.meetingDate | formatMonth}}
+                                    </div>
                                     <label>月</label>
-                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                        {{meeting.meetingDate | formatDay}}
+                                    </div>
                                     <label>日</label>
                                     <label style="margin-left:20px;">星期</label>
-                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;"></div>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;height:22px;">
+                                        {{meeting.meetingDate | formatWeek}}
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -192,7 +200,7 @@
                             <td class="per20">
                                 <table style="width:100%;" cellspacing="0" cellpadding="0">
                                     <tr>
-                                        <td>  &nbsp;&nbsp;&nbsp;&nbsp;点&nbsp;&nbsp;&nbsp;  &nbsp;  分开会</td>
+                                        <td>  {{meeting.meetingDate | formatHour}}点  {{meeting.meetingDate | formatMinute}} 分开会</td>
                                     </tr>
                                     <tr>
                                         <td>  &nbsp;&nbsp;&nbsp;&nbsp;点&nbsp;&nbsp;&nbsp;    &nbsp;分闭会</td>
@@ -230,27 +238,25 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="6">会议主要内容</td>
+                            <td colspan="6">会议主要内容记录</td>
                         </tr>
                         <tr>
                             <td colspan="6">
-                                <textarea v-if="editable" v-model="meeting.content" rows="8" ></textarea>
-                                <div v-else v-html="meeting.content"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="6">最后形成意见或决定</td>
-                        </tr>
-                        <tr>
-                            <td colspan="6">
-                                <textarea v-if="editable" v-model="meeting.finalDecision" rows="8" ></textarea>
-                                <div v-else v-html="meeting.finalDecision"></div>
+                                <textarea v-if="editable" v-model="meeting.content"  style="height:744mm;"></textarea>
+                                <div v-else v-html="meeting.content" style="height:744mm;"></div>
                             </td>
                         </tr>
                     </table>
+                    <div style="page-break-after: always;"></div>
+                    <div style="width:100%;text-align: center;border: 1px solid black;height:30px;line-height:30px;">最后形成意见或决定</div>
+                    <div style="width:100%;text-align: center;border: 1px solid black;">
+                        <textarea v-if="editable" v-model="meeting.finalDecision" style="height:260mm;width:100%;"></textarea>
+                        <div v-else v-html="meeting.finalDecision" style="height:260mm;"></div>
+                    </div>
                 </div>
-                <div style="page-break-after:always">
-                    <table style="width: 100%;margin-top:50px;" cellspacing="0" cellpadding="0">
+                <div style="page-break-after: always;">&nbsp;</div>
+                <div>
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;margin-top:50px;" cellspacing="0" cellpadding="0">
                         <caption style="font-size: 18px;letter-spacing: 10px;">会议签到表</caption>
                         <tr>
                             <td colspan="4" style="border: none;text-align: left;">
@@ -267,14 +273,36 @@
                             <td>单位(部门)</td>
                             <td>职务</td>
                             <td>联系电话</td>
+                            <td>签到</td>
+                        </tr>
+                        <tr v-for="emp in emps" >
+                            <td>{{emp.name}}</td>
+                            <td>{{emp.department.name}}</td>
+                            <td>{{emp.position.name}}</td>
+                            <td>{{emp.tel}}</td>
+                           <td></td>
+                        </tr>
+                        <tr v-for="i in 15">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     </table>
+                </div>
+                <div style="page-break-after: always;"></div>
+                <div style="width:100%;">
+                    <div style="font-size: 18px;">
+                        会议活动照片粘贴处:
+                    </div>
+
                 </div>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
                 <el-button v-if="!editable" type="warning" v-print="'#printContent'">打印</el-button>
-                <el-button v-else type="primary" @click="saveContent">保存</el-button>
+                <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
@@ -469,6 +497,7 @@
                 noteVisible:false,
                 note:'',
                 orgCategories:[],
+                emps:[],
                 areas:[],
                 editable:false,
                 notices:[],
@@ -508,6 +537,49 @@
             };
         },
         filters:{
+            formatYear(value){
+                if(value) {
+                    return new Date(value).getFullYear();
+                }else{
+                    return '';
+                }
+            },
+            formatMonth(value){
+                if(value) {
+                    return new Date(value).getMonth()+1;
+                }else{
+                    return '';
+                }
+            },
+            formatDay(value){
+                if(value) {
+                    return new Date(value).getDate();
+                }else{
+                    return '';
+                }
+            },
+            formatHour(value){
+                if(value) {
+                    return new Date(value).getHours();
+                }else{
+                    return '';
+                }
+            },
+            formatMinute(value){
+                if(value) {
+                    return new Date(value).getMinutes();
+                }else{
+                    return '';
+                }
+            },
+            formatWeek(value){
+                let weeks = ['日','一','二','三','四','五','六'];
+                if(value) {
+                    return weeks[new Date(value).getDay()];
+                }else{
+                    return '';
+                }
+            },
             formatDate(value){
                 if(value){
                     return getDate(new Date(value));
@@ -533,6 +605,9 @@
         created() {
             this.getData();
             this.uploadUrl = this.$baseURL + "/templateUpload";
+            this.$axios.get("/employee/employees").then(res=>{
+                this.emps = res.data.data;
+            }).catch(error=>console.log(error));
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
@@ -765,8 +840,7 @@
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.form.content='';
-                        this.$axios.put("/meeting/meeting?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/meeting/updateMeeting" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();

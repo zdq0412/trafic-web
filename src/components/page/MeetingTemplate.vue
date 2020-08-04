@@ -186,21 +186,6 @@
         </el-dialog>
         <!--显示模板内容-->
         <el-dialog title="" :visible.sync="showContentVisible" width="50%">
-            <div style="height: 250mm;width:210mm;">
-                <div style="margin-top: 50mm;font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">安全生产会议记录</div>
-                <div style="margin-top:50mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
-                    <label>企业名称:</label>
-                    <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
-                        {{org.name}}
-                    </div>
-                </div>
-                <div style="margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
-                    <label>地&nbsp;&nbsp;&nbsp;&nbsp;址:</label>
-                    <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
-                        {{org.addr}}
-                    </div>
-                </div>
-            </div>
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
                 <caption style="font-size: 18px;letter-spacing: 10px;">{{meetingTemplate.name}}</caption>
                 <tr>

@@ -164,98 +164,222 @@
         <!--显示培训内容-->
         <el-dialog title="培训内容" :visible.sync="showContentVisible" width="50%">
             <div id="printContent">
-                <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{training.name}}</div>
-                <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                    <tr>
-                        <td colspan="4" style="border: none;">
-                            <div style="float: right;margin-right: 10px;">会议日期</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">会议名称</td>
-                        <td colspan="3">
-                            <input v-if="editable" v-model="training.trainingName" placeholder="会议名称"/>
-                            <div v-else>{{training.trainingName}}</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">会议时间</td>
-                        <td class="per20">
-
-                        </td>
-                        <td class="per30">会议地点</td>
-                        <td class="per20">
-                            <input v-if="editable" v-model="training.trainingPlace" placeholder="会议地点" />
-                            <div v-else>{{training.trainingPlace}}</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">会议主持人</td>
-                        <td class="per20">
-                            <input v-if="editable" v-model="training.president"  placeholder="主持人"/>
-                            <div v-else>{{training.president}}</div>
-                        </td>
-                        <td class="per30">会议记录人</td>
-                        <td class="per20">
-                            <input v-if="editable" v-model="training.recorder" placeholder="记录人"/>
-                            <div v-else>{{training.recorder}}</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">到场人员</td>
-                        <td colspan="3">
-                            <input v-if="editable" v-model="training.attendants" placeholder="到场人员"/>
-                            <div v-else>{{training.attendants}}</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">到场人数</td>
-                        <td class="per20">
-                            <input v-if="editable" v-model="training.attendance" placeholder="到场人数"/>
-                            <div v-else>{{training.attendance}}</div>
-                        </td>
-                        <td class="per30">缺席人数</td>
-                        <td class="per20">
-                            <input v-if="editable" v-model="training.absent" placeholder="缺席人数"/>
-                            <div v-else>{{training.absent}}</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">会议主题</td>
-                        <td colspan="3">
-                            <input v-if="editable" v-model="training.theme" placeholder="会议主题" />
-                            <div v-else>{{training.theme}}</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">会议内容</td>
-                        <td colspan="3">
-                            <textarea v-if="editable" v-model="training.content" rows="5" placeholder="会议内容"></textarea>
-                            <div v-else v-html="training.content"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">需解决问题</td>
-                        <td colspan="3">
-                            <textarea v-if="editable" v-model="training.problems" rows="5" placeholder="需解决问题"></textarea>
-                            <div v-else v-html="training.problems"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">解决办法与工作安排</td>
-                        <td colspan="3">
-                            <textarea v-if="editable" v-model="training.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
-                            <div v-else v-html="training.methods"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="per30">备注</td>
-                        <td colspan="3">
-                            <textarea v-if="editable" v-model="training.templateNote" rows="5" placeholder="备注"></textarea>
-                            <div v-else v-html="training.templateNote"></div>
-                        </td>
-                    </tr>
-                </table>
+                <div style="height: 232mm;width:210mm;padding-top: 65mm;">
+                    <div style="font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">企业安全学习及培训教育记录</div>
+                    <div style="margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                        <label>企业名称:</label>
+                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                            {{org.name}}
+                        </div>
+                    </div>
+                    <div style="margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                        <label>地&nbsp;&nbsp;&nbsp;&nbsp;址:</label>
+                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                            {{org.addr}}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{training.name}}</div>
+                    <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td colspan="6" style="border: none;">
+                                <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
+                                    <label style="display: inline-block;border-bottom: black solid 1px;height:22px;width:50px;padding-bottom: 0px;">
+                                        {{training.trainingDate | formatYear}}
+                                    </label>
+                                    <label>年</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                        {{training.trainingDate | formatMonth}}
+                                    </div>
+                                    <label>月</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                        {{training.trainingDate | formatDay}}
+                                    </div>
+                                    <label>日</label>
+                                    <label style="margin-left:20px;">星期</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;height:22px;">
+                                        {{training.trainingDate | formatWeek}}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>活动名称</td>
+                            <td colspan="3">
+                                <input v-if="editable" v-model="training.trainingName"  />
+                                <div v-else>{{training.trainingName}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>参加对象</td>
+                            <td colspan="3">
+                                <input v-if="editable" v-model="training.attendants" />
+                                <div v-else>{{training.attendants}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-space: 30px;">地点</td>
+                            <td>
+                                <input v-if="editable" v-model="training.trainingPlace" />
+                                <div v-else>{{training.trainingPlace}}</div>
+                            </td>
+                            <td style="text-space: 30px;">主讲人</td>
+                            <td>
+                                <input v-if="editable" v-model="training.president" />
+                                <div v-else>{{training.president}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>参加人数</td>
+                            <td style="text-align: left;">
+                                <span>应到:</span>
+                                <input v-if="editable" v-model="training.attendance" style="width:50px;"/>
+                                <span v-else>{{training.attendance}}</span>
+                                <span>实到:</span>
+                                <input v-if="editable" v-model="training.realAttendance" style="width:50px;"/>
+                                <span v-else>{{training.realAttendance}}</span>
+                            </td>
+                            <td style="text-space: 30px;">记录人</td>
+                            <td style="width:250px;">
+                                <input v-if="editable" v-model="training.recorder" />
+                                <div v-else>{{training.recorder}}</div>
+                            </td>
+                        </tr>
+                        <tr style="border-bottom: none;">
+                            <td colspan="4" style="text-align: left; border-bottom: none;" >
+                                安全学习及教育培训活动内容和反馈意见（可粘附活动照片）：
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <textarea v-if="editable" v-model="training.content" style="height:744mm;" ></textarea>
+                                <div v-else v-html="training.content" style="height:744mm;"></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="page-break-after: always;"></div>
+                <div style="width:100%;">
+                    <table style="width:100%" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td colspan="6" style="height:20mm;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="text-align: center;border: none;letter-spacing: 10px;">
+                                            参加活动的人员名单
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: center;border: none;">
+                                            <label style="display: inline-block;border-bottom: black solid 1px;height:22px;width:50px;padding-bottom: 0px;">
+                                            </label>
+                                            <label>年</label>
+                                            <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                            </div>
+                                            <label>月</label>
+                                            <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                            </div>
+                                            <label>日</label>
+                                            <label style="margin-left:20px;">星期</label>
+                                            <div style="display: inline-block;border-bottom: black solid 1px;width:50px;height:22px;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>姓名(签名)</td>
+                            <td>备注(岗位)</td>
+                            <td>成绩</td>
+                            <td>姓名(签名)</td>
+                            <td>备注(岗位)</td>
+                            <td>成绩</td>
+                        </tr>
+                        <tr v-for="i in 20">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="page-break-after: always;"></div>
+                <div style="width: 100%;">
+                    <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">补课签到表</div>
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td colspan="6" style="border: none;">
+                                <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
+                                    <label style="display: inline-block;border-bottom: black solid 1px;height:22px;width:50px;padding-bottom: 0px;">
+                                    </label>
+                                    <label>年</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                    </div>
+                                    <label>月</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:30px;height:22px;">
+                                    </div>
+                                    <label>日</label>
+                                    <label style="margin-left:20px;">星期</label>
+                                    <div style="display: inline-block;border-bottom: black solid 1px;width:50px;height:22px;">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>活动名称</td>
+                            <td colspan="5">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>参加对象</td>
+                            <td colspan="5">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-space: 30px;">地点</td>
+                            <td colspan="2">
+                            </td>
+                            <td style="text-space: 30px;">主讲人</td>
+                            <td colspan="2">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>参加人数</td>
+                            <td style="text-align: left;" colspan="2">
+                                <span>应到:</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <span>实到:</span>
+                            </td>
+                            <td style="text-space: 30px;">记录人</td>
+                            <td colspan="2">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                参加补课的人员名单
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>姓名(签名)</td>
+                            <td>备注(岗位)</td>
+                            <td>成绩</td>
+                            <td>姓名(签名)</td>
+                            <td>备注(岗位)</td>
+                            <td>成绩</td>
+                        </tr>
+                        <tr v-for="i in 15">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
@@ -492,6 +616,49 @@
             };
         },
         filters:{
+            formatYear(value){
+                if(value) {
+                    return new Date(value).getFullYear();
+                }else{
+                    return '';
+                }
+            },
+            formatMonth(value){
+                if(value) {
+                    return new Date(value).getMonth()+1;
+                }else{
+                    return '';
+                }
+            },
+            formatDay(value){
+                if(value) {
+                    return new Date(value).getDate();
+                }else{
+                    return '';
+                }
+            },
+            formatHour(value){
+                if(value) {
+                    return new Date(value).getHours();
+                }else{
+                    return '';
+                }
+            },
+            formatMinute(value){
+                if(value) {
+                    return new Date(value).getMinutes();
+                }else{
+                    return '';
+                }
+            },
+            formatWeek(value){
+                let weeks = ['日','一','二','三','四','五','六'];
+                if(value) {
+                    return weeks[new Date(value).getDay()];
+                }else{
+                    return '';
+                }
+            },
             formatDate(value){
                 if(value){
                     return getDate(new Date(value));
@@ -560,7 +727,7 @@
             },
             //查找模板
             findTemplates(){
-                this.$axios.get("/trainingTemplate/trainingTemplatesByPage",{
+                this.$axios.get("/training/trainingsByPage",{
                     params:{
                         page:this.templates.pageIndex,
                         limit:this.templates.pageSize,
