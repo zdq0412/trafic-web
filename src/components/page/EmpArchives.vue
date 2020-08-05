@@ -162,6 +162,38 @@
                         this.$router.push({name:"resume",params:{empId:row.id}});
                         break;
                     }
+                    case "idcard":{
+                        this.$router.push({name:"idcard",params:{empId:row.id}});
+                        break;
+                    }
+                    case "contract":{
+                        this.$router.push({name:"contract",params:{empId:row.id}});
+                        break;
+                    }
+                    case "qualificationDocument":{
+                        this.$router.push({name:"qualificationDocument",params:{empId:row.id}});
+                        break;
+                    }
+                    case "jobHistory":{
+                        this.$router.push({name:"jobHistory",params:{empId:row.id}});
+                        break;
+                    }
+                    case "inductionTraining":{
+                        this.$router.push({name:"inductionTraining",params:{empId:row.id}});
+                        break;
+                    }
+                    case "safetyResponsibilityAgreement":{
+                        this.$router.push({name:"safetyResponsibilityAgreement",params:{empId:row.id}});
+                        break;
+                    }
+                    case "trainingExamine":{
+                        this.$router.push({name:"trainingExamine",params:{empId:row.id}});
+                        break;
+                    }
+                    case "otherDocument":{
+                        this.$router.push({name:"otherDocument",params:{empId:row.id}});
+                        break;
+                    }
                 }
             },
             // 分页导航

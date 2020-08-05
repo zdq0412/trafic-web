@@ -206,6 +206,54 @@ export default new Router({
                     name:'resume',
                     component: () => import( '../components/page/Resume.vue'),
                     meta: { title: '人员简历' }
+                },
+                {
+                    path: '/idcard',
+                    name:'idcard',
+                    component: () => import( '../components/page/IDCard.vue'),
+                    meta: { title: '人员身份证' }
+                },
+                {
+                    path: '/contract',
+                    name:'contract',
+                    component: () => import( '../components/page/Contract.vue'),
+                    meta: { title: '劳动合同' }
+                },
+                {
+                    path: '/qualificationDocument',
+                    name:'qualificationDocument',
+                    component: () => import( '../components/page/QualificationDocument.vue'),
+                    meta: { title: '资质文件' }
+                },
+                {
+                    path: '/jobHistory',
+                    name:'jobHistory',
+                    component: () => import( '../components/page/JobHistory.vue'),
+                    meta: { title: '从业经历' }
+                },
+                {
+                    path: '/inductionTraining',
+                    name:'inductionTraining',
+                    component: () => import( '../components/page/InductionTraining.vue'),
+                    meta: { title: '入职培训' }
+                },
+                {
+                    path: '/safetyResponsibilityAgreement',
+                    name:'safetyResponsibilityAgreement',
+                    component: () => import( '../components/page/SafetyResponsibilityAgreement.vue'),
+                    meta: { title: '安全责任书' }
+                },
+                {
+                    path: '/trainingExamine',
+                    name:'trainingExamine',
+                    component: () => import( '../components/page/TrainingExamine.vue'),
+                    meta: { title: '培训考核情况' }
+                },
+                {
+                    path: '/otherDocument',
+                    name:'otherDocument',
+                    component: () => import( '../components/page/OtherDocument.vue'),
+                    meta: { title: '其他档案' }
                 }
             ]
         },

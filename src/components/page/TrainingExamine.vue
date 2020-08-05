@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 简历管理
+                    <i class="el-icon-lx-cascades"></i> 培训考核
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -124,7 +124,7 @@
                 },
 
                 uploadUrl:'',
-                param:{type:'resume'},
+                param:{type:'trainingExamine'},
                 headers:{
                     token : localStorage.getItem("token")
                 },
@@ -190,7 +190,7 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/resume/resumesByPage",{
+                this.$axios.get("/trainingExamine/trainingExaminesByPage",{
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
@@ -215,7 +215,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/resume/resume/" + this.form.id).then(res => {
+                        this.$axios.delete("/trainingExamine/trainingExamine/" + this.form.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -240,7 +240,7 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.empId=this.empId;
-                        this.$axios.put("/resume/resume?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/trainingExamine/trainingExamine?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -259,7 +259,7 @@
                 this.$refs.form.validate(validate =>{
                     if(validate){
                         this.form.empId = this.empId;
-                        this.$axios.post("/resume/resume",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/trainingExamine/trainingExamine",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();

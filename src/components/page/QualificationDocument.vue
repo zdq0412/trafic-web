@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 简历管理
+                    <i class="el-icon-lx-cascades"></i> 资质文件管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -13,7 +13,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addVisible=true"
+                        @click="addVisible=true;form={}"
                 >新增</el-button>
             </div>
             <el-table
@@ -23,7 +23,9 @@
                     header-cell-class-name="table-header"
             >
                 <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="createDate" label="创建时间" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="createDate" label="创建时间" :formatter="dateTimeFormatter"></el-table-column>
+                <el-table-column prop="beginDate" label="有效期开始" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="endDate" label="有效期结束" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
@@ -79,9 +81,25 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="有效期开始" >
+                    <el-date-picker
+                            v-model="form.beginDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="有效期截止" >
+                    <el-date-picker
+                            v-model="form.endDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -94,10 +112,26 @@
         </el-dialog>
         <!-- 新增弹出框 -->
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
-            <el-form ref="form" :model="form" :rules="rules"  label-width="70px">
+            <el-form ref="form" :model="form" :rules="rules"  label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                     <el-input v-model="form.id" v-show="false"></el-input>
+                </el-form-item>
+                <el-form-item label="有效期开始" >
+                    <el-date-picker
+                            v-model="form.beginDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="有效期截止" >
+                    <el-date-picker
+                            v-model="form.endDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -112,7 +146,7 @@
 </template>
 
 <script>
-    import {getDateTime} from "../common/utils";
+    import {getDateTime,getDate} from "../common/utils";
 
     export default {
         name: 'basetable',
@@ -124,7 +158,7 @@
                 },
 
                 uploadUrl:'',
-                param:{type:'resume'},
+                param:{type:'qualificationDocument'},
                 headers:{
                     token : localStorage.getItem("token")
                 },
@@ -154,6 +188,13 @@
         methods: {
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
+                    return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
+            },
+            dateTimeFormatter(row, column, cellValue, index){
+                if(cellValue){
                     return getDateTime(new Date(cellValue));
                 }else{
                     return '';
@@ -173,24 +214,18 @@
             },
             beforeAvatarUpload(file) {
                 const isLt5M = file.size / 1024 / 1024 < 5;
-                //const isWord = (file.type==='application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
                 if (!isLt5M) {
                     this.$message.error('上传文件大小不能超过 5MB!');
                     return false
                 }
-                /*if(!isWord){
-                    this.$message.error('只能上传work文档!');
-                    return false;
-                }*/
                 return  isLt5M;
-               // return  isWord&isLt5M;
             },
             closeDialog(){
                 this.$refs["form"].clearValidate();
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/resume/resumesByPage",{
+                this.$axios.get("/qualificationDocument/qualificationDocumentsByPage",{
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
@@ -215,7 +250,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/resume/resume/" + this.form.id).then(res => {
+                        this.$axios.delete("/qualificationDocument/qualificationDocument/" + this.form.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -233,14 +268,19 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                this.$refs["form"].clearValidate();
+                if(row.beginDate){
+                    this.form.beginDate = getDate(new Date(row.beginDate));
+                }
+                if(row.endDate){
+                    this.form.endDate = getDate(new Date(row.endDate));
+                }
             },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.empId=this.empId;
-                        this.$axios.put("/resume/resume?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/qualificationDocument/qualificationDocument?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -259,7 +299,7 @@
                 this.$refs.form.validate(validate =>{
                     if(validate){
                         this.form.empId = this.empId;
-                        this.$axios.post("/resume/resume",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/qualificationDocument/qualificationDocument",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
