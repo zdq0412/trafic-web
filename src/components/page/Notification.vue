@@ -78,7 +78,8 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog" @open="loadData">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="发布日期" prop="publishDate">
                     <el-date-picker
@@ -135,7 +136,8 @@
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" @open="loadData">
             <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="发布日期" prop="publishDate">
                     <el-date-picker
@@ -188,14 +190,14 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
+        <el-dialog title="备注" :visible.sync="noteVisible" width="60%">
             {{note}}
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
             </span>
         </el-dialog>
         <!--显示文本内容-->
-        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="30%">
+        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="60%">
             <div v-html="form.content"></div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
@@ -203,7 +205,7 @@
             </span>
         </el-dialog>
         <!--编辑文本内容-->
-        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="30%">
+        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="60%">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                <!-- <el-row type="flex" class="row-bg">
                     <el-col>

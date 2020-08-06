@@ -91,7 +91,8 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="form.username"></el-input>
+                    <el-input v-model="form.username" maxlength="15"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="所属角色" >
                     <el-select v-model="form.roleId" @change="$set(form,roleId)">
@@ -102,7 +103,8 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="真名">
-                    <el-input v-model="form.realname"></el-input>
+                    <el-input v-model="form.realname" maxlength="10"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="tel">
                     <el-input v-model="form.tel"></el-input>
@@ -127,7 +129,8 @@
         <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="form.username"></el-input>
+                    <el-input v-model="form.username" maxlength="15"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="角色">
                     <el-select v-model="form.roleId" @change="$set(form,roleId)">
@@ -138,7 +141,8 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="真名">
-                    <el-input v-model="form.realname"></el-input>
+                    <el-input v-model="form.realname" maxlength="10"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="tel">
                     <el-input v-model="form.tel"></el-input>

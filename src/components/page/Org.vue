@@ -69,14 +69,10 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-row type="flex" class="row-bg">
-                    <!--<el-col>
-                        <el-form-item label="代码" prop="code">
-                            <el-input v-model="form.code"></el-input>
-                        </el-form-item>
-                    </el-col>-->
                     <el-col>
                         <el-form-item label="名称" prop="name">
-                            <el-input v-model="form.name"></el-input>
+                            <el-input v-model="form.name" maxlength="50"
+                                      show-word-limit></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col>
@@ -97,18 +93,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row type="flex" class="row-bg">
-                    <el-col>
-                        <el-form-item label="地址">
-                            <el-input v-model="form.addr"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col>
-                        <el-form-item label="法人">
-                            <el-input v-model="form.legalPerson"></el-input>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="省市区">
@@ -132,6 +117,20 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
+                <el-row type="flex" class="row-bg">
+                    <el-col>
+                        <el-form-item label="法人">
+                            <el-input v-model="form.legalPerson"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row type="flex" class="row-bg">
+                    <el-col>
+                        <el-form-item label="地址">
+                            <el-input v-model="form.addr"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="备注">
@@ -150,14 +149,10 @@
                   @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-row type="flex" class="row-bg">
-                    <!--<el-col>
-                        <el-form-item label="代码" prop="code">
-                            <el-input v-model="form.code"></el-input>
-                        </el-form-item>
-                    </el-col>-->
                     <el-col>
                         <el-form-item label="名称" prop="name">
-                            <el-input v-model="form.name"></el-input>
+                            <el-input v-model="form.name" maxlength="50"
+                                      show-word-limit></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col>
@@ -175,18 +170,6 @@
                     <el-col>
                         <el-form-item label="手机号" prop="tel">
                             <el-input v-model="form.tel"></el-input>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row type="flex" class="row-bg">
-                    <el-col>
-                        <el-form-item label="地址">
-                            <el-input v-model="form.addr"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col>
-                        <el-form-item label="法人" prop="legalPerson">
-                            <el-input v-model="form.legalPerson"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -210,6 +193,20 @@
                                         :value="item.id">
                                 </el-option>
                             </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row type="flex" class="row-bg">
+                    <el-col>
+                        <el-form-item label="法人">
+                            <el-input v-model="form.legalPerson" style="width:45%;"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row type="flex" class="row-bg">
+                    <el-col>
+                        <el-form-item label="地址">
+                            <el-input v-model="form.addr"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>

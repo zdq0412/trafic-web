@@ -56,8 +56,32 @@
                 <el-table-column prop="billNo" label="票据号码"></el-table-column>
                 <el-table-column prop="operator" label="经办人"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="250" align="center">
                     <template slot-scope="scope">
+                        <el-upload style="display: none;"
+                                   :action="uploadUrl"
+                                   :limit="1"
+                                   :auto-upload="true"
+                                   ref="uploadFile"
+                                   :data="param"
+                                   :accept="ext"
+                                   :on-success="handleAvatarSuccess"
+                                   :before-upload="beforeAvatarUpload"
+                                   :headers="headers">
+                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                        </el-upload>
+                        <el-button
+                                type="text"
+                                icon="el-icon-upload2"
+                                class="upload"
+                                @click="upload(scope.$index, scope.row)"
+                        >上传</el-button>
+                        <el-button v-if="scope.row.realPath"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   class="download"
+                                   @click="download(scope.$index, scope.row)"
+                        >下载</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -491,6 +515,14 @@
                     date:'',
                     type:'year'
                 },
+
+                uploadUrl:'',
+                param:{type:'contract'},
+                headers:{
+                    token : localStorage.getItem("token")
+                },
+                ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
+
                 tableData: [],
                 safetyProductionCostPlans:[],
                 safetyProductionCost:{},
@@ -525,6 +557,7 @@
             };
         },
         created() {
+            this.uploadUrl = this.$baseURL + "/safetyAccountUpload";
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.org = res.data.data;
@@ -533,6 +566,37 @@
             this.getData();
         },
         methods: {
+            upload(index,row){
+                this.$refs.uploadFile.clearFiles();
+                this.param.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
+            download(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
+            },
+            handleAvatarSuccess(res, file) {
+                this.$message.success("上传成功!");
+                this.getData();
+            },
+            beforeAvatarUpload(file) {
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isBMP = file.type === 'image/bmp';
+                const isWord = (file.type === ' application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                const isPdf = file.type==='application/pdf';
+                const isRar = (file.type==='application/octet-stream' || file.type==='');
+                const isZip = file.type==='application/x-zip-compressed';
+                if(!isJPG && !isPNG && !isBMP && !isWord && !isPdf && !isRar && !isZip){
+                    this.$message.error('上传文件支持的类型：jpg、png、bmp、doc、docx、pdf、rar、zip!');
+                    return false;
+                }
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false
+                }
+                return  isLt5M;
+            },
             //年度安全生产费用提取和使用情况汇总表
             total(){
                 //道路运输企业安全生产费用提取和使用情况统计表

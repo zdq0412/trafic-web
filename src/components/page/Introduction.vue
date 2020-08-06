@@ -6,7 +6,7 @@
                 编辑<i class="el-icon-arrow-down el-icon--right"></i>
               </span>
                 <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="name">企业名称</el-dropdown-item>
+                    <el-dropdown-item command="name">企业基本信息</el-dropdown-item>
                     <el-dropdown-item command="introduction">企业介绍</el-dropdown-item>
                     <el-dropdown-item command="baseInfo">举报信息</el-dropdown-item>
                 </el-dropdown-menu>
@@ -56,7 +56,6 @@
                 </div>
             </div>
             <div style="display: inline-block;margin-left: 10px;">
-                <!-- <el-button type="success" @click="uploadVisible=true">上传图片</el-button>-->
                 <div  class="avatar-uploader" style="height: 200px;width:200px;" @click="uploadVisible=true">
                     <i class="el-icon-plus avatar-uploader-iconBtn"></i>
                 </div>
@@ -117,16 +116,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <!--<div class="pagination">
-                    <el-pagination
-                            background
-                            layout="total, prev, pager, next"
-                            :current-page="query.pageIndex"
-                            :page-size="query.pageSize"
-                            :total="pageTotal"
-                            @current-change="handlePageChange"
-                    ></el-pagination>
-                </div>-->
             </div>
         </div>
 
@@ -134,7 +123,8 @@
         <el-dialog title="新增" :visible.sync="addOrgDocVisible" width="30%" >
             <el-form ref="form" :rules="rules" :model="orgDoc" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="orgDoc.name"></el-input>
+                    <el-input v-model="orgDoc.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件编号" prop="docNum">
                     <el-input v-model="orgDoc.docNum"></el-input>
@@ -184,7 +174,8 @@
         <el-dialog title="编辑" :visible.sync="editOrgDocVisible" width="30%" >
             <el-form ref="form" :rules="rules" :model="orgDoc" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="orgDoc.name"></el-input>
+                    <el-input v-model="orgDoc.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件编号" prop="docNum">
                     <el-input v-model="orgDoc.docNum"></el-input>
@@ -266,15 +257,54 @@
             </span>
         </el-dialog>
 
-        <el-dialog title="编辑企业名称" :visible.sync="titleVisible" width="40%">
+        <el-dialog title="编辑企业基础信息" :visible.sync="titleVisible" width="60%">
             <el-form ref="form" :rules="rules" :model="org" label-width="100px">
-                <el-row type="flex" class="row-bg">
                     <el-col>
-                        <el-form-item label="企业名称" prop="name">
-                            <el-input v-model="org.name"></el-input>
-                        </el-form-item>
+                            <el-row type="flex" class="row-bg">
+                                <el-col>
+                                    <el-form-item label="名称" prop="name">
+                                        <el-input v-model="org.name" maxlength="50"
+                                                  show-word-limit></el-input>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col>
+                                    <el-form-item label="简称" prop="shortName">
+                                        <el-input v-model="org.shortName"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row type="flex" class="row-bg">
+                                <el-col>
+                                    <el-form-item label="联系人">
+                                        <el-input v-model="org.contact"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col>
+                                    <el-form-item label="手机号" prop="tel">
+                                        <el-input v-model="org.tel"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row type="flex" class="row-bg">
+                                <el-col>
+                                    <el-form-item label="地址">
+                                        <el-input v-model="org.addr"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col>
+                                    <el-form-item label="法人">
+                                        <el-input v-model="org.legalPerson"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row type="flex" class="row-bg" >
+                                <el-col >
+                                    <el-form-item label="备注">
+                                        <el-input type="textarea" v-model="org.note"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
                     </el-col>
-                </el-row>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="titleVisible = false">取 消</el-button>
@@ -296,7 +326,7 @@
                 <el-button type="primary" @click="saveEditImg">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="编辑企业简介" :visible.sync="introductionVisible" width="40%">
+        <el-dialog title="编辑企业简介" :visible.sync="introductionVisible" width="60%">
             <el-form ref="form" :rules="rules" :model="org" label-width="100px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
@@ -312,26 +342,8 @@
                 <el-button type="primary" @click="saveIntroduction">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="编辑基本信息" :visible.sync="headVisible" width="40%">
+        <el-dialog title="编辑基本信息" :visible.sync="headVisible" width="60%">
             <el-form ref="form" :rules="rules" :model="org" label-width="100px">
-                <!--<el-row type="flex" class="row-bg">
-                    <el-col>
-                        <el-form-item label="成立日期">
-                            <el-date-picker
-                                    v-model="org.establishedTime"
-                                    type="date"
-                                    placeholder="选择日期">
-                            </el-date-picker>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row type="flex" class="row-bg">
-                    <el-col>
-                        <el-form-item label="经营范围">
-                            <el-input type="textarea" v-model="org.businessScope"></el-input>
-                        </el-form-item>
-                    </el-col>
-                </el-row>-->
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="安全举报邮箱">
@@ -651,7 +663,7 @@
             saveEdit(){
                 this.$refs.form.validate(validate=>{
                     if(validate){
-                        this.$axios.put("/org/org?" + this.$qs.stringify(this.org)).then(res => {
+                        this.$axios.post("/org/updateOrg" ,this.$qs.stringify(this.org)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.titleVisible = false;
                                 this.headVisible = false;

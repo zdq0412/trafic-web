@@ -1,6 +1,6 @@
 <template>
     <div style="overflow: auto;">
-        <div style="height: 500px;">
+        <div>
             <div class="crumbs">
                 <el-breadcrumb separator="/">
                     <el-breadcrumb-item>
@@ -8,7 +8,7 @@
                     </el-breadcrumb-item>
                 </el-breadcrumb>
             </div>
-            <div class="container" style="height: 80%;">
+            <div class="container">
                 <div class="handle-box">
                     <el-button
                             type="primary"
@@ -21,7 +21,6 @@
                 </div>
                 <el-table
                         :data="departments"
-                        height="320"
                         style="width: 100%;height:80%;"
                         row-key="id"
                         border
@@ -143,7 +142,7 @@
             </el-dialog>
         </div>
         <!--职位管理-->
-        <div style="height: 500px;">
+        <div>
             <div class="crumbs">
                 <el-breadcrumb separator="/">
                     <el-breadcrumb-item>
@@ -205,7 +204,8 @@
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="form.name"></el-input>
+                                <el-input v-model="form.name" maxlength="50"
+                                          show-word-limit></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -217,6 +217,17 @@
                                               :props="{label:'name',value:'id',checkStrictly: true}"
                                               clearable
                                               ></el-cascader>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row type="flex" class="row-bg">
+                        <el-col>
+                            <el-form-item label="管理层">
+                                <el-switch
+                                        v-model="form.managementLayer"
+                                        active-text="是"
+                                        inactive-text="否">
+                                </el-switch>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -236,7 +247,6 @@
             <!-- 新增弹出框 -->
             <el-dialog title="新增" :visible.sync="addPositionVisible" width="30%"
                        @open="loadSelectData" @close="closeDialog">
-              <!--  <span style="color:red;">{{deptName}}</span>-->
                 <el-form ref="form" :rules="rules" :model="form" label-width="80px">
                     <el-row type="flex" class="row-bg">
                         <el-col>
@@ -248,22 +258,22 @@
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="form.name"></el-input>
+                                <el-input v-model="form.name" maxlength="50"
+                                          show-word-limit></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
-                    <!--<el-row type="flex" class="row-bg" >
-                        <el-col >
-                            <el-form-item label="部门">
-                                <el-cascader  v-model="deptIds"
-                                              style="width:100%"
-                                              :options="depts"
-                                              :props="{label:'name',value:'id',checkStrictly: true}"
-                                              clearable
-                                              @change="handleChange"></el-cascader>
+                    <el-row type="flex" class="row-bg">
+                        <el-col>
+                            <el-form-item label="管理层">
+                                <el-switch
+                                v-model="form.managementLayer"
+                                active-text="是"
+                                inactive-text="否">
+                                </el-switch>
                             </el-form-item>
                         </el-col>
-                    </el-row>-->
+                    </el-row>
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="职位描述">
@@ -496,7 +506,7 @@
                 }
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.$axios.put("/position/position?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/position/updatePosition" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editPositionVisible = false;
                                 this.getData();

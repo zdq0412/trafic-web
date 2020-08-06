@@ -33,6 +33,11 @@ export default new Router({
                   meta:{title:'人员档案'}
                 },
                 {
+                  path:'/deviceArchives',
+                  component:()=>import('../components/page/DeviceArchives.vue'),
+                  meta:{title:'设备档案'}
+                },
+                {
                   path:'/safetyAccount',
                   component:()=>import('../components/page/SafetyAccount.vue'),
                   meta:{title:'安全投入台账'}

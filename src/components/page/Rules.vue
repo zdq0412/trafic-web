@@ -108,7 +108,8 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog" @open="loadData">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="发布日期" prop="publishDate">
                     <el-date-picker
@@ -215,7 +216,8 @@
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" @open="loadData">
             <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="发布日期" prop="publishDate">
                     <el-date-picker

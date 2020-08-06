@@ -62,7 +62,8 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="form.username"></el-input>
+                    <el-input v-model="form.username" maxlength="15"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="省市区">
                     <el-cascader style="width: 100%;"
@@ -91,7 +92,8 @@
         <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="form.username" ></el-input>
+                    <el-input v-model="form.username" maxlength="15"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="省市区">
                     <el-cascader style="width: 100%;"

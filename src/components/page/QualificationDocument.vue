@@ -35,7 +35,7 @@
                                    :auto-upload="true"
                                    ref="uploadFile"
                                    :data="param"
-                                   accept=".doc,.docx"
+                                   :accept="ext"
                                    :on-success="handleAvatarSuccess"
                                    :before-upload="beforeAvatarUpload"
                                    :headers="headers">
@@ -83,7 +83,8 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="有效期开始" >
                     <el-date-picker
@@ -114,8 +115,8 @@
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
             <el-form ref="form" :model="form" :rules="rules"  label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
-                    <el-input v-model="form.id" v-show="false"></el-input>
+                    <el-input v-model="form.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="有效期开始" >
                     <el-date-picker
@@ -162,6 +163,7 @@
                 headers:{
                     token : localStorage.getItem("token")
                 },
+                ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
 
                 tableData: [],
                 delList: [],
@@ -214,6 +216,17 @@
             },
             beforeAvatarUpload(file) {
                 const isLt5M = file.size / 1024 / 1024 < 5;
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isBMP = file.type === 'image/bmp';
+                const isWord = (file.type === ' application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                const isPdf = file.type==='application/pdf';
+                const isRar = (file.type==='application/octet-stream' || file.type==='');
+                const isZip = file.type==='application/x-zip-compressed';
+                if(!isJPG && !isPNG && !isBMP && !isWord && !isPdf && !isRar && !isZip){
+                    this.$message.error('上传文件支持的类型：jpg、png、bmp、doc、docx、pdf、rar、zip!');
+                    return false;
+                }
                 if (!isLt5M) {
                     this.$message.error('上传文件大小不能超过 5MB!');
                     return false

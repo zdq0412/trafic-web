@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 企业人员资料
+                    <i class="el-icon-lx-cascades"></i> 设备档案
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -218,31 +218,6 @@
     export default {
         name: 'basetable',
         data() {
-            let checkTel=(rule, value, callback) =>{
-                if(value){
-                    let myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
-                    if (!myreg.test(value)) {
-                        callback(new Error("不是有效的手机号码格式!"));
-                    } else {
-                        callback();
-                    }
-                }  else{
-                    callback(new Error("请输入手机号"));
-                }
-            };
-            let checkIdNum=(rule,value,callback) => {
-                if(value){
-                    let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-                    if(!reg.test(value))
-                    {
-                        callback(new Error("身份证号不合法"));
-                    }else{
-                        callback();
-                    }
-                }  else{
-                    callback(new Error("请输入身份证号"));
-                }
-            };
             return {
                 query: {
                     name: '',
@@ -274,15 +249,7 @@
                 imgUrl:'',
                 rules:{
                     name: [
-                        { required: true, message: '请输入员工名称', trigger: 'blur' }
-                    ],
-                    tel:[
-                        { required: true, message: '请输入联系电话', trigger: 'blur' },
-                        {validator:checkTel,trigger:'blur'}
-                    ],
-                    idnum:[
-                        { required: true, message: '请输入身份证号', trigger: 'blur' },
-                        {validator:checkIdNum,trigger:'blur'}
+                        { required: true, message: '请输入设备名称', trigger: 'blur' }
                     ]
                 }
             };
@@ -294,8 +261,8 @@
         },
         created() {
             this.baseUrl = this.$baseURL;
-            this.modifyUrl = this.baseUrl + "/employee/updateEmployee";
-            this.uploadUrl = this.$baseURL + "/employee/addEmployee";
+            this.modifyUrl = this.baseUrl + "/device/updateEmployee";
+            this.uploadUrl = this.$baseURL + "/device/addEmployee";
             this.getData();
         },
         methods: {
@@ -305,7 +272,7 @@
             },
             changeDepartment(value){
                 this.$set(this.form,'positionId','');
-              this.getPositionByDepartmentId(value[value.length-1]);
+                this.getPositionByDepartmentId(value[value.length-1]);
             },
             handlePhotoChange(file){
                 this.imageUrl=URL.createObjectURL(file.raw);
@@ -363,7 +330,7 @@
                 });
             },
             getData() {
-                this.$axios.get("/employee/employeesByPage", {
+                this.$axios.get("/device/devicesByPage", {
                     params: {
                         page: this.query.pageIndex,
                         limit: this.query.pageSize,
@@ -389,7 +356,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/employee/employee/" + this.form.id).then(res => {
+                        this.$axios.delete("/device/device/" + this.form.id).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -462,7 +429,7 @@
                         if(this.isSelectFile) {
                             this.$refs.upload_edit.submit();
                         }else{
-                            this.$axios.post("/employee/updateEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
+                            this.$axios.post("/device/updateEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
                                 this.editVisible= false;
                                 this.getData();
                                 this.isSelectFile = false;
@@ -492,10 +459,10 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         //触发组件的action
-                       if(this.isSelectFile){
+                        if(this.isSelectFile){
                             this.$refs.upload_add.submit();
                         }else{
-                            this.$axios.post("/employee/addEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
+                            this.$axios.post("/device/addEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
                                 this.addVisible= false;
                                 this.getData();
                                 this.isSelectFile = false;

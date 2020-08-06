@@ -105,7 +105,8 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
@@ -132,7 +133,8 @@
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @close="closeDialog" >
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name" maxlength="50"
+                              show-word-limit></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
@@ -290,15 +292,20 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>姓名(签名)</td>
-                            <td>备注(岗位)</td>
-                            <td>成绩</td>
-                            <td>姓名(签名)</td>
-                            <td>备注(岗位)</td>
-                            <td>成绩</td>
+                            <td style="width: 120px;">姓名</td>
+                            <td>单位(部门)</td>
+                            <td>职务</td>
+                            <td style="width: 100px;">联系电话</td>
+                            <td style="width: 150px;">签到</td>
                         </tr>
-                        <tr v-for="i in 20">
+                        <tr v-for="emp in emps" >
+                            <td>{{emp.name}}</td>
+                            <td>{{emp.department.name}}</td>
+                            <td>{{emp.position.name}}</td>
+                            <td>{{emp.tel}}</td>
                             <td></td>
+                        </tr>
+                        <tr v-for="i in 15">
                             <td></td>
                             <td></td>
                             <td></td>
@@ -587,6 +594,7 @@
 
                 noteVisible:false,
                 note:'',
+                emps:[],
                 orgCategories:[],
                 areas:[],
                 editable:false,
@@ -670,6 +678,9 @@
         created() {
             this.getData();
             this.uploadUrl = this.$baseURL + "/templateUpload";
+            this.$axios.get("/employee/employees").then(res=>{
+                this.emps = res.data.data;
+            }).catch(error=>console.log(error));
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
