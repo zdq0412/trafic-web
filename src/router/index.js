@@ -259,6 +259,12 @@ export default new Router({
                     name:'otherDocument',
                     component: () => import( '../components/page/OtherDocument.vue'),
                     meta: { title: '其他档案' }
+                },
+                {
+                    path: '/deviceMaintain',
+                    name:'deviceMaintain',
+                    component: () => import( '../components/page/DeviceMaintain.vue'),
+                    meta: { title: '设备保养维修检修' }
                 }
             ]
         },

@@ -22,29 +22,52 @@
                     :data="tableData"
                     border
                     class="table"
-                    ref="multipleTable"
                     header-cell-class-name="table-header"
             >
-                <el-table-column prop="photo" label="大头照" align="center">
+                <el-table-column prop="equipmentCode" label="编码"></el-table-column>
+                <el-table-column prop="name" label="名称"></el-table-column>
+                <el-table-column prop="specification" label="规格型号"></el-table-column>
+                <el-table-column prop="price" label="单价"></el-table-column>
+                <el-table-column prop="category.name" label="类别"></el-table-column>
+                <el-table-column prop="buyDate" label="购置日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="manufacturer" label="厂商"></el-table-column>
+                <el-table-column prop="position" label="放置位置"></el-table-column>
+                <el-table-column prop="note" label="备注"></el-table-column>
+                <el-table-column label="保养维修记录">
                     <template slot-scope="scope">
-                        <el-image
-                                class="table-td-thumb"
-                                :src="baseUrl + '/' + scope.row.photo"
-                                @click="showPreview(baseUrl + '/' + scope.row.photo)"
-                        ></el-image>
-                        <!-- :preview-src-list="[baseUrl + '/' +scope.row.photo]"-->
+                        <el-button
+                                type="text"
+                                icon="el-icon-search"
+                                @click="lookup(scope.$index, scope.row)"
+                        >查看</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="姓名"></el-table-column>
-                <el-table-column prop="sex" label="性别"></el-table-column>
-                <el-table-column prop="age" label="年龄"></el-table-column>
-                <el-table-column prop="tel" label="联系电话"></el-table-column>
-                <el-table-column prop="idnum" label="身份证"></el-table-column>
-                <el-table-column prop="department.name" label="所在部门"></el-table-column>
-                <el-table-column prop="position.name" label="职务"></el-table-column>
-                <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
+                        <el-upload style="display: none;"
+                                   :action="uploadUrl"
+                                   :limit="1"
+                                   :auto-upload="true"
+                                   ref="uploadFile"
+                                   :data="param"
+                                   :accept="ext"
+                                   :on-success="handleAvatarSuccess"
+                                   :before-upload="beforeAvatarUpload"
+                                   :headers="headers">
+                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                        </el-upload>
+                        <el-button
+                                type="text"
+                                icon="el-icon-upload2"
+                                class="upload"
+                                @click="upload(scope.$index, scope.row)"
+                        >上传</el-button>
+                        <el-button v-if="scope.row.realPath"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   class="download"
+                                   @click="download(scope.$index, scope.row)"
+                        >下载</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -75,66 +98,44 @@
         </el-dialog>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
-                <el-form-item label="姓名" prop="name">
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="手机号" prop="tel">
-                    <el-input v-model="form.tel"></el-input>
+                <el-form-item label="编码">
+                    <el-input v-model="form.equipmentCode"></el-input>
                 </el-form-item>
-                <el-form-item label="身份证" prop="idnum">
-                    <el-input v-model="form.idnum"></el-input>
-                </el-form-item>
-                <el-form-item label="大头照">
-                    <div>
-                        <div>
-                            <el-upload
-                                    class="avatar-uploader"
-                                    ref="upload_edit"
-                                    :data="updata"
-                                    :action="modifyUrl"
-                                    :headers="headers"
-                                    accept="image/*"
-                                    :auto-upload="false"
-                                    :on-change="handlePhotoChange"
-                                    :show-file-list="false"
-                                    :on-success="handleUpdateSuccess"
-                                    :before-upload="beforeAvatarUpload">
-                                <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                            </el-upload>
-                        </div>
-                    </div>
-                </el-form-item>
-                <el-form-item label="所在部门">
-                    <el-cascader  v-model="departmentIds"
-                                  :options="depts"
+                <el-form-item label="设备类别">
+                    <el-cascader  v-model="form.categoryId"
+                                  :options="categorys"
                                   :props="{label:'name',value:'id',checkStrictly: true}"
                                   clearable
-                                  @change="changeDepartment"
+                                  @change="changeCategorys"
                     ></el-cascader>
                 </el-form-item>
-                <el-form-item label="职务">
-                    <el-select v-model="form.positionId" placeholder="请选择">
-                        <el-option
-                                v-for="item in positions"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
+                <el-form-item label="规格型号">
+                    <el-input v-model="form.specification"></el-input>
+                </el-form-item>
+                <el-form-item label="单价(元)">
+                    <el-input v-model="form.price"></el-input>
+                </el-form-item>
+                <el-form-item label="购置日期" >
+                    <el-date-picker
+                            v-model="form.buyDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="厂商">
+                    <el-input  v-model="form.manufacturer"></el-input>
+                </el-form-item>
+                <el-form-item label="放置位置">
+                    <el-input  v-model="form.position"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="form.note"></el-input>
-                </el-form-item>
-                <el-form-item label="角色">
-                    <el-select v-model="form.roleId" @change="$set(form,roleId)">
-                        <el-option v-for="item in roles"
-                                   :key="item.id"
-                                   :label="item.name"
-                                   :value="item.id"></el-option>
-                    </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -144,66 +145,44 @@
         </el-dialog>
         <!-- 新增弹出框 -->
         <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
-                <el-form-item label="姓名" prop="name">
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="手机号" prop="tel">
-                    <el-input v-model="form.tel"></el-input>
+                <el-form-item label="编码">
+                    <el-input v-model="form.equipmentCode"></el-input>
                 </el-form-item>
-                <el-form-item label="身份证" prop="idnum">
-                    <el-input v-model="form.idnum"></el-input>
-                </el-form-item>
-                <el-form-item label="大头照">
-                    <div>
-                        <el-upload
-                                class="avatar-uploader"
-                                ref="upload_add"
-                                :data="updata"
-                                :action="uploadUrl"
-                                :headers="headers"
-                                accept="image/*"
-                                :auto-upload="false"
-                                :on-change="handlePhotoChange"
-                                :show-file-list="false"
-                                :on-success="handleAvatarSuccess"
-                                :before-upload="beforeAvatarUpload">
-                            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
-                    </div>
-                </el-form-item>
-
-                <el-form-item label="所在部门">
-                    <el-cascader  v-model="departmentIds"
-                                  :options="depts"
+                <el-form-item label="设备类别">
+                    <el-cascader  v-model="form.categoryId"
+                                  :options="categorys"
                                   :props="{label:'name',value:'id',checkStrictly: true}"
                                   clearable
-                                  @change="changeDepartment"
+                                  @change="changeCategorys"
                     ></el-cascader>
                 </el-form-item>
-                <el-form-item label="职务">
-                    <el-select v-model="form.positionId" placeholder="请选择">
-                        <el-option
-                                ref="addPosition"
-                                v-for="item in positions"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
+                <el-form-item label="规格型号">
+                    <el-input v-model="form.specification"></el-input>
+                </el-form-item>
+                <el-form-item label="单价(元)">
+                    <el-input v-model="form.price"></el-input>
+                </el-form-item>
+                <el-form-item label="购置日期" >
+                    <el-date-picker
+                            v-model="form.buyDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="厂商">
+                    <el-input  v-model="form.manufacturer"></el-input>
+                </el-form-item>
+                <el-form-item label="放置位置">
+                    <el-input  v-model="form.position"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="form.note"></el-input>
-                </el-form-item>
-                <el-form-item label="角色">
-                    <el-select v-model="form.roleId" @change="$set(form,roleId)" style="width:100%;">
-                        <el-option v-for="item in roles"
-                                   :key="item.id"
-                                   :label="item.name"
-                                   :value="item.id"></el-option>
-                    </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -215,6 +194,7 @@
 </template>
 
 <script>
+    import {getDate} from "../common/utils";
     export default {
         name: 'basetable',
         data() {
@@ -224,29 +204,22 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
-                dialogImageUrl:'',
-                dialogVisible:false,
+                categorys:[],
                 uploadUrl:'',
-                modifyUrl:'',
-                roleId:'',
+                param:{type:'device'},
                 headers:{
                     token : localStorage.getItem("token")
                 },
-                imageUrl:'',
+                ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
+
                 baseUrl:'',
                 tableData: [],
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
-                isSelectFile:false,
-                positions:[],
-                depts:[],
-                departmentIds:[],
                 form: {},
                 idx: -1,
                 id: -1,
-                roles:[],
-                imgUrl:'',
                 rules:{
                     name: [
                         { required: true, message: '请输入设备名称', trigger: 'blur' }
@@ -254,77 +227,61 @@
                 }
             };
         },
-        computed:{
-            updata:function(){
-                return this.form;
-            }
-        },
         created() {
             this.baseUrl = this.$baseURL;
-            this.modifyUrl = this.baseUrl + "/device/updateEmployee";
-            this.uploadUrl = this.$baseURL + "/device/addEmployee";
+            this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
             this.getData();
         },
         methods: {
-            showPreview(imgUrl){
-                this.imgUrl = imgUrl;
-                this.dialogVisible = true;
+            lookup(index, row) {
+                this.$router.push({name:"deviceMaintain",params:{deviceId:row.id}});
             },
-            changeDepartment(value){
-                this.$set(this.form,'positionId','');
-                this.getPositionByDepartmentId(value[value.length-1]);
+            dateFormatter(row, column, cellValue, index){
+                if(cellValue){
+                    return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
             },
-            handlePhotoChange(file){
-                this.imageUrl=URL.createObjectURL(file.raw);
-                this.isSelectFile = true;
+            upload(index,row){
+                this.$refs.uploadFile.clearFiles();
+                this.param.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
+            download(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
             },
             handleAvatarSuccess(res, file) {
-                this.isSelectFile = false;
-                this.addVisible= false;
+                this.$message.success("上传成功!");
                 this.getData();
-                this.$refs.upload_add.clearFiles();
-            },
-            handleUpdateSuccess(res, file) {
-                this.editVisible= false;
-                this.getData();
-                this.isSelectFile = false;
             },
             beforeAvatarUpload(file) {
-                const isLt2M = file.size / 1024 / 1024 < 2;
+                const isLt5M = file.size / 1024 / 1024 < 5;
                 const isJPG = file.type === 'image/jpeg';
-                const isGIF = file.type === 'image/gif';
                 const isPNG = file.type === 'image/png';
                 const isBMP = file.type === 'image/bmp';
-
-                if (!isJPG && !isGIF && !isPNG && !isBMP) {
-                    this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+                const isWord = (file.type === ' application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                const isPdf = file.type==='application/pdf';
+                const isRar = (file.type==='application/octet-stream' || file.type==='');
+                const isZip = file.type==='application/x-zip-compressed';
+                if(!isJPG && !isPNG && !isBMP && !isWord && !isPdf && !isRar && !isZip){
+                    this.$message.error('上传文件支持的类型：jpg、png、bmp、doc、docx、pdf、rar、zip!');
+                    return false;
                 }
-                if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false
                 }
-                return isJPG && isLt2M;
-            },
-            getPositionByDepartmentId(departmentId){
-                this.$axios.get("/position/positions",{
-                    params:{
-                        departmentId:departmentId
-                    }
-                }).then(res => {
-                    this.positions = res.data;
-                }).catch(error => {
-                    console.log(error);
-                });
-
+                return  isLt5M;
             },
             //加载下拉选择数据
             loadSelectData() {
-                this.$axios.get("/role/roles").then(res => {
-                    this.roles = res.data.data;
-                }).catch(error => {
-                    console.log(error);
-                });
-                this.$axios.get("/department/departments").then(res => {
-                    this.depts = res.data.data;
+                this.$axios.get("/category/categorys",{
+                    params:{
+                        type:'设备档案'
+                    }
+                }).then(res => {
+                    this.categorys = res.data.data;
                 }).catch(error => {
                     console.log(error);
                 });
@@ -374,41 +331,10 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
-                if(this.form.photo) {
-                    this.imageUrl =this.$baseURL + "/" + this.form.photo;
-                }else{
-                    this.imageUrl = '';
-                }
                 this.editVisible = true;
-                if (row.user) {
-                    if(row.user.role){
-                        this.form.roleId = row.user.role.id;
-                    }
+                if(row.buyDate){
+                    this.form.buyDate = getDate(new Date(row.buyDate));
                 }
-                this.isSelectFile = false;
-
-                if(row.department){
-                    this.$axios.get("/department/findParent",{
-                        params:{
-                            id:row.department.id
-                        }
-                    }).then(res=>{
-                        this.departmentIds=res.data;
-                        if(row.position){
-                            this.$axios.get("/position/positions",{
-                                params:{
-                                    departmentId:row.department.id
-                                }
-                            }).then(res => {
-                                this.positions = res.data;
-                                this.form.positionId=row.position.id;
-                            }).catch(error => {
-                                console.log(error);
-                            });
-                        }
-                    }).catch(error=>console.log(error));
-                }
-
             },
             handleAdd(){
                 this.addVisible = true;
@@ -416,8 +342,6 @@
                     this.$refs.form.resetFields();
                 }
                 this.form = {};
-                this.imageUrl = '';
-                this.isSelectFile = false;
             },
             // 保存编辑
             saveEdit() {
@@ -429,7 +353,7 @@
                         if(this.isSelectFile) {
                             this.$refs.upload_edit.submit();
                         }else{
-                            this.$axios.post("/device/updateEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
+                            this.$axios.post("/device/updateDeviceNoPhoto",this.$qs.stringify(this.form)).then(res=>{
                                 this.editVisible= false;
                                 this.getData();
                                 this.isSelectFile = false;
@@ -447,8 +371,6 @@
                 if (this.$refs.form) {
                     this.$refs.form.resetFields();
                 }
-                this.fileList = [];
-                this.imageUrl = '';
             },
             // 保存新增
             saveAdd() {
@@ -458,20 +380,12 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        //触发组件的action
-                        if(this.isSelectFile){
-                            this.$refs.upload_add.submit();
-                        }else{
-                            this.$axios.post("/device/addEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
-                                this.addVisible= false;
-                                this.getData();
-                                this.isSelectFile = false;
-                            }).catch(error=>{
-                                console.log(error);
-                            });
-                        }
-                    } else {
-                        return false;
+                        this.$axios.post("/device/addDeviceNoPhoto",this.$qs.stringify(this.form)).then(res=>{
+                            this.addVisible= false;
+                            this.getData();
+                        }).catch(error=>{
+                            console.log(error);
+                        });
                     }
                 });
             },
