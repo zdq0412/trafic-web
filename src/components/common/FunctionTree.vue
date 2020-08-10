@@ -26,7 +26,7 @@
         },
         methods:{
             getCheckedKeys(){
-              return this.$refs.tree.getCheckedKeys();
+                return this.$refs.tree.getCheckedKeys();
             },
             getData(){
                 let url = '';

@@ -64,7 +64,6 @@
                 ></el-pagination>
             </div>
         </div>
-
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadOrgCategory">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
@@ -119,6 +118,7 @@
         </el-dialog>
         <!-- 新增授权对话框 -->
         <el-dialog title="授权" :visible.sync="grantFunctionVisible" width="30%">
+            <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
             <div style="height:500px;overflow: auto;">
                 <function-tree ref="functionTree" v-if="grantFunctionVisible" :paramType="param" :param="roleId"></function-tree>
             </div>
@@ -146,11 +146,11 @@
                     pageSize: 10
                 },
                 param:'role',
+                checkAll:false,
                 roleId:'',
                 orgCategoryId:'',
                 tableData: [],
                 orgCategories: [],
-                delList: [],
                 editVisible: false,
                 addVisible: false,
                 grantFunctionVisible:false,
@@ -169,6 +169,13 @@
             this.getData();
         },
         methods: {
+            handleCheckAllChange(val) {
+                if (this.checkAll) {
+                    this.$refs.functionTree.$refs.tree.setCheckedNodes(this.$refs.functionTree.functions);
+                } else {
+                    this.$refs.functionTree.$refs.tree.setCheckedKeys([]);
+                }
+            },
             //保存权限
             saveFunctions(){
                 let checkedIds = this.$refs.functionTree.getCheckedKeys();

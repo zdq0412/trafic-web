@@ -93,9 +93,6 @@
                 ></el-pagination>
             </div>
         </div>
-        <el-dialog :visible.sync="dialogVisible">
-            <img style="width: 100%;" :src="imgUrl" alt="">
-        </el-dialog>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
@@ -107,18 +104,20 @@
                     <el-input v-model="form.equipmentCode"></el-input>
                 </el-form-item>
                 <el-form-item label="设备类别">
-                    <el-cascader  v-model="form.categoryId"
-                                  :options="categorys"
-                                  :props="{label:'name',value:'id',checkStrictly: true}"
-                                  clearable
-                                  @change="changeCategorys"
-                    ></el-cascader>
+                    <el-select   v-model="form.categoryId" placeholder="请选择">
+                        <el-option
+                                v-for="item in categorys"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select >
                 </el-form-item>
                 <el-form-item label="规格型号">
                     <el-input v-model="form.specification"></el-input>
                 </el-form-item>
                 <el-form-item label="单价(元)">
-                    <el-input v-model="form.price"></el-input>
+                    <el-input-number v-model="form.price"></el-input-number>
                 </el-form-item>
                 <el-form-item label="购置日期" >
                     <el-date-picker
@@ -154,18 +153,20 @@
                     <el-input v-model="form.equipmentCode"></el-input>
                 </el-form-item>
                 <el-form-item label="设备类别">
-                    <el-cascader  v-model="form.categoryId"
-                                  :options="categorys"
-                                  :props="{label:'name',value:'id',checkStrictly: true}"
-                                  clearable
-                                  @change="changeCategorys"
-                    ></el-cascader>
+                    <el-select   v-model="form.categoryId" placeholder="请选择">
+                        <el-option
+                                v-for="item in categorys"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select >
                 </el-form-item>
                 <el-form-item label="规格型号">
                     <el-input v-model="form.specification"></el-input>
                 </el-form-item>
                 <el-form-item label="单价(元)">
-                    <el-input v-model="form.price"></el-input>
+                    <el-input-number v-model="form.price"></el-input-number>
                 </el-form-item>
                 <el-form-item label="购置日期" >
                     <el-date-picker
@@ -260,7 +261,7 @@
                 const isJPG = file.type === 'image/jpeg';
                 const isPNG = file.type === 'image/png';
                 const isBMP = file.type === 'image/bmp';
-                const isWord = (file.type === ' application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                const isWord = (file.type === 'application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
                 const isPdf = file.type==='application/pdf';
                 const isRar = (file.type==='application/octet-stream' || file.type==='');
                 const isZip = file.type==='application/x-zip-compressed';
@@ -334,6 +335,10 @@
                 this.editVisible = true;
                 if(row.buyDate){
                     this.form.buyDate = getDate(new Date(row.buyDate));
+                }
+
+                if(row.category){
+                    this.form.categoryId=row.category.id;
                 }
             },
             handleAdd(){

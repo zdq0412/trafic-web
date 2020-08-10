@@ -134,7 +134,7 @@
 </template>
 
 <script>
-    import {getDateTime,getDate} from "../common/utils";
+    import {getDate} from "../common/utils";
 
     export default {
         name: 'basetable',
@@ -178,7 +178,7 @@
         methods: {
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
-                    return getDateTime(new Date(cellValue));
+                    return getDate(new Date(cellValue));
                 }else{
                     return '';
                 }
@@ -200,7 +200,7 @@
                 const isJPG = file.type === 'image/jpeg';
                 const isPNG = file.type === 'image/png';
                 const isBMP = file.type === 'image/bmp';
-                const isWord = (file.type === ' application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                const isWord = (file.type === 'application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
                 const isPdf = file.type==='application/pdf';
                 const isRar = (file.type==='application/octet-stream' || file.type==='');
                 const isZip = (file.type==='application/x-zip-compressed' || file.type==='application/zip');
