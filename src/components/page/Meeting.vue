@@ -202,10 +202,23 @@
                             <td class="per20">
                                 <table style="width:100%;" cellspacing="0" cellpadding="0">
                                     <tr>
-                                        <td>  {{meeting.meetingDate | formatHour}}点  {{meeting.meetingDate | formatMinute}} 分开会</td>
+                                        <!--<td>  {{meeting.meetingDate | formatHour}}点  {{meeting.meetingDate | formatMinute}} 分开会</td>-->
+                                        <td>  {{meeting.meetingDate | formatMeetingTime}}开会</td>
                                     </tr>
                                     <tr>
-                                        <td>  &nbsp;&nbsp;&nbsp;&nbsp;点&nbsp;&nbsp;&nbsp;    &nbsp;分闭会</td>
+                                        <td>
+                                            <el-time-select v-if="editable"
+                                                            v-model="endMeetingDate"
+                                                            :clearable="false"
+                                                            size="mini"
+                                                            :picker-options="{
+                                                            start: '08:30',
+                                                            step: '00:15',
+                                                            end: '18:30'
+                                                          }"
+                                                            style="width: 100px;display: inline-block;margin-right: 3px;">
+                                            </el-time-select>
+                                            <div v-else style="display: inline-block;">{{meeting.endMeetingDate | formatMeetingTime}}</div>闭会</td>
                                     </tr>
                                 </table>
                             </td>
@@ -283,7 +296,7 @@
                             <td>{{emp.department.name}}</td>
                             <td>{{emp.position.name}}</td>
                             <td>{{emp.tel}}</td>
-                           <td></td>
+                            <td></td>
                         </tr>
                         <tr v-for="i in 15">
                             <td></td>
@@ -302,7 +315,7 @@
 
                 </div>
             </div>
-            <span slot="footer" class="dialog-footer">
+            <span slot="footer" class="dialog-footer" style="position:fixed;bottom: 30px;left:45%;">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
                 <el-button v-if="!editable" type="warning" v-print="'#printContent'">打印</el-button>
                 <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
@@ -466,6 +479,14 @@
                 <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
+
+
+       <!-- <div v-if="showContentVisible" style="position:absolute;left: 0;right:0;text-align: center; bottom:0;z-index: 9999;">
+            <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
+            <el-button v-if="!editable" type="warning" v-print="'#printContent'">打印</el-button>
+            <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
+            <el-button  @click="showContentVisible=false">关闭</el-button>
+        </div>-->
     </div>
 </template>
 
@@ -499,6 +520,7 @@
 
                 noteVisible:false,
                 note:'',
+                endMeetingDate:'',
                 orgCategories:[],
                 emps:[],
                 areas:[],
@@ -571,6 +593,14 @@
             formatMinute(value){
                 if(value) {
                     return new Date(value).getMinutes();
+                }else{
+                    return '';
+                }
+            },
+            formatMeetingTime(value){
+                if(value) {
+                    let date = new Date(value);
+                    return date.getHours() + ":" +date.getMinutes();
                 }else{
                     return '';
                 }
@@ -700,6 +730,10 @@
             },
             editContent(){
                 this.editable=true;
+                if(this.meeting.endMeetingDate){
+                    let date = new Date(this.meeting.endMeetingDate);
+                    this.endMeetingDate =  date.getHours() + ":" +date.getMinutes();
+                }
                 if(this.meeting.content){
                     this.meeting.content = this.meeting.content.replace(/<br>/g,"\n");
                 }
@@ -726,6 +760,8 @@
                 if(this.meeting.methods){
                     this.meeting.methods = this.meeting.methods.replace(/\n/g,"<br>");
                 }
+
+                this.meeting.endMeetingDate = this.endMeetingDate;
                 this.$axios.post("/meeting/content", this.$qs.stringify(this.meeting)).then(res => {
                     if (res.data.result.resultCode == 200) {
                         this.showContentVisible = false;
@@ -935,6 +971,10 @@
     td div{
         text-align: left;
         padding-left: 5px;
+    }
+    .customeIcon{
+        width:0px;
+        margin-left:-20px;
     }
 </style>
 

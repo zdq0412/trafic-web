@@ -388,7 +388,7 @@
                     </table>
                 </div>
             </div>
-            <span slot="footer" class="dialog-footer">
+            <span slot="footer" class="dialog-footer"  style="position:fixed;bottom: 30px;left:45%;">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
                 <el-button v-if="!editable" type="warning" v-print="printObj">打印</el-button>
                 <el-button v-else type="primary" @click="saveContent">保存</el-button>
