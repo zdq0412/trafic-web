@@ -76,7 +76,7 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="提取标准%" prop="safetyCostRatio">
-                    <el-input v-model="form.safetyCostRatio" placeholder="安全生产费用提取标准"></el-input>
+                    <el-input-number v-model="form.safetyCostRatio" placeholder="安全生产费用提取标准"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
@@ -95,7 +95,7 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="提取标准%" prop="safetyCostRatio">
-                    <el-input v-model="form.safetyCostRatio" placeholder="安全生产费用提取标准"></el-input>
+                    <el-input-number v-model="form.safetyCostRatio" placeholder="安全生产费用提取标准"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note" type="textarea" :rows="3"></el-input>

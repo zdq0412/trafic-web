@@ -28,6 +28,11 @@ export default new Router({
                   meta:{title:'企业人员资料'}
                 },
                 {
+                  path:'/securityExaminationTemplate',
+                  component:()=>import('../components/page/SecurityExaminationTemplate.vue'),
+                  meta:{title:'安全责任考核模板'}
+                },
+                {
                   path:'/empArchives',
                   component:()=>import('../components/page/EmpArchives.vue'),
                   meta:{title:'人员档案'}
