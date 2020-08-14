@@ -38,6 +38,11 @@ export default new Router({
                   meta:{title:'人员档案模板'}
                 },
                 {
+                  path:'/deviceArchivesTemplate',
+                  component:()=>import('../components/page/DeviceArchivesTemplate.vue'),
+                  meta:{title:'设备档案模板'}
+                },
+                {
                   path:'/securityExamination',
                   component:()=>import('../components/page/SecurityExamination.vue'),
                   meta:{title:'安全责任考核'}
