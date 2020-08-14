@@ -82,9 +82,9 @@
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="类别">
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-model="form.type"
+                <el-form-item label="类别" prop="type">
+                    <el-select v-model="form.type" placeholder="请选择">
+                        <el-option
                                 v-for="item in options"
                                 :key="item.value"
                                 :label="item.label"
@@ -152,9 +152,9 @@
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="类别">
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-model="form.type"
+                <el-form-item label="类别" prop="type">
+                    <el-select v-model="form.type" placeholder="请选择">
+                        <el-option
                                    v-for="item in options"
                                    :key="item.value"
                                    :label="item.label"
@@ -286,6 +286,9 @@
                 rules:{
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' }
+                    ],
+                    type:[
+                        {required:true,message:'请选择类别',trigger:['blur','change']}
                     ]
                 }
             };
@@ -440,10 +443,16 @@
                 }
                 if(row.province && row.city && row.region){
                     this.form.area=[row.province.id,row.city.id,row.region.id];
+                    this.form.provinceId=row.province.id;
+                    this.form.cityId=row.city.id;
+                    this.form.regionId=row.region.id;
                 }else if(row.province && row.city){
                     this.form.area=[row.province.id,row.city.id];
+                    this.form.provinceId=row.province.id;
+                    this.form.cityId=row.city.id;
                 }else if(row.province){
                     this.form.area=[row.province.id];
+                    this.form.provinceId=row.province.id;
                 }
             },
             handleAdd(){
