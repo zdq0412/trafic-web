@@ -273,7 +273,7 @@
                     this.$message.error('上传文件大小不能超过 5MB!');
                     return false
                 }
-                return  isLt5M;
+                return  true;
             },
             //加载下拉选择数据
             loadSelectData() {

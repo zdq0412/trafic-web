@@ -335,7 +335,7 @@
                 if (!isLt2M) {
                     this.$message.error('上传头像图片大小不能超过 2MB!');
                 }
-                return isJPG && isLt2M;
+                return true;
             },
             getPositionByDepartmentId(departmentId){
                 this.$axios.get("/position/positions",{

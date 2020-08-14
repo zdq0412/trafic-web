@@ -672,7 +672,7 @@
                     this.$message.error('只能上传work文档!');
                     return false;
                 }
-                return  isWord&isLt5M;
+                return  true;
             },
             importTemplate(index,row){//引入模板
                 this.template = row;

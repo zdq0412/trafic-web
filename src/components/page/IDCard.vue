@@ -231,7 +231,7 @@
                     this.$message.error('上传文件大小不能超过 5MB!');
                     return false
                 }
-                return  isLt5M;
+                return  true;
             },
             closeDialog(){
                 this.$refs["form"].clearValidate();

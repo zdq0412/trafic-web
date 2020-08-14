@@ -344,7 +344,7 @@
                     this.$message.error('只能上传work文档!');
                     return false;
                 }
-                return  isWord&isLt5M;
+                return  false;
             },
             uploadTemplate(index,row){
                 this.$refs.uploadFile.clearFiles();

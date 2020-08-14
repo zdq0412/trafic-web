@@ -33,6 +33,51 @@ export default new Router({
                   meta:{title:'安全责任考核模板'}
                 },
                 {
+                  path:'/securityExamination',
+                  component:()=>import('../components/page/SecurityExamination.vue'),
+                  meta:{title:'安全责任考核'}
+                },
+                {
+                  path:'/goalExaminationTemplate',
+                  component:()=>import('../components/page/GoalExaminationTemplate.vue'),
+                  meta:{title:'安全目标考核模板'}
+                },
+                {
+                  path:'/goalExamination',
+                  component:()=>import('../components/page/GoalExamination.vue'),
+                  meta:{title:'安全目标考核'}
+                },
+                {
+                  path:'/emergencyPlanDrillTemplate',
+                  component:()=>import('../components/page/EmergencyPlanDrillTemplate.vue'),
+                  meta:{title:'应急预案演练模板'}
+                },
+                {
+                  path:'/emergencyPlanDrill',
+                  component:()=>import('../components/page/EmergencyPlanDrill.vue'),
+                  meta:{title:'应急预案演练'}
+                },
+                {
+                  path:'/healthyRecordTemplate',
+                  component:()=>import('../components/page/HealthyRecordTemplate.vue'),
+                  meta:{title:'职业健康记录模板'}
+                },
+                {
+                  path:'/healthyRecord',
+                  component:()=>import('../components/page/HealthyRecord.vue'),
+                  meta:{title:'职业健康记录'}
+                },
+                {
+                  path:'/standardizationTemplate',
+                  component:()=>import('../components/page/StandardizationTemplate.vue'),
+                  meta:{title:'标准化自评模板'}
+                },
+                {
+                  path:'/standardization',
+                  component:()=>import('../components/page/Standardization.vue'),
+                  meta:{title:'标准化自评'}
+                },
+                {
                   path:'/empArchives',
                   component:()=>import('../components/page/EmpArchives.vue'),
                   meta:{title:'人员档案'}

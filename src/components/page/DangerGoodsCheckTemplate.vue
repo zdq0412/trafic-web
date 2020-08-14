@@ -414,7 +414,7 @@
                     this.$message.error('只能上传work文档!');
                     return false;
                 }
-                return  isWord&isLt5M;
+                return  true;
             },
             addLine(){
               this.details.push({id:'',checkDate:'',checkedOrg:'',hiddenDanger:'',correctiveAction:'',timelimit:'',person:'',endTime:'',cancelDate:'',note:''})

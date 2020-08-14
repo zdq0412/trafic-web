@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 安全规章制度模板
+                    <i class="el-icon-lx-cascades"></i>安全目标考核模板
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -15,11 +15,14 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
+                <el-input v-model="query.name" placeholder="模板名称" class="handle-input mr10"></el-input>
+                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table
                     :data="tableData"
                     border
                     class="table"
+                    ref="multipleTable"
                     header-cell-class-name="table-header"
             >
                 <el-table-column
@@ -31,48 +34,22 @@
                         <span>{{(query.pageIndex - 1) * query.pageSize + scope.$index + 1}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="名称">
-                    <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="creator" label="创建人"></el-table-column>
+                <el-table-column prop="name" label="名称"></el-table-column>
+                <el-table-column prop="filename" label="文件名称"></el-table-column>
                 <el-table-column prop="orgCategory.name" label="企业类别"></el-table-column>
                 <el-table-column prop="province.name" label="省"></el-table-column>
                 <el-table-column prop="city.name" label="市"></el-table-column>
                 <el-table-column prop="region.name" label="区"></el-table-column>
-                <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="note" label="备注">
-                    <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="280" align="center">
+                <el-table-column prop="createDate" label="上传日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="note" label="备注"></el-table-column>
+                <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   accept=".doc,.docx"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
-                                icon="el-icon-upload2"
-                                class="upload"
-                                @click="uploadTemplate(scope.$index, scope.row)"
-                        >上传模板</el-button>
-                        <el-button v-if="scope.row.realPath"
-                                   type="text"
-                                   icon="el-icon-download"
-                                   class="download"
-                                   @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载模板</el-button>
+                                icon="el-icon-download"
+                                class="download"
+                                @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -99,11 +76,31 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @open="loadSelectData" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="文件">
+                    <el-upload style="display: none;"
+                               :action="modifyUrl"
+                               :limit="1"
+                               :auto-upload="false"
+                               ref="uploadFileEdit"
+                               :data="form"
+                               :accept="ext"
+                               :on-change="handleChange"
+                               :on-success="handleUpdateSuccess"
+                               :before-upload="beforeAvatarUpload"
+                               :headers="headers">
+                        <el-button size="small" ref="uploadBtn" slot="trigger" type="primary">导入</el-button>
+                    </el-upload>
+                    <div>
+                        <el-button size="small"  type="primary" @click="fileupload_edit">点击上传</el-button>
+                        <div v-html="filename"></div>
+
+                    </div>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" v-if="!haveOrg">
                     <el-col >
@@ -112,7 +109,7 @@
                                     v-model="form.area"
                                     :options="areas"
                                     :props="{label:'name',value:'id'}"
-                                    @change="handleChange"></el-cascader>
+                                    @change="handleAreaChange"></el-cascader>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -131,7 +128,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input type="textarea" v-model="form.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -140,11 +137,31 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @open="loadSelectData" @close="closeDialog" >
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="文件">
+                    <el-upload style="display: none;"
+                               :action="uploadUrl"
+                               :limit="1"
+                               :auto-upload="false"
+                               ref="uploadFile"
+                               :data="form"
+                               :accept="ext"
+                               :on-change="handleChange"
+                               :on-success="handleAvatarSuccess"
+                               :before-upload="beforeAvatarUpload"
+                               :headers="headers">
+                        <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                    </el-upload>
+                    <div>
+                        <el-button size="small"  type="primary" @click="upload">点击上传</el-button>
+                        <div v-html="filename"></div>
+
+                    </div>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" v-if="!haveOrg">
                     <el-col >
@@ -153,7 +170,7 @@
                                     v-model="form.area"
                                     :options="areas"
                                     :props="{label:'name',value:'id'}"
-                                    @change="handleChange"></el-cascader>
+                                    @change="handleAreaChange"></el-cascader>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -172,105 +189,71 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input type="textarea" v-model="form.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="cancelAdd()">取 消</el-button>
+                <el-button @click="resetForm">取 消</el-button>
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
-        </el-dialog>
-        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
-            {{note}}
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="noteVisible=false">确 定</el-button>
-            </span>
-        </el-dialog>
-        <!--显示文本内容-->
-        <el-dialog title="文本内容" :visible.sync="showContentVisible" width="60%">
-            <div v-html="form.content"></div>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
-                <el-button  @click="showContentVisible=false">关闭</el-button>
-            </span>
-        </el-dialog>
-        <!--编辑文本内容-->
-        <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="60%">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
-                <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                        <el-button  @click="editContentVisible=false">取消</el-button>
-                        <el-button type="primary" @click="saveContent">确 定</el-button>
-                    </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import  {getDate} from "../common/utils";
-    import { VueEditor } from "vue2-editor";
+    import {getDate} from "../common/utils";
+
     export default {
-        components:{
-            VueEditor
-        },
         name: 'basetable',
         data() {
             return {
-                customToolbar: [
-                    ["bold", "italic", "underline"]
-                ],
                 query: {
+                    name: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
-                noteVisible:false,
-                note:'',
-                orgCategories:[],
-                areas:[],
-                notices:[],
-                tableData: [],
-                delList: [],
-                editVisible: false,
+                dialogImageUrl:'',
+                dialogVisible:false,
                 uploadUrl:'',
-                param:{type:'ruleTemplate'},
+                modifyUrl:'',
+                filename:'',
+                isSelectUploadFile:false,
+                roleId:'',
                 headers:{
                     token : localStorage.getItem("token")
                 },
+                imageUrl:'',
+                org:{},
+                orgCategories:[],
+                areas:[],
+                ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
+                baseUrl:'',
+                tableData: [],
+                editVisible: false,
                 addVisible: false,
-                showContentVisible:false,
-                editContentVisible:false,
                 pageTotal: 0,
                 haveOrg:false,
-                form: {
-                    area:[]
-                },
+                form: {},
                 idx: -1,
-                org:{},
                 id: -1,
+                imgUrl:'',
                 rules:{
-
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' }
-                    ],
-                    content:[
-                        { required: true, message: '请输入文本内容', trigger: 'blur' }
                     ]
                 }
             };
         },
-        filters:{
-            formatDate(value){
-                if(value){
-                    return getDate(new Date(value));
-                }else{
-                    return '';
-                }
+        computed:{
+            updata:function(){
+                return this.form;
             }
         },
         created() {
+            this.baseUrl = this.$baseURL;
+            this.uploadUrl = this.$baseURL + "/goalExaminationTemplate/goalExaminationTemplate";
+            this.modifyUrl = this.$baseURL + "/goalExaminationTemplate/updateGoalExaminationTemplate";
             this.getData();
-            this.uploadUrl = this.$baseURL + "/templateUpload";
             this.$axios.get("/user/haveOrg").then(res =>{
                 if(res.data.data){
                     this.haveOrg = true;
@@ -279,31 +262,6 @@
             }).catch(error=>console.log(error));
         },
         methods: {
-            uploadTemplate(index,row){
-                this.$refs.uploadFile.clearFiles();
-                this.param.id=row.id;
-                this.$refs.fileUploadBtn.$el.click();
-            },
-            downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
-            },
-            handleAvatarSuccess(res, file) {
-                this.$message.success("上传成功!");
-                this.getData();
-            },
-            beforeAvatarUpload(file) {
-                const isLt5M = file.size / 1024 / 1024 < 5;
-                const isWord = file.type==='application/msword';
-                if (!isLt5M) {
-                    this.$message.error('上传文件大小不能超过 5MB!');
-                    return false
-                }
-                if(!isWord){
-                    this.$message.error('只能上传work文档!');
-                    return false;
-                }
-                return  true;
-            },
             loadSelectData(){
                 this.$axios.get("/orgCategory/orgCategorys").then(res => {
                     this.orgCategories = res.data.data;
@@ -320,31 +278,27 @@
                     console.log(error);
                 });
             },
-            saveContent(){
-                this.$axios.post("/template/content" , this.$qs.stringify(this.form)).then(res => {
-                    if (res.data.result.resultCode == 200) {
-                        this.editContentVisible = false;
-                        this.getData();
-                    } else {
-                        this.$message.error(res.data.result.message);
-                    }
-                }).catch(err => {
-                    console.log(err);
-                });
+            fileupload_edit(){
+                this.$refs.uploadBtn.$el.click();
             },
-            showContent(row){
-                this.form = row;
-                this.showContentVisible=true;
+            upload(){
+                this.$refs.fileUploadBtn.$el.click();
             },
-            showNote(note){
-                this.note = note;
-                this.noteVisible=true;
+            downloadTemplate(index,row){
+                window.location.href=this.$baseURL + "/" + row.url;
             },
-            handleAdd(){
-                this.form = {};
-                this.addVisible = true;
+            dateFormatter(row, column, cellValue, index){
+                if(cellValue){
+                    return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
             },
-            handleChange(){
+            handleChange(file){
+                this.filename = file.name;
+                this.isSelectUploadFile = true;
+            },
+            handleAreaChange(file){
                 if(this.form.area&&this.form.area.length>0){
                     this.form.provinceId=this.form.area[0];
                     if(this.form.area.length==2){
@@ -356,22 +310,43 @@
                     }
                 }
             },
-            dateFormatter(row, column, cellValue, index){
-                if(cellValue){
-                    return getDate(new Date(cellValue));
-                }else{
-                    return '';
+            handleAvatarSuccess(res, file) {
+                this.addVisible= false;
+                this.getData();
+                this.$refs.uploadFile.clearFiles();
+                this.isSelectUploadFile = false;
+            },
+            handleUpdateSuccess(res, file) {
+                this.editVisible= false;
+                this.getData();
+                this.$refs.uploadFileEdit.clearFiles();
+                this.isSelectUploadFile = false;
+            },
+            beforeAvatarUpload(file) {
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isBMP = file.type === 'image/bmp';
+                const isWord = (file.type === 'application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                const isPdf = file.type==='application/pdf';
+                const isRar = (file.type==='application/octet-stream' || file.type==='');
+                const isZip = file.type==='application/x-zip-compressed';
+                if(!isJPG && !isPNG && !isBMP && !isWord && !isPdf && !isRar && !isZip){
+                    this.$message.error('上传文件支持的类型：jpg、png、bmp、doc、docx、pdf、rar、zip!');
+                    return false;
                 }
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false;
+                }
+                return true;
             },
-            closeDialog(){
-                this.$refs["form"].clearValidate();
-            },
-            // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/template/templatesByPage",{
-                    params:{
-                        page:this.query.pageIndex,
-                        limit:this.query.pageSize
+                this.$axios.get("/goalExaminationTemplate/goalExaminationTemplatesByPage", {
+                    params: {
+                        page: this.query.pageIndex,
+                        limit: this.query.pageSize,
+                        name: this.query.name
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -380,36 +355,41 @@
                     console.log(error);
                 });
             },
-            cancelAdd(){
-                this.addVisible=false;
-                this.$refs["form"].clearValidate();
+            // 触发搜索按钮
+            handleSearch() {
+                this.$set(this.query, 'pageIndex', 1);
+                this.getData();
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
+                this.form = row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/template/template/" + row.id).then(res => {
-                            if(res.data.result.resultCode==200){
+                        this.$axios.delete("/goalExaminationTemplate/goalExaminationTemplate/" + this.form.id).then(res => {
+                            if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getData();
-                            }else{
+                            } else {
                                 this.$message.error(res.data.result.message);
                             }
-                        }) .catch(error =>{
+                        }).catch(error => {
                             console.log(error);
                         });
                     })
-                    .catch(() => {});
+                    .catch(() => {
+                    });
             },
             // 编辑操作
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
+                this.filename = row.filename;
+                this.isSelectUploadFile = false;
+
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
                 }
@@ -421,43 +401,49 @@
                     this.form.area=[row.province.id];
                 }
             },
+            handleAdd(){
+                this.addVisible = true;
+                if (this.$refs.form) {
+                    this.$refs.form.resetFields();
+                }
+                this.form = {};
+                this.filename='';
+
+            },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.form.content='';
-                        this.$axios.put("/template/template?" + this.$qs.stringify(this.form)).then(res => {
-                            if (res.data.result.resultCode == 200) {
-                                this.editVisible = false;
-                                this.getData();
-                            } else {
-                                this.$message.error(res.data.result.message);
-                            }
-                        }).catch(err => {
-                            console.log(err);
-                        });
+                        if(this.isSelectUploadFile)
+                            this.$refs.uploadFileEdit.submit();
+                        else{
+                            this.$axios.post("/goalExaminationTemplate/updateGoalExaminationTemplateNoFile",this.$qs.stringify(this.form))
+                                .then(res=>{
+                                    this.editVisible = false;
+                                    this.getData();
+                                    this.isSelectUploadFile=false;
+                                }).catch(error=>console.log(error))
+                        }
                     } else {
                         return false;
                     }
                 });
             },
+            resetForm() {
+                this.addVisible = false;
+                if (this.$refs.form) {
+                    this.$refs.form.resetFields();
+                }
+                this.imageUrl = '';
+            },
             // 保存新增
-            saveAdd(){
+            saveAdd() {
                 this.$refs["form"].clearValidate();
-                this.$refs.form.validate(validate =>{
-                    if(validate){
-                        this.$axios.post("/template/template",this.$qs.stringify(this.form)).then(res=>{
-                            if(res.data.result.resultCode==200){
-                                this.addVisible = false;
-                                this.getData();
-                                this.form = {};
-                            }else{
-                                this.$message.error(res.data.result.message);
-                            }
-                        }).catch(err =>{
-                            console.log(err);
-                        });
-                    }else{
+                this.$refs.form.validate(validate => {
+                    if (validate) {
+                        //触发组件的action
+                        this.$refs.uploadFile.submit();
+                    } else {
                         return false;
                     }
                 });
@@ -470,13 +456,14 @@
         }
     };
 </script>
-
 <style scoped>
-    @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
     }
-
+    .handle-input {
+        width: 300px;
+        display: inline-block;
+    }
     .table {
         width: 100%;
         font-size: 14px;

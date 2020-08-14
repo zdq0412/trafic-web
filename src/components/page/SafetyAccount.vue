@@ -595,7 +595,7 @@
                     this.$message.error('上传文件大小不能超过 5MB!');
                     return false
                 }
-                return  isLt5M;
+                return  true;
             },
             //年度安全生产费用提取和使用情况汇总表
             total(){
