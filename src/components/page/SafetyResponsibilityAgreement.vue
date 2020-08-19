@@ -328,7 +328,7 @@
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
-                        empId:this.empId
+                        empId:localStorage.getItem("empId")
                     }
                 }).then(res => {
                     this.tableData = res.data.data;

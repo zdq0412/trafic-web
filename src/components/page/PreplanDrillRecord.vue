@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 简历管理
+                    <i class="el-icon-lx-cascades"></i> 应急预案演练
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -15,12 +15,12 @@
                         class="handle-del mr10"
                         @click="addVisible=true"
                 >新增</el-button>
-                <el-button
+                <!--<el-button
                         type="warning"
                         icon="el-icon-search"
                         class="handle-del mr10"
                         @click="findTemplates"
-                >查找模板</el-button>
+                >查找模板</el-button>-->
             </div>
             <el-table
                     :data="tableData"
@@ -28,8 +28,9 @@
                     class="table"
                     header-cell-class-name="table-header"
             >
-                <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="createDate" label="创建时间" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="name" label="项目名称"></el-table-column>
+                <el-table-column prop="type" label="应急预案类型"></el-table-column>
+                <el-table-column prop="developDate" label="开展时间" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
@@ -37,7 +38,7 @@
                                    :action="uploadUrl"
                                    :limit="1"
                                    :auto-upload="true"
-                                   ref="uploadFile"
+                                   ref="uploadPreplanDrillRecordFile"
                                    :data="param"
                                    :accept="ext"
                                    :on-success="handleAvatarSuccess"
@@ -85,24 +86,26 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="form" label-width="120px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="有效期开始" >
-                    <el-date-picker
-                            v-model="form.beginDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
+                <el-form-item label="应急预案类型" prop="type">
+                    <el-select v-model="form.type" placeholder="请选择">
+                        <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="有效期截止" >
+                <el-form-item label="开展时间" >
                     <el-date-picker
-                            v-model="form.endDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
+                            v-model="form.developDate"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
@@ -117,24 +120,26 @@
         </el-dialog>
         <!-- 新增弹出框 -->
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
-            <el-form ref="form" :model="form" :rules="rules"  label-width="100px">
+            <el-form ref="form" :rules="rules" :model="form" label-width="120px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="有效期开始" >
-                    <el-date-picker
-                            v-model="form.beginDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
+                <el-form-item label="应急预案类型" prop="type">
+                    <el-select v-model="form.type" placeholder="请选择">
+                        <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="有效期截止" >
+                <el-form-item label="开展时间" >
                     <el-date-picker
-                            v-model="form.endDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
+                            v-model="form.developDate"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
@@ -148,60 +153,11 @@
             </span>
         </el-dialog>
 
-        <!--查看系统模板-->
-        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
-            <el-table
-                    :data="templatesData"
-            >
-                <el-table-column
-                        label="序号"
-                        type="index"
-                        width="50"
-                        align="center">
-                    <template scope="scope">
-                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="name" label="名称">
-                </el-table-column>
-                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="creator"  label="创建人"></el-table-column>
-                <el-table-column prop="note" label="备注"  width="150" >
-                    <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
-                    <template slot-scope="scope">
-                        <el-button v-if="scope.row.url"
-                                   type="text"
-                                   icon="el-icon-download"
-                                   style="color:#67C23A"
-                                   @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="pagination">
-                <el-pagination
-                        background
-                        layout="total, prev, pager, next"
-                        :current-page="templates.pageIndex"
-                        :page-size="templates.pageSize"
-                        :total="templates.pageTotal"
-                        @current-change="handleTemplatesPageChange"
-                ></el-pagination>
-            </div>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
-            </span>
-        </el-dialog>
     </div>
 </template>
 
 <script>
-    import {getDateTime,getDate} from "../common/utils";
-
+    import {getDateTime} from "../common/utils";
     export default {
         name: 'basetable',
         data() {
@@ -210,27 +166,15 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
-
-                templatesData:[],
-                templateVisible:false,
-                templates: {
-                    pageIndex: 1,
-                    pageSize: 10,
-                    pageTotal:0
-                },
-                template:{},
-                templatesVisible:false,
-
-
                 uploadUrl:'',
-                param:{type:'resume'},
+                param:{type:'preplanDrillRecord'},
                 headers:{
                     token : localStorage.getItem("token")
                 },
                 ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
                 tableData: [],
                 delList: [],
-                empId:'',
+                emergencyPlanBakId:'',
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
@@ -238,41 +182,34 @@
                 },
                 idx: -1,
                 id: -1,
+                options: [{
+                    value: '综合',
+                    label: '综合'
+                }, {
+                    value: '专项',
+                    label: '专项'
+                }, {
+                    value: '现场处置方案',
+                    label: '现场处置方案'
+                }],
                 rules:{
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' }
+                    ],
+                    type:[
+                        {
+                            required:true,message:'请选择应急预案类型',trigger:['blur','changhe']
+                        }
                     ]
                 }
             };
         },
         created() {
-            this.empId = this.$route.params.empId;
-            this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
+            this.emergencyPlanBakId = this.$route.params.emergencyPlanBakId;
+            this.uploadUrl = this.$baseURL + "/emergencyPlanBakUpload";
             this.getData();
         },
         methods: {
-            // 分页导航
-            handleTemplatesPageChange(val) {
-                this.$set(this.templates, 'pageIndex', val);
-                this.findTemplates();
-            },
-            downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
-            },
-            //查找模板
-            findTemplates(){
-                this.$axios.get("/empArchivesTemplate/empArchivesTemplatesByPage",{
-                    params:{
-                        type:'resume',
-                        page:this.templates.pageIndex,
-                        limit:this.templates.pageSize
-                    }
-                }).then(res => {
-                    this.templatesData = res.data.data;
-                    this.templates.pageTotal = res.data.count;
-                    this.templatesVisible = true;
-                }).catch(error => console.log(error));
-            },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
                     return getDateTime(new Date(cellValue));
@@ -281,7 +218,7 @@
                 }
             },
             upload(index,row){
-                this.$refs.uploadFile.clearFiles();
+                this.$refs.uploadPreplanDrillRecordFile.clearFiles();
                 this.param.id=row.id;
                 this.$refs.fileUploadBtn.$el.click();
             },
@@ -316,11 +253,11 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/resume/resumesByPage",{
+                this.$axios.get("/preplanDrillRecord/preplanDrillRecordsByPage",{
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
-                        empId:localStorage.getItem("empId")
+                        emergencyPlanBakId:localStorage.getItem("emergencyPlanBakId")
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -341,7 +278,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/resume/resume/" + this.form.id).then(res => {
+                        this.$axios.delete("/preplanDrillRecord/preplanDrillRecord/" + this.form.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -359,19 +296,16 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                if(row.beginDate){
-                    this.form.beginDate = getDate(new Date(row.beginDate));
-                }
-                if(row.endDate){
-                    this.form.endDate = getDate(new Date(row.endDate));
+                if(row.developDate){
+                    this.form.developDate = getDateTime(new Date(row.developDate));
                 }
             },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.form.empId=this.empId;
-                        this.$axios.put("/resume/resume?" + this.$qs.stringify(this.form)).then(res => {
+                        this.form.emergencyPlanBakId=this.emergencyPlanBakId;
+                        this.$axios.put("/preplanDrillRecord/preplanDrillRecord?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -389,8 +323,8 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.form.empId = this.empId;
-                        this.$axios.post("/resume/resume",this.$qs.stringify(this.form)).then(res=>{
+                        this.form.emergencyPlanBakId = this.emergencyPlanBakId;
+                        this.$axios.post("/preplanDrillRecord/preplanDrillRecord",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
@@ -411,7 +345,6 @@
         }
     };
 </script>
-
 <style scoped>
     @import "../../assets/css/common.css";
     .handle-box {

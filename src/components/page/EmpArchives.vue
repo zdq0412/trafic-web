@@ -195,6 +195,8 @@
                         break;
                     }
                 }
+
+                localStorage.setItem("empId",row.id);
             },
             // 分页导航
             handlePageChange(val) {

@@ -15,12 +15,49 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
-                <el-button v-if="Object.keys(org).length>0"
-                           type="warning"
-                           icon="el-icon-search"
-                           class="handle-del mr10"
-                           @click="findTemplates"
-                >查找模板</el-button>
+                <el-date-picker
+                        v-model="form.checkDateFrom"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="检查时间开始">
+                </el-date-picker>
+                -
+                <el-date-picker
+                        v-model="form.checkDateTo"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="检查时间截止">
+                </el-date-picker>
+
+                <el-button
+                        style="margin-left:10px;"
+                        type="primary"
+                        icon="el-icon-search"
+                        class="handle-del mr10"
+                        @click="searchRecord"
+                >搜索</el-button>
+
+                <el-button
+                        type="warning"
+                        icon="el-icon-printer"
+                        class="handle-del mr10"
+                       @click="showPrintDialog"
+                >打印</el-button>
+
+                <el-button
+                        type="success"
+                        icon="el-icon-s-data"
+                        class="handle-del mr10"
+                        @click="analysisVisible=true"
+                >治理分析表</el-button>
+
+                <el-button
+                        type="success"
+                        icon="el-icon-s-data"
+                        class="handle-del mr10"
+                        @click="statisticsVisible=true"
+                >类型统计表</el-button>
+
             </div>
             <el-table
                     :data="tableData"
@@ -37,44 +74,57 @@
                         <span>{{(query.pageIndex - 1) * query.pageSize + scope.$index + 1}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="名称">
-                    <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
-                    </template>
+                <el-table-column prop="checkDate" label="检查时间" :formatter="dateFormatter">
                 </el-table-column>
-                <el-table-column prop="creator" label="创建人"></el-table-column>
-                <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="note" label="备注">
-                    <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="280" align="center">
+                <el-table-column prop="checkedOrg" label="被检单位名称" width="120"></el-table-column>
+                <el-table-column prop="hiddenDanger" label="存在的安全隐患" width="120"></el-table-column>
+                <el-table-column prop="correctiveAction" label="整改措施"></el-table-column>
+                <el-table-column prop="timelimit" label="整改时限"></el-table-column>
+                <el-table-column prop="person" label="责任人"></el-table-column>
+                <el-table-column prop="endTime" label="整改到位时间" :formatter="dateFormatter" width="120"></el-table-column>
+                <el-table-column prop="cancelDate" label="销号时间" :formatter="dateFormatter" width="100"></el-table-column>
+                <el-table-column prop="rectification" label="是否已整改" width="100">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   accept=".doc,.docx"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
-                        <el-button
-                                type="text"
-                                icon="el-icon-upload2"
-                                class="upload"
-                                @click="uploadTemplate(scope.$index, scope.row)"
-                        >上传文件</el-button>
-                        <el-button v-if="scope.row.realPath"
+                        <span v-if="!scope.row.rectification">否</span>
+                        <span v-else>是</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="rectificationFund" label="整改金额（元）" width="120"></el-table-column>
+                <el-table-column prop="severity.name" label="隐患严重程度" width="120"></el-table-column>
+                <el-table-column prop="reasonCategory.name" label="隐患原因类别" width="120"></el-table-column>
+                <el-table-column prop="detailNote" label="备注" width="120"></el-table-column>
+                <el-table-column label="操作" width="180" align="center"  fixed="right">
+                    <template slot-scope="scope">
+                        <!-- <el-upload style="display: none;"
+                                    :action="uploadUrl"
+                                    :limit="1"
+                                    :auto-upload="true"
+                                    ref="uploadFile"
+                                    :data="param"
+                                    accept=".doc,.docx"
+                                    :on-success="handleAvatarSuccess"
+                                    :before-upload="beforeAvatarUpload"
+                                    :headers="headers">
+                             <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+                         </el-upload>
+                         <el-button
+                                 type="text"
+                                 icon="el-icon-upload2"
+                                 class="upload"
+                                 @click="uploadTemplate(scope.$index, scope.row)"
+                         >上传文件</el-button>
+                         <el-button v-if="scope.row.realPath"
+                                    type="text"
+                                    icon="el-icon-download"
+                                    class="download"
+                                    @click="downloadTemplate(scope.$index, scope.row)"
+                         >下载文件</el-button>-->
+                        <el-button v-if="!scope.row.rectification"
                                    type="text"
-                                   icon="el-icon-download"
+                                   icon="el-icon-s-operation"
                                    class="download"
-                                   @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载文件</el-button>
+                                   @click="rectificationFun(scope.$index, scope.row)"
+                        >整改</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -101,26 +151,82 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
-                <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
-                              show-word-limit></el-input>
-                </el-form-item>
+        <el-dialog title="编辑" :visible.sync="editVisible" width="50%"  @close="closeDialog" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="120px">
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="检查时间" prop="checkDate">
                             <el-date-picker
                                     v-model="form.checkDate"
-                                    type="datetime"
-                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
                                     placeholder="选择检查时间">
                             </el-date-picker>
                         </el-form-item>
                     </el-col>
                 </el-row>
+                <el-form-item label="被检单位名称">
+                    <el-input v-model="form.checkedOrg" maxlength="100"
+                              show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="存在的安全隐患">
+                    <el-input v-model="form.hiddenDanger" type="textarea" ></el-input>
+                </el-form-item>
+                <el-form-item label="整改措施">
+                    <el-input v-model="form.correctiveAction" type="textarea" ></el-input>
+                </el-form-item>
+                <el-form-item label="整改时限">
+                    <el-input v-model="form.timelimit"></el-input>
+                </el-form-item>
+                <el-form-item label="责任人">
+                    <el-input v-model="form.person"></el-input>
+                </el-form-item>
+                <el-row type="flex" class="row-bg" >
+                    <el-col >
+                        <el-form-item label="整改到位时间">
+                            <el-date-picker
+                                    v-model="form.endTime"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="请选择时间">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row type="flex" class="row-bg" >
+                    <el-col >
+                        <el-form-item label="销号时间">
+                            <el-date-picker
+                                    v-model="form.cancelDate"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="请选择时间">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item label="隐患严重程度" prop="severityId">
+                    <el-select   v-model="form.severityId" placeholder="请选择">
+                        <el-option
+                                v-for="item in severitys"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select >
+                </el-form-item>
+                <el-form-item label="隐患原因类别" prop="reasonCategoryId">
+                    <el-select   v-model="form.reasonCategoryId" placeholder="请选择">
+                        <el-option
+                                v-for="item in reasonCategorys"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select >
+                </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.detailNote" type="textarea" ></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -129,26 +235,82 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" >
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
-                <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
-                              show-word-limit></el-input>
-                </el-form-item>
+        <el-dialog title="新增" :visible.sync="addVisible" width="50%"  @close="closeDialog" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="120px">
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="检查时间" prop="checkDate">
                             <el-date-picker
                                     v-model="form.checkDate"
-                                    type="datetime"
-                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
                                     placeholder="选择检查时间">
                             </el-date-picker>
                         </el-form-item>
                     </el-col>
                 </el-row>
+                <el-form-item label="被检单位名称">
+                    <el-input v-model="form.checkedOrg" maxlength="100"
+                              show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="存在的安全隐患">
+                    <el-input v-model="form.hiddenDanger" type="textarea" ></el-input>
+                </el-form-item>
+                <el-form-item label="整改措施">
+                    <el-input v-model="form.correctiveAction" type="textarea" ></el-input>
+                </el-form-item>
+                <el-form-item label="整改时限">
+                    <el-input v-model="form.timelimit"></el-input>
+                </el-form-item>
+                <el-form-item label="责任人">
+                    <el-input v-model="form.person"></el-input>
+                </el-form-item>
+                <el-row type="flex" class="row-bg" >
+                    <el-col >
+                        <el-form-item label="整改到位时间">
+                            <el-date-picker
+                                    v-model="form.endTime"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="请选择时间">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row type="flex" class="row-bg" >
+                    <el-col >
+                        <el-form-item label="销号时间">
+                            <el-date-picker
+                                    v-model="form.cancelDate"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="请选择时间">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item label="隐患严重程度" prop="severityId">
+                    <el-select   v-model="form.severityId" placeholder="请选择">
+                        <el-option
+                                v-for="item in severitys"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select >
+                </el-form-item>
+                <el-form-item label="隐患原因类别" prop="reasonCategoryId">
+                    <el-select   v-model="form.reasonCategoryId" placeholder="请选择">
+                        <el-option
+                                v-for="item in reasonCategorys"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select >
+                </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.detailNote" type="textarea" ></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -156,395 +318,298 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
-            {{note}}
+        <!--整改-->
+        <el-dialog title="整改" :visible.sync="rectificationVisible" width="50%"  @close="closeDialog" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="120px">
+                <el-form-item label="整改金额（元）" prop="rectificationFund">
+                    <el-input-number v-model="form.rectificationFund"></el-input-number>
+                </el-form-item>
+            </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="noteVisible=false">确 定</el-button>
+                <el-button @click="rectificationVisible=false">取 消</el-button>
+                <el-button type="primary" @click="saveRectification">确 定</el-button>
             </span>
         </el-dialog>
-        <!--显示模板内容-->
-        <el-dialog title="检查内容" :visible.sync="showContentVisible" width="70%">
+        <!--隐患排查和治理情况分析表-->
+        <el-dialog title="治理情况分析表" :visible.sync="analysisVisible" width="50%"   @open="analysis">
+            <el-form>
+                <div class="handle-box">
+                    <el-form-item label="日期" label-width="60">
+                        <el-date-picker
+                                v-model="checkDateFrom"
+                                type="date"
+                                value-format="yyyy-MM-dd"
+                                placeholder="检查日期开始">
+                        </el-date-picker>
+                        -
+                        <el-date-picker
+                                v-model="checkDateTo"
+                                type="date"
+                                value-format="yyyy-MM-dd"
+                                placeholder="检查日期截止">
+                        </el-date-picker>
+                        <el-button style="margin-left:10px;"
+                                   type="primary"
+                                   icon="el-icon-search"
+                                   class="handle-del mr10"
+                                   @click="analysis"
+                        >查找</el-button>
+                    </el-form-item>
+                </div>
+                <div id="print_analysis" style="padding-left:10px;padding-right: 10px;">
+                    <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                        <caption style="font-size: 20px;">隐患排查和治理情况分析表</caption>
+                        <tr>
+                            <td colspan="5" style="border: none;text-align: left;" >
+                                <div style="display: inline-block;">统计人:{{employee.name}}</div>
+                                <div v-if="!checkDateFrom && !checkDateTo" style="float: right;display: inline-block;">统计时间段:全部</div>
+                                <div v-else style="float: right;display: inline-block;">统计时间段:{{checkDateFrom}}~{{checkDateTo}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>隐患排查数(项)</td>
+                            <td>已整改数（项）</td>
+                            <td>整改率（%）</td>
+                            <td>整改投入资金（元）</td>
+                        </tr>
+                        <tr v-for="record in analysisRecord">
+                            <td>{{record[0]}}</td>
+                            <td>{{record[1]}}</td>
+                            <td>{{record[2]}}</td>
+                            <td>{{record[3]}}</td>
+                            <td>{{record[4]}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="analysisVisible=false">关 闭</el-button>
+                <el-button v-print="print_analysis">打 印</el-button>
+            </span>
+        </el-dialog>
+        <!--隐患类型统计表-->
+        <el-dialog title="隐患类型统计表" :visible.sync="statisticsVisible" width="50%"   @open="statistics">
+            <el-form>
+                <div class="handle-box">
+                    <el-form-item label="日期" label-width="60">
+                        <el-date-picker
+                                v-model="checkDateFrom"
+                                type="date"
+                                value-format="yyyy-MM-dd"
+                                placeholder="检查日期开始">
+                        </el-date-picker>
+                        -
+                        <el-date-picker
+                                v-model="checkDateTo"
+                                type="date"
+                                value-format="yyyy-MM-dd"
+                                placeholder="检查日期截止">
+                        </el-date-picker>
+                        <el-button style="margin-left:10px;"
+                                   type="primary"
+                                   icon="el-icon-search"
+                                   class="handle-del mr10"
+                                   @click="statistics"
+                        >查找</el-button>
+                    </el-form-item>
+                </div>
+                <div id="print_statistics" style="padding-left:10px;padding-right: 10px;">
+                    <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                        <caption style="font-size: 20px;">隐患类型统计表</caption>
+                        <tr>
+                            <td colspan="5" style="border: none;text-align: left;">
+                                <div style="display: inline-block;">统计人:{{employee.name}}</div>
+                                <div v-if="!checkDateFrom && !checkDateTo" style="float: right;display: inline-block;">统计时间段:全部</div>
+                                <div v-else style="float: right;display: inline-block;">统计时间段:{{checkDateFrom}}-{{checkDateTo}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>隐患排查数(项)</td>
+                            <td>已整改数（项）</td>
+                            <td>整改率（%）</td>
+                            <td>整改投入资金（元）</td>
+                        </tr>
+                        <tr v-for="record in statisticsRecord">
+                            <td>{{record[0]}}</td>
+                            <td>{{record[1]}}</td>
+                            <td>{{record[2]}}</td>
+                            <td>{{record[3]}}</td>
+                            <td>{{record[4]}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="statisticsVisible=false">关 闭</el-button>
+                <el-button  v-print="print_statistics">打 印</el-button>
+            </span>
+        </el-dialog>
+        <!--显示打印内容-->
+        <el-dialog title="打印" :visible.sync="showPrintVisible" width="70%">
             <div id="printContent">
-                <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{dangerGoodsCheck.name}}</div>
-            <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                <thead>
-                <tr>
-                    <th style="width:10%;">检查时间</th>
-                    <th style="width:12%;">被检单位名称</th>
-                    <th style="width:17%;">存在的安全隐患</th>
-                    <th style="width:17%;">整改措施</th>
-                    <th style="width:8%;">整改时限</th>
-                    <th style="width:8%;">责任人</th>
-                    <th style="width:8%;">整改到位时间</th>
-                    <th style="width:8%;">销号时间</th>
-                    <th style="width:12%;">备注</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="detail in details">
-                    <td>
-                        <span v-if="editable">
-                            <el-date-picker
-                                    style="width: 150px;"
-                                    v-model="detail.checkDate"
-                                    type="date"
-                                    value-format="yyyy-MM-dd"
-                                    placeholder="选择日期">
-                             </el-date-picker>
-                        </span>
-                        <span v-else>
+                <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;margin-bottom:10px;">危险货物运输企业安全生产隐患排查整改台账</div>
+                <table style="width: 100%;" cellspacing="0" cellpadding="0">
+                    <thead>
+                    <tr>
+                        <th style="width:5%;">检查时间</th>
+                        <th style="width:8%;">被检单位名称</th>
+                        <th style="width:15%;">存在的安全隐患</th>
+                        <th style="width:15%;">整改措施</th>
+                        <th style="width:5%;">整改时限</th>
+                        <th style="width:5%;">责任人</th>
+                        <th style="width:10%;">整改到位时间</th>
+                        <th style="width:5%;">销号时间</th>
+                        <th style="width:5%;">是否已整改</th>
+                        <th style="width:5%;">整改金额(元)</th>
+                        <th style="width:5%;">隐患严重程度</th>
+                        <th style="width:5%;">隐患原因类别</th>
+                        <th style="width:12%;">备注</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="detail in details">
+                        <td>
+                        <span>
                             {{detail.checkDate | formatDate}}
                         </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <textarea type="text" v-model="detail.checkedOrg"></textarea>
-                        </span>
-                        <span v-else>
+                        </td>
+                        <td>
+                        <span>
                             {{detail.checkedOrg}}
                         </span>
-                    </td>
-                    <td style="text-align: left;padding-left:3px;">
-                        <span v-if="editable">
-                            <textarea type="text" v-model="detail.hiddenDanger" rows="5"></textarea>
+                        </td>
+                        <td style="text-align: left;padding-left:3px;">
+                        <span  v-html="detail.hiddenDanger" >
                         </span>
-                        <span v-else v-html="detail.hiddenDanger" >
+                        </td>
+                        <td>
+                        <span  v-html="detail.correctiveAction">
                         </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <textarea type="text" v-model="detail.correctiveAction" rows="5"></textarea>
-                        </span>
-                        <span v-else v-html="detail.correctiveAction">
-                        </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <input type="text" v-model="detail.timelimit" />
-                        </span>
-                        <span v-else>
+                        </td>
+                        <td>
+                        <span>
                             {{detail.timelimit}}
                         </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <input type="text" v-model="detail.person" />
-                        </span>
-                        <span v-else>
+                        </td>
+                        <td>
+                        <span>
                             {{detail.person}}
                         </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <el-date-picker
-                                    style="width: 150px;"
-                                    v-model="detail.endTime"
-                                    type="date"
-                                    value-format="yyyy-MM-dd"
-                                    placeholder="选择日期">
-                             </el-date-picker>
-                        </span>
-                        <span v-else>
+                        </td>
+                        <td>
+                        <span>
                             {{detail.endTime | formatDate}}
                         </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <el-date-picker
-                                    style="width: 150px;"
-                                    v-model="detail.cancelDate"
-                                    type="date"
-                                    value-format="yyyy-MM-dd"
-                                    placeholder="选择日期">
-                             </el-date-picker>
-                        </span>
-                        <span v-else>
+                        </td>
+                        <td>
+                        <span>
                             {{detail.cancelDate | formatDate}}
                         </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <textarea type="text" v-model="detail.detailNote" rows="5"></textarea>
+                        </td>
+                        <td>
+                        <span v-if="!detail.rectification">
+                            否
                         </span>
-                        <span v-else v-html="detail.detailNote">
+                        <span v-else>
+                            是
                         </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="9" style="border: none;text-align: left;">
-                        <span>企业负责人签字：</span> <div style="width:200px;display: inline-block;">&nbsp;</div>
-                        <span>安全检查组人员签字：</span>
-                    </td>
-                </tr>
-                <tr v-if="editable">
-                    <td colspan="9" style="border: none;">
-                        <div style="width: 100%;text-align: center;">
-                            <el-button type="text" @click="addLine">新增一行</el-button>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-            <span slot="footer" class="dialog-footer">
-                <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
-                 <el-button v-if="!editable" type="warning" v-print="printObj">打印</el-button>
-                <el-button v-else type="primary" @click="saveContent">保存</el-button>
-                <el-button  @click="showContentVisible=false">关闭</el-button>
-            </span>
-        </el-dialog>
-        <!--查看系统模板-->
-        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
-            <el-table
-                    :data="templatesData"
-            >
-                <el-table-column
-                        label="序号"
-                        type="index"
-                        width="50"
-                        align="center">
-                    <template scope="scope">
-                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="name" label="名称">
-                </el-table-column>
-                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="creator"  label="创建人"></el-table-column>
-                <el-table-column prop="note" label="备注"  width="150" >
-                    <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
-                    <template slot-scope="scope">
-                        <el-button
-                                type="text"
-                                icon="el-icon-view"
-                                @click="checkContent(scope.$index, scope.row)"
-                        >查看内容</el-button>
-                        <el-button
-                                type="text"
-                                icon="el-icon-copy-document"
-                                class="red"
-                                @click="importTemplate(scope.$index, scope.row)"
-                        >引入</el-button>
-                        <el-button v-if="scope.row.url"
-                                   type="text"
-                                   icon="el-icon-download"
-                                   style="color:#67C23A"
-                                   @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="pagination">
-                <el-pagination
-                        background
-                        layout="total, prev, pager, next"
-                        :current-page="templates.pageIndex"
-                        :page-size="templates.pageSize"
-                        :total="templates.pageTotal"
-                        @current-change="handleTemplatesPageChange"
-                ></el-pagination>
+                        </td>
+                        <td>
+                        <span>
+                            {{detail.rectificationFund}}
+                        </span>
+                        </td>
+                        <td>
+                        <span>
+                            {{detail.severity.name}}
+                        </span>
+                        </td>
+                        <td>
+                        <span>
+                            {{detail.reasonCategory.name}}
+                        </span>
+                        </td>
+                        <td>
+                        <span v-html="detail.detailNote">
+                        </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="13" style="border: none;text-align: left;">
+                            <span>企业负责人签字：</span> <div style="width:200px;display: inline-block;">&nbsp;</div>
+                            <span>安全检查组人员签字：</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
-            </span>
-        </el-dialog>
-        <!--模板内容-->
-        <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="60%">
-            <table style="width: 100%;" cellspacing="0" cellpadding="0">
-                <caption style="margin-bottom: 20px;font-size: 18px;">{{dangerGoodsCheck.name}}</caption>
-
-                <thead>
-                <tr>
-                    <th style="width:10%;">检查时间</th>
-                    <th style="width:12%;">被检单位名称</th>
-                    <th style="width:17%;">存在的安全隐患</th>
-                    <th style="width:17%;">整改措施</th>
-                    <th style="width:8%;">整改时限</th>
-                    <th style="width:8%;">责任人</th>
-                    <th style="width:8%;">整改到位时间</th>
-                    <th style="width:8%;">销号时间</th>
-                    <th style="width:12%;">备注</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="detail in details">
-                    <td>
-                        <span v-if="editable">
-                            <el-date-picker
-                                    style="width: 150px;"
-                                    v-model="detail.checkDate"
-                                    type="date"
-                                    value-format="yyyy-MM-dd"
-                                    placeholder="选择日期">
-                             </el-date-picker>
-                        </span>
-                        <span v-else>
-                            {{detail.checkDate | formatDate}}
-                        </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <textarea type="text" v-model="detail.checkedOrg"></textarea>
-                        </span>
-                        <span v-else>
-                            {{detail.checkedOrg}}
-                        </span>
-                    </td>
-                    <td style="text-align: left;padding-left:3px;">
-                        <span v-if="editable">
-                            <textarea type="text" v-model="detail.hiddenDanger" rows="5"></textarea>
-                        </span>
-                        <span v-else v-html="detail.hiddenDanger" >
-                        </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <textarea type="text" v-model="detail.correctiveAction" rows="5"></textarea>
-                        </span>
-                        <span v-else v-html="detail.correctiveAction">
-                        </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <input type="text" v-model="detail.timelimit" />
-                        </span>
-                        <span v-else>
-                            {{detail.timelimit}}
-                        </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <input type="text" v-model="detail.person" />
-                        </span>
-                        <span v-else>
-                            {{detail.person}}
-                        </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <el-date-picker
-                                    style="width: 150px;"
-                                    v-model="detail.endTime"
-                                    type="date"
-                                    value-format="yyyy-MM-dd"
-                                    placeholder="选择日期">
-                             </el-date-picker>
-                        </span>
-                        <span v-else>
-                            {{detail.endTime | formatDate}}
-                        </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <el-date-picker
-                                    style="width: 150px;"
-                                    v-model="detail.cancelDate"
-                                    type="date"
-                                    value-format="yyyy-MM-dd"
-                                    placeholder="选择日期">
-                             </el-date-picker>
-                        </span>
-                        <span v-else>
-                            {{detail.cancelDate | formatDate}}
-                        </span>
-                    </td>
-                    <td>
-                        <span v-if="editable">
-                            <textarea type="text" v-model="detail.detailNote" rows="5"></textarea>
-                        </span>
-                        <span v-else v-html="detail.detailNote">
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="9" style="border: none;text-align: left;">
-                        <span>企业负责人签字：</span> <div style="width:200px;display: inline-block;">&nbsp;</div>
-                        <span>安全检查组人员签字：</span>
-                    </td>
-                </tr>
-                <tr v-if="editable">
-                    <td colspan="9" style="border: none;">
-                        <div style="width: 100%;text-align: center;">
-                            <el-button type="text" @click="addLine">新增一行</el-button>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <span slot="footer" class="dialog-footer">
-                <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
+                 <el-button type="warning" v-print="printObj">打印</el-button>
+                <el-button  @click="showPrintVisible=false">关闭</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import  {getDate,getDateTime,getTime} from "../common/utils";
-    import { VueEditor } from "vue2-editor";
+    import  {getDate} from "../common/utils";
     export default {
-        components:{
-            VueEditor
-        },
         name: 'basetable',
         data() {
             return {
                 printObj:{
                     id:'printContent'
                 },
-                customToolbar: [
-                    ["bold", "italic", "underline"]
-                ],
+                print_analysis:{
+                    id:'print_analysis'
+                },
+                print_statistics:{
+                    id:'print_statistics'
+                },
                 query: {
                     pageIndex: 1,
                     pageSize: 10
                 },
-
-                headers:{
-                    token : localStorage.getItem("token")
-                },
-                param:{type:'dangerGoodsCheck'},
-                templatesData:[],
-                templateVisible:false,
-                templates: {
-                    pageIndex: 1,
-                    pageSize: 10,
-                    pageTotal:0
-                },
-                showTemplateContentVisible:false,
-                template:{},
-                templatesVisible:false,
-                
-                noteVisible:false,
-                note:'',
-                orgCategories:[],
-                areas:[],
-                editable:false,
-                notices:[],
+                severityId:'',
+                employee:{},
+                reasonCategoryId:'',
+                severitys:[],
+                reasonCategorys:[],
+                rectificationVisible:false,
                 tableData: [],
-                delList: [],
+                showPrintVisible:false,
                 editVisible: false,
                 addVisible: false,
-                showContentVisible:false,
                 pageTotal: 0,
                 haveOrg:false,
+                checkDateFrom:'',
+                analysisRecord:[],
+                statisticsRecord:[],
+                checkDateTo:'',
                 details:[],
-                dangerGoodsCheck:{},
+                statisticsVisible:false,//类型统计
+                analysisVisible:false,//治理分析
                 form: {
-                    area:[]
                 },
                 idx: -1,
                 org:{},
                 id: -1,
                 rules:{
-                    name: [
-                        { required: true, message: '请输入名称', trigger: 'blur' }
+                    checkDate: [
+                        { required: true, message: '请选择检查日期', trigger: 'blur' }
                     ],
-                    content:[
-                        { required: true, message: '请输入文本内容', trigger: 'blur' }
+                    severityId:[
+                        { required: true, message: '请选择隐患严重程度', trigger: ['blur','change'] }
+                    ],
+                    reasonCategoryId:[
+                        { required: true, message: '请选择隐患原因类别', trigger: ['blur','change'] }
+                    ],
+                    rectificationFund:[
+                        {
+                            required:true,message:'请输入整改金额',trigger:'blur'
+                        }
                     ]
                 }
             };
@@ -560,188 +625,116 @@
         },
         created() {
             this.getData();
-            this.uploadUrl = this.$baseURL + "/templateUpload";
-            this.$axios.get("/user/haveOrg").then(res =>{
-                if(res.data.data){
-                    this.haveOrg = true;
-                    this.org = res.data.data;
-                }
+            this.$axios.get("/employee/currentEmployee").then(res =>{
+                this.employee = res.data.data;
             }).catch(error=>console.log(error));
         },
         methods: {
-            importTemplate(index,row){//引入模板
-                this.template = row;
-                this.$confirm('确定要引入该模板吗？', '提示', {
+            showPrintDialog(){
+                this.$axios.get("/dangerGoodsCheckDetailRecord/dangerGoodsCheckDetailRecords",{
+                    params:{
+                        checkDateFrom:this.form.checkDateFrom,
+                        checkDateTo:this.form.checkDateTo,
+                        page:this.query.pageIndex,
+                        limit:this.query.pageSize
+                    }
+                }).then(res => {
+                    this.details = res.data.data;
+                    this.showPrintVisible=true;
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            //统计
+            statistics(){
+                this.$axios.get("/dangerGoodsCheckDetailRecord/statistics",{
+                    params:{
+                        checkDateFrom:this.checkDateFrom,
+                        checkDateTo:this.checkDateTo
+                    }
+                }).then(res=>{
+                    this.statisticsRecord = res.data;
+                    //a:隐患排查总数 b:整改数总数 c: 整改数  d:整改投入总资金
+                    let a = 0,b=0,c=0,d=0;
+                    for(let i = 0;i<this.statisticsRecord.length;i++){
+                        let record = this.statisticsRecord[i];
+                        a+=record[1];
+                        b+=record[2];
+                        c+=record[1]*record[3]/100;
+                        d+=record[4];
+                    }
+
+                    this.statisticsRecord.push(['全部',a,b,(c/a*100).toFixed(2),d]);
+                }).catch(error=>console.log(error));
+            },
+            //分析
+            analysis(){
+                this.$axios.get("/dangerGoodsCheckDetailRecord/analysis",{
+                    params:{
+                        checkDateFrom:this.checkDateFrom,
+                        checkDateTo:this.checkDateTo
+                    }
+                }).then(res=>{
+                    this.analysisRecord = res.data;
+                    //a:隐患排查总数 b:整改数总数 c: 整改数  d:整改投入总资金
+                    let a = 0,b=0,c=0,d=0;
+                    for(let i = 0;i<this.analysisRecord.length;i++){
+                        let record = this.analysisRecord[i];
+                        a+=record[1];
+                        b+=record[2];
+                        c+=record[1]*record[3]/100;
+                        d+=record[4];
+                    }
+
+                    this.analysisRecord.push(['全部',a,b,(c/a*100).toFixed(2),d]);
+                }).catch(error=>console.log(error));
+            },
+            saveRectification(){
+                this.$axios.get("/dangerGoodsCheckDetailRecord/rectificate",{
+                    params:{
+                        id:this.form.id,
+                        rectificationFund:this.form.rectificationFund
+                    }
+                }).then(res =>{
+                    this.rectificationVisible = false;
+                    this.$message.success("已整改!");
+                    this.getData();
+                }).catch(error=>console.log(error));
+            },
+            rectificationFun(index,row){
+                this.$confirm('确定要整改吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        let formData = new FormData();
-                        formData.append("templateId",row.id);
-                        this.$axios.post("/dangerGoodsCheck/template",formData)
-                            .then(res=>{
-                                this.getData();
-                                this.templatesVisible=false;
-                                this.showContentVisible = true;
-                                this.editable=true;
-                            }).catch(error=>console.log(error));
+                        this.form = row;
+                        this.rectificationVisible = true;
                     })
                     .catch(() => {});
             },
-            checkContent(index,row){//查看模板内容
-                this.showTemplateContentVisible = true;
-                this.template = row;
-            },
-            uploadTemplate(index,row){
-                this.$refs.uploadFile.clearFiles();
-                this.param.id=row.id;
-                this.$refs.fileUploadBtn.$el.click();
-            },
-            downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
-            },
-            handleAvatarSuccess(res, file) {
-                this.$message.success("上传成功!");
-                this.getData();
-            },
-            beforeAvatarUpload(file) {
-                const isLt5M = file.size / 1024 / 1024 < 5;
-                const isWord = (file.type==='application/msword' | file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-                if (!isLt5M) {
-                    this.$message.error('上传文件大小不能超过 5MB!');
-                    return false
-                }
-                if(!isWord){
-                    this.$message.error('只能上传work文档!');
-                    return false;
-                }
-                return  true;
-            },
-            //查找模板
-            findTemplates(){
-                this.$axios.get("/dangerGoodsCheckTemplate/dangerGoodsCheckTemplatesByPage",{
+            loadSelectData(){
+                this.$axios.get("/category/categorys",{
                     params:{
-                        page:this.templates.pageIndex,
-                        limit:this.templates.pageSize
+                        type:'隐患排查严重程度'
                     }
                 }).then(res => {
-                    this.templatesData = res.data.data;
-                    this.templates.pageTotal = res.data.count;
-                    this.templatesVisible = true;
-                }).catch(error => console.log(error));
-            },
-            addLine(){
-              this.details.push({id:'',checkDate:'',checkedOrg:'',hiddenDanger:'',correctiveAction:'',timelimit:'',person:'',endTime:'',cancelDate:'',note:''})
-            },
-            loadSelectData(){
-                this.$axios.get("/orgCategory/orgCategorys").then(res => {
-                    this.orgCategories = res.data.data;
+                    this.severitys = res.data.data;
                 }).catch(error => {
                     console.log(error);
                 });
                 this.$axios.get("/category/categorys",{
                     params:{
-                        type:'区域'
+                        type:'隐患排查原因类别'
                     }
                 }).then(res => {
-                    this.areas = res.data.data;
+                    this.reasonCategorys = res.data.data;
                 }).catch(error => {
                     console.log(error);
                 });
             },
-            editContent(){
-                this.editable=true;
-                if(this.details && this.details.length>0){
-                    for(let i = 0;i<this.details.length;i++){
-                        let detail = this.details[i];
-                        detail.cancelDate = getDate(new Date(detail.cancelDate));
-                        detail.checkDate = getDate(new Date(detail.checkDate));
-                        detail.endTime = getDate(new Date(detail.endTime));
-                        if(detail.hiddenDanger){
-                            detail.hiddenDanger = detail.hiddenDanger.replace(/<br>/g,"\n");
-                        }
-                        if(detail.correctiveAction){
-                            detail.correctiveAction = detail.correctiveAction.replace(/<br>/g,"\n");
-                        }
-                        if(detail.detailNote){
-                            detail.detailNote = detail.detailNote.replace(/<br>/g,"\n");
-                        }
-                    }
-                }
-            },
-            saveContent(){
-                let details = '';
-                if(this.details && this.details.length>0){
-                    for(let i = 0;i<this.details.length;i++){
-                        let detail = this.details[i];
-                        if(!detail.checkDate &&!detail.person&&!detail.cancelDate&&!detail.checkedOrg&&!detail.hiddenDanger
-                        &&!detail.correctiveAction&&!detail.timelimit&&!detail.endTime&&!detail.detailNote){
-
-                        }else{
-                            if(detail.hiddenDanger){
-                                detail.hiddenDanger = detail.hiddenDanger.replace(/\n/g,"<br>");
-                            }
-                            if(detail.correctiveAction){
-                                detail.correctiveAction = detail.correctiveAction.replace(/\n/g,"<br>");
-                            }
-                            if(detail.detailNote){
-                                detail.detailNote = detail.detailNote.replace(/\n/g,"<br>");
-                            }
-                            details+=detail.checkDate + "|" + detail.person + "|" + detail.cancelDate + "|" + detail.checkedOrg + "|" +
-                                    detail.hiddenDanger + "|" + detail.correctiveAction + "|" + detail.timelimit + "|" + detail.endTime + "|" + detail.detailNote;
-                            if(i<this.details.length-1){
-                                details+="#";
-                            }
-                        }
-                    }
-                }
-                let formData = new FormData();
-                formData.append("id",this.dangerGoodsCheck.id);
-                formData.append("details",details);
-                this.$axios.post("/dangerGoodsCheck/content", formData).then(res => {
-                    if (res.data.result.resultCode == 200) {
-                        this.showContentVisible = false;
-                        this.getData();
-                    } else {
-                        this.$message.error(res.data.result.message);
-                    }
-                }).catch(err => {
-                    console.log(err);
-                });
-            },
-            showContent(row){
-                this.form = row;
-                this.dangerGoodsCheck=row;
-                this.showContentVisible=true;
-                this.editable = false;
-                this.$axios.get("dangerGoodsCheckDetailRecord/dangerGoodsCheckDetailRecord",{
-                    params:{
-                        id:row.id
-                    }
-                }).then(res=>{
-                    this.details = res.data;
-                }).catch(error=>{
-                    console.log(error);
-                });
-            },
-            showNote(note){
-                this.note = note;
-                this.noteVisible=true;
-            },
             handleAdd(){
                 this.form = {};
                 this.addVisible = true;
-            },
-            handleChange(){
-                if(this.form.area&&this.form.area.length>0){
-                    this.form.provinceId=this.form.area[0];
-                    if(this.form.area.length==2){
-                        this.form.cityId=this.form.area[1];
-                    }
-                    if(this.form.area.length==3){
-                        this.form.cityId=this.form.area[1];
-                        this.form.regionId=this.form.area[2];
-                    }
-                }
+                this.$refs['form'].clearValidate();
             },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
@@ -753,13 +746,17 @@
             closeDialog(){
                 this.$refs["form"].clearValidate();
             },
+            searchRecord(){
+                this.getData();
+            },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/dangerGoodsCheck/dangerGoodsChecksByPage",{
+                this.$axios.get("/dangerGoodsCheckDetailRecord/dangerGoodsCheckDetailRecordsByPage",{
                     params:{
+                        checkDateFrom:this.form.checkDateFrom,
+                        checkDateTo:this.form.checkDateTo,
                         page:this.query.pageIndex,
-                        limit:this.query.pageSize,
-                        type:'training'
+                        limit:this.query.pageSize
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -780,7 +777,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/dangerGoodsCheck/dangerGoodsCheck/" + row.id).then(res => {
+                        this.$axios.delete("/dangerGoodsCheckDetailRecord/dangerGoodsCheckDetailRecord/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -798,15 +795,20 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                if(row.orgCategory){
-                    this.form.orgCategoryId = row.orgCategory.id;
+                if(row.checkDate){
+                    this.form.checkDate = getDate(new Date(row.checkDate));
                 }
-                if(row.province && row.city && row.region){
-                    this.form.area=[row.province.id,row.city.id,row.region.id];
-                }else if(row.province && row.city){
-                    this.form.area=[row.province.id,row.city.id];
-                }else if(row.province){
-                    this.form.area=[row.province.id];
+                if(row.cancelDate){
+                    this.form.cancelDate = getDate(new Date(row.cancelDate));
+                }
+                if(row.endTime){
+                    this.form.endTime = getDate(new Date(row.endTime));
+                }
+                if(row.severity){
+                    this.form.severityId = row.severity.id;
+                }
+                if(row.reasonCategory){
+                    this.form.reasonCategoryId = row.reasonCategory.id;
                 }
             },
             // 保存编辑
@@ -814,7 +816,7 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.content='';
-                        this.$axios.put("/dangerGoodsCheck/dangerGoodsCheck?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.put("/dangerGoodsCheckDetailRecord/dangerGoodsCheckDetailRecord?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -835,7 +837,7 @@
                 this.$refs.form.validate(validate =>{
                     if(validate){
                         this.form.type='training';
-                        this.$axios.post("/dangerGoodsCheck/dangerGoodsCheck",this.$qs.stringify(this.form)).then(res=>{
+                        this.$axios.post("/dangerGoodsCheckDetailRecord/dangerGoodsCheckDetailRecord",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
@@ -866,9 +868,9 @@
         margin-bottom: 20px;
     }
 
-    .table {
+    table {
         width: 100%;
-        font-size: 14px;
+        font-size: 12px;
     }
     .red {
         color: #ff0000;
@@ -877,24 +879,11 @@
         margin-right: 10px;
     }
 
-    .per20{
-        width:20%;
-    }
-    .per80{
-        width:80%;
-    }
-
     tr td,tr th{
         border: black solid 1px;
         text-align: center;
         height:30px;
         line-height: 30px;
-    }
-    td input,td textarea{
-        border: none;
-        font-size: 14px;
-        width: 93%;
-        padding: 3px;
     }
 
     td div{

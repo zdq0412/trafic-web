@@ -1,11 +1,10 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 Vue.use(Router);
-const originalPush = Router.prototype.push
+const originalPush = Router.prototype.push;
 Router.prototype.push = function push(location) {
     return originalPush.call(this, location).catch(err => err)
 };
-
 export default new Router({
     routes: [
         {
@@ -14,7 +13,7 @@ export default new Router({
         },
         {
             path: '/',
-            component: () => import(/* webpackChunkName: "home" */ '../components/common/Home.vue'),
+            component: () => import('../components/common/Home.vue'),
             meta: { title: '' },
             children: [
                 {
@@ -26,6 +25,11 @@ export default new Router({
                   path:'/employee',
                   component:()=>import('../components/page/Employee.vue'),
                   meta:{title:'企业人员资料'}
+                },
+                {
+                  path:'/emergencyPlanBak',
+                  component:()=>import('../components/page/EmergencyPlanBak.vue'),
+                  meta:{title:'应急预案备案'}
                 },
                 {
                   path:'/securityExaminationTemplate',
@@ -177,7 +181,7 @@ export default new Router({
                   component:()=>import('../components/page/Responsibility.vue'),
                   meta:{title:'安全责任考核'}
                 },
-            {
+               {
                   path:'/law',
                   component:()=>import('../components/page/Law.vue'),
                   meta:{title:'法律法规政策'}
@@ -271,6 +275,12 @@ export default new Router({
                     name:'resume',
                     component: () => import( '../components/page/Resume.vue'),
                     meta: { title: '人员简历' }
+                },
+                {
+                    path: '/preplanDrillRecord',
+                    name:'preplanDrillRecord',
+                    component: () => import( '../components/page/PreplanDrillRecord.vue'),
+                    meta: { title: '应急预案演练' }
                 },
                 {
                     path: '/idcard',
