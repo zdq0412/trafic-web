@@ -107,6 +107,11 @@ export default new Router({
                   meta:{title:'安全投入台账'}
                 },
                 {
+                  path:'/GPSAccount',
+                  component:()=>import('../components/page/GPSAccount.vue'),
+                  meta:{title:'GPS监控台账'}
+                },
+                {
                   path:'/rulesTemplate',
                   component:()=>import('../components/page/RuleTemplate.vue'),
                   meta:{title:'安全规章制度'}
@@ -180,6 +185,36 @@ export default new Router({
                   path:'/examination',
                   component:()=>import('../components/page/Responsibility.vue'),
                   meta:{title:'安全责任考核'}
+                },
+                {
+                  path:'/deviceCheck',
+                  component:()=>import('../components/page/DeviceCheck.vue'),
+                  meta:{title:'设备点检'}
+                },
+                {
+                  path:'/securityBuild',
+                  component:()=>import('../components/page/SecurityBuild.vue'),
+                  meta:{title:'安全文化建设'}
+                },
+                {
+                  path:'/securityMonth',
+                  component:()=>import('../components/page/SecurityMonth.vue'),
+                  meta:{title:'安全生产月'}
+                },
+                {
+                  path:'/securityActivity',
+                  component:()=>import('../components/page/SecurityActivity.vue'),
+                  meta:{title:'各种安全活动'}
+                },
+                {
+                  path:'/accidentRecord',
+                  component:()=>import('../components/page/AccidentRecord.vue'),
+                  meta:{title:'事故记录及处理'}
+                },
+                {
+                  path:'/fourRecord',
+                  component:()=>import('../components/page/FourRecord.vue'),
+                  meta:{title:'四不放过记录'}
                 },
                {
                   path:'/law',
