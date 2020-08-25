@@ -13,7 +13,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addVisible=true"
+                        @click="addVisible=true;form={};"
                 >新增</el-button>
                 <!--<el-button
                         type="warning"

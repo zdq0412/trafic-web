@@ -268,6 +268,7 @@
             },
             handleAdd(){
                 this.addVisible=true;
+                this.form={};
             },
             // 查看功能
             handleFunction(index, row) {

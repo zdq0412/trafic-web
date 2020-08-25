@@ -13,7 +13,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addVisible=true"
+                        @click="addVisible=true;form={};"
                 >新增</el-button>
                 <el-input v-model="query.name" placeholder="目录名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
