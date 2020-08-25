@@ -51,7 +51,7 @@
                               <i class="el-icon-edit" style="font-size: 30px;"></i>
                             </span>
                     <span  @click="handleRemove(orgImg)" style="margin-left: 20px;cursor:pointer;">
-                              <i class="el-icon-delete" style="font-size: 30px;"></i>
+                              <i class="el-icon-delete" style="font-size: 30px;color:white;"></i>
                             </span>
                 </div>
             </div>
@@ -93,7 +93,8 @@
                             <el-image
                                     class="table-td-thumb"
                                     :src="baseUrl + '/' + scope.row.url"
-                                    :preview-src-list="[baseUrl + '/' +scope.row.url]"
+                                    style="cursor: pointer;"
+                                    @click="dialogImageUrl=baseUrl + '/' + scope.row.url;dialogVisible=true;"
                             ></el-image>
                         </template>
                     </el-table-column>
@@ -118,7 +119,10 @@
                 </el-table>
             </div>
         </div>
-
+        <!--预览图片-->
+        <el-dialog :visible.sync="dialogVisible">
+            <img style="width: 100%;" :src="dialogImageUrl" alt="">
+        </el-dialog>
         <!--新增企业资质-->
         <el-dialog title="新增" :visible.sync="addOrgDocVisible" width="30%" >
             <el-form ref="form" :rules="rules" :model="orgDoc" label-width="100px">
@@ -129,8 +133,9 @@
                 <el-form-item label="文件编号" prop="docNum">
                     <el-input v-model="orgDoc.docNum"></el-input>
                 </el-form-item>
-                <el-form-item label="照片">
+                  <el-form-item label="图片">
                     <div>
+                        <el-input style="display: none;" v-model="orgDoc.myImage"></el-input>
                         <el-upload
                                 class="avatar-uploader"
                                 ref="upload_add"
@@ -180,8 +185,9 @@
                 <el-form-item label="文件编号" prop="docNum">
                     <el-input v-model="orgDoc.docNum"></el-input>
                 </el-form-item>
-                <el-form-item label="照片">
+                <el-form-item label="照片" >
                     <div>
+                        <el-input style="display: none;" v-model="orgDoc.myImage"></el-input>
                         <el-upload
                                 class="avatar-uploader"
                                 ref="upload_modify"
@@ -222,10 +228,6 @@
             </span>
         </el-dialog>
 
-        <!--预览图片-->
-        <el-dialog :visible.sync="dialogVisible">
-            <img style="width: 100%;" :src="dialogImageUrl" alt="">
-        </el-dialog>
 
         <!--上传图片-->
         <el-dialog title="上传" :visible.sync="uploadVisible" width="30%" >
@@ -408,7 +410,8 @@
                     name:[{required:true,message:'请输入名称',trigger:'blur'}],
                     docNum:[{required:true,message:'请输入文件编号',trigger:'blur'}],
                     beginDate:[{required:true,message:'请选择开始日期',trigger:'blur'}],
-                    endDate:[{required:true,message:'请选择截止日期',trigger:'blur'}]
+                    endDate:[{required:true,message:'请选择截止日期',trigger:'blur'}],
+                    myImage:[{required:true,message:'请选择图片',trigger:['change','blur']}]
                 }
             }
         },
@@ -518,8 +521,12 @@
                 });
             },
             handlePhotoChange(file){
+                this.orgDoc.myImage = file.name;
                 this.imageUrl=URL.createObjectURL(file.raw);
                 this.isSelectFile = true;
+                if(this.isSelectFile){
+                    this.$refs.form.clearValidate(["myImage"]);
+                }
             },
             handleAvatarSuccess(res, file) {
                 this.uploadVisible= false;
@@ -536,12 +543,13 @@
                 const isGIF = file.type === 'image/gif';
                 const isPNG = file.type === 'image/png';
                 const isBMP = file.type === 'image/bmp';
-
                 if (!isJPG && !isGIF && !isPNG && !isBMP) {
                     this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+                    return false;
                 }
                 if (!isLt2M) {
                     this.$message.error('上传头像图片大小不能超过 2MB!');
+                    return false;
                 }
                 return true;
             },
@@ -609,10 +617,8 @@
                     }
                 }
             },
-            handleEditIntroduction(){
-                this.introductionVisible=true;
-            },
             handleEdit(orgImg){
+                this.image = 'edit';
                 this.orgImg = orgImg;
                 this.imgVisible = true;
             },
