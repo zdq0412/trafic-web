@@ -548,6 +548,7 @@
             <span slot="footer" class="dialog-footer">
                  <el-button type="warning" v-print="printObj">打印</el-button>
                 <el-button  @click="showPrintVisible=false">关闭</el-button>
+                <div style="color:red;margin-top:5px;font-size:12px;">如需打印功能请使用火狐或谷歌浏览器!</div>
             </span>
         </el-dialog>
     </div>
