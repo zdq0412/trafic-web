@@ -705,7 +705,7 @@
                         if(!reg.test(this.safetyProductionCostPlans[index].planCost)){
                             this.$message.error("计划使用金额必须为数值!");
                             //this.$refs.plan+index.focus();
-                            this.safetyProductionCostPlans[index]=0;
+                            this.safetyProductionCostPlans[index].planCost=0;
                         }
                         break;
                     }
@@ -809,14 +809,18 @@
                 if(row.safetyProductionCostPlan){
                     this.form.safetyProductionCostPlanId = row.safetyProductionCostPlan.id;
                 }
+                if(row.billingDate){
+                    this.form.billingDate=getDate(new Date(row.billingDate));
+                }
                 this.editVisible = true;
                 this.$refs["form"].clearValidate();
             },
             // 保存编辑
             saveEdit() {
                 this.$refs.form.validate(validate => {
-                    console.log(this.form);
                     if (validate) {
+                        this.form.org=null;
+                        this.form.safetyProductionCostPlan=null;
                         this.$axios.put("/safetyProductionCostPlanDetail/safetyProductionCostPlanDetail?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;

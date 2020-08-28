@@ -71,7 +71,7 @@
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="企业类别">
+                <el-form-item label="企业类别"  v-if="!haveOrg">
                     <el-select v-model="form.orgCategoryId" placeholder="请选择" @change="$set(form,orgCategoryId)">
                         <el-option
                                 v-for="item in orgCategories"
@@ -97,7 +97,7 @@
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="企业类别">
+                <el-form-item label="企业类别" v-if="!haveOrg">
                     <el-select v-model="form.orgCategoryId" placeholder="请选择">
                         <el-option
                                 v-for="item in orgCategories"
@@ -147,6 +147,8 @@
                 },
                 param:'role',
                 checkAll:false,
+                haveOrg:false,
+                org:{},
                 roleId:'',
                 orgCategoryId:'',
                 tableData: [],
@@ -166,6 +168,12 @@
             };
         },
         created() {
+            this.$axios.get("/user/haveOrg").then(res =>{
+                if(res.data.data){
+                    this.haveOrg = true;
+                    this.org = res.data.data;
+                }
+            }).catch(error=>console.log(error));
             this.getData();
         },
         methods: {

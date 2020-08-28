@@ -133,7 +133,7 @@
                 <el-form-item label="文件编号" prop="docNum">
                     <el-input v-model="orgDoc.docNum"></el-input>
                 </el-form-item>
-                  <el-form-item label="图片">
+                <el-form-item label="图片">
                     <div>
                         <el-input style="display: none;" v-model="orgDoc.myImage"></el-input>
                         <el-upload
@@ -261,52 +261,52 @@
 
         <el-dialog title="编辑企业基础信息" :visible.sync="titleVisible" width="60%">
             <el-form ref="form" :rules="rules" :model="org" label-width="100px">
-                    <el-col>
-                            <el-row type="flex" class="row-bg">
-                                <el-col>
-                                    <el-form-item label="名称" prop="name">
-                                        <el-input v-model="org.name" maxlength="50"
-                                                  show-word-limit></el-input>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col>
-                                    <el-form-item label="简称" prop="shortName">
-                                        <el-input v-model="org.shortName"></el-input>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
-                            <el-row type="flex" class="row-bg">
-                                <el-col>
-                                    <el-form-item label="联系人">
-                                        <el-input v-model="org.contact"></el-input>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col>
-                                    <el-form-item label="手机号" prop="tel">
-                                        <el-input v-model="org.tel"></el-input>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
-                            <el-row type="flex" class="row-bg">
-                                <el-col>
-                                    <el-form-item label="地址">
-                                        <el-input v-model="org.addr"></el-input>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col>
-                                    <el-form-item label="法人">
-                                        <el-input v-model="org.legalPerson"></el-input>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
-                            <el-row type="flex" class="row-bg" >
-                                <el-col >
-                                    <el-form-item label="备注">
-                                        <el-input type="textarea" v-model="org.note"></el-input>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
-                    </el-col>
+                <el-col>
+                    <el-row type="flex" class="row-bg">
+                        <el-col>
+                            <el-form-item label="名称" prop="name">
+                                <el-input v-model="org.name" maxlength="50"
+                                          show-word-limit></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col>
+                            <el-form-item label="简称" prop="shortName">
+                                <el-input v-model="org.shortName"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row type="flex" class="row-bg">
+                        <el-col>
+                            <el-form-item label="联系人">
+                                <el-input v-model="org.contact"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col>
+                            <el-form-item label="手机号" prop="tel">
+                                <el-input v-model="org.tel"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row type="flex" class="row-bg">
+                        <el-col>
+                            <el-form-item label="地址">
+                                <el-input v-model="org.addr"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col>
+                            <el-form-item label="法人">
+                                <el-input v-model="org.legalPerson"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row type="flex" class="row-bg" >
+                        <el-col >
+                            <el-form-item label="备注">
+                                <el-input type="textarea" v-model="org.note"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-col>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="titleVisible = false">取 消</el-button>
@@ -378,6 +378,40 @@
             VueEditor
         },
         data() {
+            let checkBeginDate=(rule, value, callback) =>{
+                if(value){
+                    if(this.orgDoc.endDate){
+                        let beginDate = new Date(value);
+                        let endDate = new Date(this.orgDoc.endDate);
+                        if(beginDate.getTime()>=endDate.getTime()){
+                            callback(new Error("开始日期不能大于等于结束日期!"));
+                        }else{
+                            callback();
+                        }
+                    }else{
+                        callback();
+                    }
+                }  else{
+                    callback(new Error("请选择开始日期!"));
+                }
+            };
+            let checkEndDate=(rule, value, callback) =>{
+                if(value){
+                    if(this.orgDoc.beginDate){
+                        let beginDate = new Date(this.orgDoc.beginDate);
+                        let endDate = new Date(value);
+                        if(beginDate.getTime()>=endDate.getTime()){
+                            callback(new Error("结束日期不能小于等于开始日期!"));
+                        }else{
+                            callback();
+                        }
+                    }else{
+                        callback();
+                    }
+                }  else{
+                    callback(new Error("请选择结束日期!"));
+                }
+            };
             return {
                 customToolbar: [
                     ["bold", "italic", "underline"]
@@ -409,8 +443,14 @@
                 rules:{
                     name:[{required:true,message:'请输入名称',trigger:'blur'}],
                     docNum:[{required:true,message:'请输入文件编号',trigger:'blur'}],
-                    beginDate:[{required:true,message:'请选择开始日期',trigger:'blur'}],
-                    endDate:[{required:true,message:'请选择截止日期',trigger:'blur'}],
+                    beginDate:[{required:true,message:'请选择开始日期',trigger:'blur'},
+                        {
+                            validator:checkBeginDate,trigger:'blur'
+                        }],
+                    endDate:[{required:true,message:'请选择截止日期',trigger:'blur'},
+                        {
+                            validator:checkEndDate,trigger:'blur'
+                        }],
                     myImage:[{required:true,message:'请选择图片',trigger:['change','blur']}]
                 }
             }
@@ -623,16 +663,16 @@
                 this.imgVisible = true;
             },
             handleEditOrgDoc(index,row){
-              this.uploadOrgDocUrl = this.$baseURL + "/orgDoc/updateOrgDoc";
-              this.editOrgDocVisible=true;
-              this.orgDoc = row;
-              if(row.beginDate){
-                  this.orgDoc.beginDate=getDate(new Date(row.beginDate));
-              }
-              if(row.endDate){
-                  this.orgDoc.endDate=getDate(new Date(row.endDate));
-              }
-              this.imageUrl = this.$baseURL + "/" + row.url;
+                this.uploadOrgDocUrl = this.$baseURL + "/orgDoc/updateOrgDoc";
+                this.editOrgDocVisible=true;
+                this.orgDoc = row;
+                if(row.beginDate){
+                    this.orgDoc.beginDate=getDate(new Date(row.beginDate));
+                }
+                if(row.endDate){
+                    this.orgDoc.endDate=getDate(new Date(row.endDate));
+                }
+                this.imageUrl = this.$baseURL + "/" + row.url;
             },
             getData(){
                 this.$axios.get("/org/orgInfo").then(res => {

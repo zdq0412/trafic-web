@@ -89,7 +89,7 @@
                 <el-form-item label="文件">
                     <el-upload style="display: none;"
                                :action="modifyUrl"
-                               :limit="1"
+                               :file-list="fileList"
                                :auto-upload="false"
                                ref="uploadFileEdit"
                                :data="form"
@@ -141,7 +141,7 @@
                 <el-form-item label="文件">
                     <el-upload style="display: none;"
                                :action="uploadUrl"
-                               :limit="1"
+                               :file-list="fileList"
                                :auto-upload="false"
                                ref="uploadFile"
                                :data="form"
@@ -252,6 +252,7 @@
                 uploadUrl:'',
                 modifyUrl:'',
                 filename:'',
+                fileList:[],
                 templatesData:[],
                 templateVisible:false,
                 templates: {
@@ -329,9 +330,10 @@
                     return '';
                 }
             },
-            handleChange(file){
+            handleChange(file,fileList){
                 this.filename = file.name;
                 this.isSelectUploadFile = true;
+                this.fileList = fileList.slice(-1);
             },
             handleAvatarSuccess(res, file) {
                 this.addVisible= false;

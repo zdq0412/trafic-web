@@ -114,8 +114,8 @@
                         <el-table-column prop="criterion" label="判定准则(R)"></el-table-column>
                         <el-table-column prop="riskLevel" label="安全风险等级"></el-table-column>
                         <el-table-column prop="fourColor" label="四色标识">
-                            <template slot-scope="scope">
-                                <span></span>
+                           <template slot-scope="scope">
+                                <span ></span>
                             </template>
                         </el-table-column>
                         <el-table-column prop="measures" label="应采取的行动/控制措施"></el-table-column>
@@ -441,7 +441,7 @@
             },
             // cellStyle(row, column, rowIndex, columnIndex){
             fourColorBg(obj){
-               if(obj.columnIndex==5){
+               if(obj.columnIndex==6){
                     return 'backgroundColor:' + obj.row.fourColor;
                }
                return '';

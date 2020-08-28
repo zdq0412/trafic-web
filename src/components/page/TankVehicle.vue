@@ -748,7 +748,7 @@
                     return false
                 }
                 if(!isWord){
-                    this.$message.error('只能上传work文档!');
+                    this.$message.error('只能上传word文档!');
                     return false;
                 }
                 return  true;
