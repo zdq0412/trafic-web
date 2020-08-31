@@ -16,8 +16,8 @@
                         @click="handleAdd"
                 >新增</el-button>
                 <el-button
-                        type="primary"
-                        icon="el-icon-upload"
+                        type="success"
+                        icon="el-icon-d-arrow-right"
                         class="handle-del mr10"
                         @click="handleImport"
                         v-loading.fullscreen.lock="fullscreenLoading"
@@ -93,6 +93,10 @@
                 <el-form-item label="类型">
                     <el-select v-model="form.type">
                         <el-option label="区域"  value="区域"></el-option>
+                        <el-option label="设备档案"  value="设备档案"></el-option>
+                        <el-option label="隐患排查严重程度"  value="隐患排查严重程度"></el-option>
+                        <el-option label="隐患排查原因类别"  value="隐患排查原因类别"></el-option>
+                        <el-option label="作业台账类别"  value="作业台账类别"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
@@ -117,6 +121,10 @@
                 <el-form-item label="类型">
                     <el-select v-model="form.type">
                         <el-option label="区域"  value="区域"></el-option>
+                        <el-option label="设备档案"  value="设备档案"></el-option>
+                        <el-option label="隐患排查严重程度"  value="隐患排查严重程度"></el-option>
+                        <el-option label="隐患排查原因类别"  value="隐患排查原因类别"></el-option>
+                        <el-option label="作业台账类别"  value="作业台账类别"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">

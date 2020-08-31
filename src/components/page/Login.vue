@@ -199,9 +199,6 @@ width:500px;text-align: center;height:500px;" stretch>
                     const that = this;
                     if (valid) {
                         //解决后台接收不到参数问题
-                       /* const params = new URLSearchParams();
-                        params.append("username",this.param.username);
-                        params.append("password",this.param.password);*/
                         this.$axios.post("/login",this.$qs.stringify({username:this.param.username,password:this.param.password})).then(function (res) {
                             if(res.data.result.resultCode===200){
                                 localStorage.setItem('username', that.param.username);

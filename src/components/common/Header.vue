@@ -1,16 +1,17 @@
-   <template>
+<template>
     <div class="header">
         <!-- 折叠按钮 -->
         <div class="collapse-btn" @click="collapseChage">
             <i v-if="!collapse" class="el-icon-s-fold"></i>
             <i v-else class="el-icon-s-unfold"></i>
         </div>
-        <div class="logo">后台管理系统</div>
+        <div class="logo" v-if="user.org==null">后台管理系统</div>
+        <div class="logo" v-else>{{user.org.name}}</div>
         <!--<el-radio v-model="radio1" :label="schema.id" border>{{schema.name}}</el-radio>-->
         <el-radio-group v-model="schemaId" style="height: 100px;"  @change="switchSchema()">
             <el-radio-button style="height: 100%;line-height: 100px;" v-for="schema in schemas"
                              border   :id="schema.id" :label="schema.id"
-           >{{schema.name}}</el-radio-button>
+            >{{schema.name}}</el-radio-button>
         </el-radio-group>
         <div class="header-right">
             <div class="header-user-con">
@@ -22,7 +23,8 @@
                 </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
-                    <img src="../../assets/img/img.jpg" />
+                    <img src="../../assets/img/img.jpg" v-if="!user.photo"/>
+                    <img v-else :src="$baseURL + '/' + user.photo" />
                 </div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
@@ -31,11 +33,26 @@
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item command="uploadPhoto">上传头像</el-dropdown-item>
                         <el-dropdown-item command="modifyPassword">修改密码</el-dropdown-item>
                         <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
+            <el-upload style="display: none;"
+                    class="avatar-uploader"
+                    ref="upload"
+                    :action="uploadUrl"
+                    :headers="headers"
+                    :file-list="fileList"
+                    accept="image/*"
+                    :auto-upload="true"
+                    :on-change="handlePhotoChange"
+                    :show-file-list="false"
+                    :on-success="handleAvatarSuccess"
+                    :before-upload="beforeAvatarUpload">
+                <el-button size="small" type="primary" ref="uploadBtn">点击上传</el-button>
+            </el-upload>
         </div>
         <ModifyPassword ref="showDialog" ></ModifyPassword>
     </div>
@@ -52,10 +69,16 @@
             return {
                 collapse: false,
                 fullscreen: false,
+                headers:{
+                    token : localStorage.getItem("token")
+                },
+                uploadUrl:'',
                 name: '',
+                fileList:[],
                 message:0,
                 schemas:[],
-               schemaId:''
+                user:{},
+                schemaId:''
             };
         },
         computed: {
@@ -65,9 +88,39 @@
             }
         },
         created:function(){
-
+            this.uploadUrl = this.$baseURL + "/user/photo";
+           this.findUser();
         },
         methods: {
+            findUser(){
+                this.$axios.get("/user/userOrAreaManager/"+localStorage.getItem("username")).then(res=>{
+                    this.user = res.data.data;
+                }).catch(error=>console.log(error))
+            },
+            handlePhotoChange(file,fileList){
+                //this.imageUrl=URL.createObjectURL(file.raw);
+                this.fileList = fileList.slice(-1);
+            },
+            handleAvatarSuccess(res, file) {
+                this.$message.success("头像上传成功!");
+                this.findUser();
+            },
+            beforeAvatarUpload(file) {
+                const isLt2M = file.size / 1024 / 1024 < 2;
+                const isJPG = file.type === 'image/jpeg';
+                const isGIF = file.type === 'image/gif';
+                const isPNG = file.type === 'image/png';
+                const isBMP = file.type === 'image/bmp';
+                if (!isJPG && !isGIF && !isPNG && !isBMP) {
+                    this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+                    return false;
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                    return false;
+                }
+                return true;
+            },
             switchSchema(){
                 this.$axios.get("/schema/switchSchema",{
                     params:{
@@ -114,6 +167,10 @@
                 //弹出修改密码窗口
                 if(command == 'modifyPassword'){
                     this.$refs.showDialog.dialogFormVisible=true;
+                }
+                //上传头像
+                if(command == 'uploadPhoto'){
+                    this.$refs.uploadBtn.$el.click();
                 }
             },
             // 侧边栏折叠

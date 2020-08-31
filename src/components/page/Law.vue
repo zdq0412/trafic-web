@@ -49,12 +49,12 @@
                 </el-table-column>
                 <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
-                        <el-button
+                        <el-button v-if="scope.row.org"
                                 type="text"
                                 icon="el-icon-edit"
                                 @click="handleEdit(scope.$index, scope.row)"
                         >编辑</el-button>
-                        <el-button
+                        <el-button v-if="scope.row.org"
                                 type="text"
                                 icon="el-icon-delete"
                                 class="red"
@@ -211,7 +211,7 @@
                 </el-card>
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
+                <el-button type="primary" @click="showContentVisible=false,editContentVisible=true" v-if="form.org">编辑</el-button>
                 <el-button type="warning" @click="handleExecute" v-if="form.content">发文执行</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>

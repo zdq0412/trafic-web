@@ -216,6 +216,16 @@ export default new Router({
                   component:()=>import('../components/page/FourRecord.vue'),
                   meta:{title:'四不放过记录'}
                 },
+                {
+                  path:'/jobManagementAccount',
+                  component:()=>import('../components/page/JobManagementAccount.vue'),
+                  meta:{title:'作业管理台账'}
+                },
+                {
+                  path:'/jobManagementAccountTemplate',
+                  component:()=>import('../components/page/JobManagementAccountTemplate.vue'),
+                  meta:{title:'作业管理台账模板'}
+                },
                {
                   path:'/law',
                   component:()=>import('../components/page/Law.vue'),
