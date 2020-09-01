@@ -236,9 +236,8 @@ width:500px;text-align: center;height:500px;" stretch>
         width: 100%;
         height: 100%;
         /*background-image: url(../../assets/img/login-bg.jpg);*/
-        background-image: url(../../assets/img/bg.jpg);
+        background: url(../../assets/img/bg.jpg) no-repeat;
         background-size: 100% 100%;
-        background-repeat: no-repeat;
         overflow: auto;
     }
     .ms-title {
