@@ -27,7 +27,7 @@
             >
                 <el-table-column prop="photo" label="大头照" align="center">
                     <template slot-scope="scope">
-                        <el-image
+                        <el-image style="cursor:pointer;"
                                 class="table-td-thumb"
                                 :src="baseUrl + '/' + scope.row.photo"
                                 @click="showPreview(baseUrl + '/' + scope.row.photo)"
@@ -81,10 +81,10 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="tel">
-                    <el-input v-model="form.tel"></el-input>
+                    <el-input v-model="form.tel" maxlength="11"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证" prop="idnum">
-                    <el-input v-model="form.idnum"></el-input>
+                    <el-input v-model="form.idnum" maxlength="18"></el-input>
                 </el-form-item>
                 <el-form-item label="大头照">
                     <div>
@@ -126,7 +126,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note"></el-input>
+                    <el-input type="textarea" maxlength="200" v-model="form.note"></el-input>
                 </el-form-item>
                 <el-form-item label="角色">
                     <el-select v-model="form.roleId" @change="$set(form,roleId)">
@@ -150,10 +150,10 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="tel">
-                    <el-input v-model="form.tel"></el-input>
+                    <el-input v-model="form.tel" maxlength="11"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证" prop="idnum">
-                    <el-input v-model="form.idnum"></el-input>
+                    <el-input v-model="form.idnum" maxlength="18"></el-input>
                 </el-form-item>
                 <el-form-item label="大头照">
                     <div>
@@ -195,7 +195,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note"></el-input>
+                    <el-input type="textarea" maxlength="200" v-model="form.note"></el-input>
                 </el-form-item>
                 <el-form-item label="角色">
                     <el-select v-model="form.roleId" @change="$set(form,roleId)" style="width:100%;">

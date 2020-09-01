@@ -131,7 +131,7 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件编号" prop="docNum">
-                    <el-input v-model="orgDoc.docNum"></el-input>
+                    <el-input v-model="orgDoc.docNum" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="图片">
                     <div>
@@ -183,7 +183,7 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件编号" prop="docNum">
-                    <el-input v-model="orgDoc.docNum"></el-input>
+                    <el-input v-model="orgDoc.docNum" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="照片" >
                     <div>
@@ -233,7 +233,7 @@
         <el-dialog title="上传" :visible.sync="uploadVisible" width="30%" >
             <el-form ref="form" :rules="rules" :model="orgImg" label-width="50px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="orgImg.name"></el-input>
+                    <el-input v-model="orgImg.name" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="图片">
                     <el-upload
@@ -271,38 +271,38 @@
                         </el-col>
                         <el-col>
                             <el-form-item label="简称" prop="shortName">
-                                <el-input v-model="org.shortName"></el-input>
+                                <el-input v-model="org.shortName" maxlength="10"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="联系人">
-                                <el-input v-model="org.contact"></el-input>
+                                <el-input v-model="org.contact" maxlength="10"></el-input>
                             </el-form-item>
                         </el-col>
                         <el-col>
                             <el-form-item label="手机号" prop="tel">
-                                <el-input v-model="org.tel"></el-input>
+                                <el-input v-model="org.tel" maxlength="11"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="地址">
-                                <el-input v-model="org.addr"></el-input>
+                                <el-input v-model="org.addr" maxlength="100"></el-input>
                             </el-form-item>
                         </el-col>
                         <el-col>
                             <el-form-item label="法人">
-                                <el-input v-model="org.legalPerson"></el-input>
+                                <el-input v-model="org.legalPerson" maxlength="50"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="备注">
-                                <el-input type="textarea" v-model="org.note"></el-input>
+                                <el-input type="textarea" v-model="org.note" maxlength="2000"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -318,7 +318,7 @@
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="图片名称" prop="name">
-                            <el-input v-model="orgImg.name"></el-input>
+                            <el-input v-model="orgImg.name" maxlength="50" show-word-limit></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -332,9 +332,9 @@
             <el-form ref="form" :rules="rules" :model="org" label-width="100px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
-                        <el-form-item label="企业简介" prop="name">
+                        <el-form-item label="企业简介" prop="name" >
                             <!--<el-input type="textarea"  rows="15" v-model="org.introduction"></el-input>-->
-                            <vue-editor id="editor" v-model="org.introduction" :editor-toolbar="customToolbar" useCustomImageHandler @image-added="handleImageAdded"></vue-editor>
+                            <vue-editor id="editor" maxlength="2000" v-model="org.introduction" :editor-toolbar="customToolbar" useCustomImageHandler @image-added="handleImageAdded"></vue-editor>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -349,14 +349,14 @@
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="安全举报邮箱">
-                            <el-input v-model="org.email"></el-input>
+                            <el-input v-model="org.email" maxlength="50"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="安全举报电话">
-                            <el-input v-model="org.reportTel"></el-input>
+                            <el-input v-model="org.reportTel" maxlength="50"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -661,6 +661,7 @@
                 this.image = 'edit';
                 this.orgImg = orgImg;
                 this.imgVisible = true;
+                this.isSelectFile=false;
             },
             handleEditOrgDoc(index,row){
                 this.uploadOrgDocUrl = this.$baseURL + "/orgDoc/updateOrgDoc";

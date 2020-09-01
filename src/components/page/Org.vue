@@ -36,6 +36,7 @@
                 <el-table-column prop="province.name" label="省"></el-table-column>
                 <el-table-column prop="city.name" label="市"></el-table-column>
                 <el-table-column prop="region.name" label="区"></el-table-column>
+                <el-table-column prop="orgCategory.name" label="类别"></el-table-column>
                 <el-table-column prop="note" label="描述"></el-table-column>
                 <el-table-column label="操作" width="120" align="center">
                     <template slot-scope="scope">
@@ -365,7 +366,7 @@
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.$axios.put("/org/org?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/org/updateOrg" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();

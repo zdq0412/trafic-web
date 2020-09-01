@@ -2,13 +2,14 @@
     <el-dialog title="修改密码"  :visible.sync="dialogFormVisible">
         <el-form :model="form"  :rules="rules">
             <el-form-item  label="原密码" :label-width="formLabelWidth" prop="oldPassword">
-                <el-input type="password" v-model="form.oldPassword"  autocomplete="off"></el-input>
+                <el-input show-password maxlength="50" v-model="form.oldPassword"  autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item  label="新密码" :label-width="formLabelWidth" prop="newPassword">
-                <el-input type="password" v-model="form.newPassword" autocomplete="off"></el-input>
+                <el-input show-password maxlength="16"
+                          show-word-limit v-model="form.newPassword" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="确认密码" :label-width="formLabelWidth" prop="confirmPassword">
-                <el-input type="password" v-model="form.confirmPassword" autocomplete="off"></el-input>
+                <el-input show-password v-model="form.confirmPassword" autocomplete="off"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">

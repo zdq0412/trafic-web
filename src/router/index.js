@@ -34,7 +34,7 @@ export default new Router({
                 {
                   path:'/securityExaminationTemplate',
                   component:()=>import('../components/page/SecurityExaminationTemplate.vue'),
-                  meta:{title:'安全责任考核模板'}
+                  meta:{title:'责任考核模板'}
                 },
                 {
                   path:'/empArchivesTemplate',
@@ -49,7 +49,7 @@ export default new Router({
                 {
                   path:'/securityExamination',
                   component:()=>import('../components/page/SecurityExamination.vue'),
-                  meta:{title:'安全责任考核'}
+                  meta:{title:'责任考核'}
                 },
                 {
                   path:'/goalExaminationTemplate',
@@ -184,7 +184,7 @@ export default new Router({
                 {
                   path:'/examination',
                   component:()=>import('../components/page/Responsibility.vue'),
-                  meta:{title:'安全责任考核'}
+                  meta:{title:'责任制'}
                 },
                 {
                   path:'/deviceCheck',

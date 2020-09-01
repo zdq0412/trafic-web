@@ -107,7 +107,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="200" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -139,7 +139,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="200" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -370,7 +370,7 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.empId=this.empId;
-                        this.$axios.put("/otherDocument/otherDocument?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/otherDocument/updateOtherDocument" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();

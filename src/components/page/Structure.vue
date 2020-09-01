@@ -63,14 +63,14 @@
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="form.name"></el-input>
+                                <el-input v-model="form.name" maxlength="30"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="部门电话">
-                                <el-input v-model="form.tel"></el-input>
+                                <el-input v-model="form.tel" maxlength="20"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -88,7 +88,7 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="部门职能">
-                                <el-input type="textarea" v-model="form.business"></el-input>
+                                <el-input type="textarea" maxlength="200" show-word-limit v-model="form.business"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -105,14 +105,14 @@
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="form.name"></el-input>
+                                <el-input v-model="form.name" maxlength="30"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="部门电话">
-                                <el-input v-model="form.tel"></el-input>
+                                <el-input v-model="form.tel" maxlength="20"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -130,7 +130,7 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="部门职能">
-                                <el-input type="textarea" v-model="form.business"></el-input>
+                                <el-input type="textarea" maxlength="200" v-model="form.business"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -234,7 +234,7 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="职位描述">
-                                <el-input type="textarea" v-model="form.note"></el-input>
+                                <el-input type="textarea" maxlength="200" v-model="form.note"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -277,7 +277,7 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="职位描述">
-                                <el-input type="textarea" v-model="form.note"></el-input>
+                                <el-input type="textarea" maxlength="200" v-model="form.note"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -334,7 +334,7 @@
                 id: -1,
                 rules:{
                     name:[{
-                        required:true,message:'请输入企业名称',trigger:'blur'
+                        required:true,message:'请输入部门名称',trigger:'blur'
                     }],
                     tel:[{
                         required:true,message:'请输入手机号',trigger:'blur'

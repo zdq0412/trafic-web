@@ -57,7 +57,7 @@
                                    :auto-upload="true"
                                    ref="uploadFile"
                                    :data="param"
-                                   accept=".doc,.docx"
+                                   :accept="ext"
                                    :on-success="handleAvatarSuccess"
                                    :before-upload="beforeAvatarUpload"
                                    :headers="headers">
@@ -274,6 +274,7 @@
                 orgCategories:[],
                 notices:[],
                 tableData: [],
+                ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
                 templatesData:[],
                 templatesVisible:false,
                 delList: [],
@@ -335,16 +336,22 @@
             },
             beforeAvatarUpload(file) {
                 const isLt5M = file.size / 1024 / 1024 < 5;
-                const isWord = (file.type==='application/msword' | file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-                if (!isLt5M) {
-                    this.$message.error('上传文件大小不能超过 5MB!');
-                    return false
-                }
-                if(!isWord){
-                    this.$message.error('只能上传work文档!');
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isBMP = file.type === 'image/bmp';
+                const isWord = (file.type === 'application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                const isPdf = file.type==='application/pdf';
+                const isRar = (file.type==='application/octet-stream' || file.type==='');
+                const isZip = file.type==='application/x-zip-compressed';
+                if(!isJPG && !isPNG && !isBMP && !isWord && !isPdf && !isRar && !isZip){
+                    this.$message.error('上传文件支持的类型：jpg、png、bmp、doc、docx、pdf、rar、zip!');
                     return false;
                 }
-                return  false;
+                if (!isLt5M) {
+                    this.$message.error('上传文件大小不能超过 5MB!');
+                    return false;
+                }
+                return true;
             },
             uploadTemplate(index,row){
                 this.$refs.uploadFile.clearFiles();

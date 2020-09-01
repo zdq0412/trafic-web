@@ -8,13 +8,14 @@ width:500px;text-align: center;height:500px;" stretch>
                         <!--<div class="ms-title">后台管理系统</div>-->
                         <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                             <el-form-item prop="username">
-                                <el-input v-model="param.username" tabindex="1" placeholder="username">
+                                <el-input v-model="param.username" maxlength="50" tabindex="1" placeholder="username">
                                     <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
                                 </el-input>
                             </el-form-item>
                             <el-form-item prop="password">
                                 <el-input tabindex="2"
-                                          type="password"
+                                          show-password
+                                          maxlength="16"
                                           placeholder="password"
                                           v-model="param.password"
                                           @keyup.enter.native="submitForm()"
@@ -43,23 +44,23 @@ width:500px;text-align: center;height:500px;" stretch>
                                 </el-input>
                             </el-form-item>-->
                             <el-form-item label=" " prop="name">
-                                <el-input v-model="form.name" tabindex="2" placeholder="企业名称">
+                                <el-input v-model="form.name" maxlength="50"  tabindex="2" placeholder="企业名称">
                                 </el-input>
                             </el-form-item>
                             <el-form-item label=" " prop="shortName">
-                                <el-input v-model="form.shortName" tabindex="2" placeholder="企业简称">
+                                <el-input v-model="form.shortName" maxlength="10"  tabindex="2" placeholder="企业简称">
                                 </el-input>
                             </el-form-item>
                             <el-form-item label=" " prop="legalPerson">
-                                <el-input v-model="form.legalPerson" tabindex="2" placeholder="企业法人">
+                                <el-input v-model="form.legalPerson" maxlength="10"  tabindex="2" placeholder="企业法人">
                                 </el-input>
                             </el-form-item>
                             <el-form-item label=" ">
-                                <el-input v-model="form.contact" tabindex="3" placeholder="联系人">
+                                <el-input v-model="form.contact" maxlength="10"  tabindex="3" placeholder="联系人">
                                 </el-input>
                             </el-form-item>
                             <el-form-item prop="tel" label=" ">
-                                <el-input v-model="form.tel" tabindex="4" placeholder="手机号">
+                                <el-input v-model="form.tel" tabindex="4" maxlength="11"  placeholder="手机号">
                                 </el-input>
 
                             </el-form-item>
