@@ -170,16 +170,16 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="存在的安全隐患">
-                    <el-input v-model="form.hiddenDanger" type="textarea" ></el-input>
+                    <el-input v-model="form.hiddenDanger" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
                 <el-form-item label="整改措施">
-                    <el-input v-model="form.correctiveAction" type="textarea" ></el-input>
+                    <el-input v-model="form.correctiveAction" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
                 <el-form-item label="整改时限">
-                    <el-input v-model="form.timelimit"></el-input>
+                    <el-input v-model="form.timelimit" maxlength="200"></el-input>
                 </el-form-item>
                 <el-form-item label="责任人">
-                    <el-input v-model="form.person"></el-input>
+                    <el-input v-model="form.person" maxlength="50"></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
@@ -226,7 +226,7 @@
                     </el-select >
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.detailNote" type="textarea" ></el-input>
+                    <el-input v-model="form.detailNote" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -254,16 +254,16 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="存在的安全隐患">
-                    <el-input v-model="form.hiddenDanger" type="textarea" ></el-input>
+                    <el-input v-model="form.hiddenDanger" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
                 <el-form-item label="整改措施">
-                    <el-input v-model="form.correctiveAction" type="textarea" ></el-input>
+                    <el-input v-model="form.correctiveAction" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
                 <el-form-item label="整改时限">
-                    <el-input v-model="form.timelimit"></el-input>
+                    <el-input v-model="form.timelimit" maxlength="200"></el-input>
                 </el-form-item>
                 <el-form-item label="责任人">
-                    <el-input v-model="form.person"></el-input>
+                    <el-input v-model="form.person" maxlength="50"></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
@@ -310,7 +310,7 @@
                     </el-select >
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.detailNote" type="textarea" ></el-input>
+                    <el-input v-model="form.detailNote" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -322,7 +322,7 @@
         <el-dialog title="整改" :visible.sync="rectificationVisible" width="50%"  @close="closeDialog" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="120px">
                 <el-form-item label="整改金额（元）" prop="rectificationFund">
-                    <el-input-number v-model="form.rectificationFund"></el-input-number>
+                    <el-input-number v-model="form.rectificationFund" maxlength="10"></el-input-number>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

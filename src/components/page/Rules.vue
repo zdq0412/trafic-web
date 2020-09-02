@@ -120,7 +120,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="发文部门">
-                    <el-input v-model="form.publishDepartment" ></el-input>
+                    <el-input v-model="form.publishDepartment"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="区域" v-if="!haveOrg" prop="area">
                     <el-cascader
@@ -140,7 +140,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
                 <el-form-item label="时效性" prop="timeliness">
                     <el-select v-model="form.timeliness">
@@ -228,7 +228,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="发文部门">
-                    <el-input v-model="form.publishDepartment" ></el-input>
+                    <el-input v-model="form.publishDepartment"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="区域" v-if="!haveOrg" prop="area">
                     <el-cascader
@@ -248,7 +248,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
                 <el-form-item label="时效性" prop="timeliness">
                     <el-select v-model="form.timeliness">

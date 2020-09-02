@@ -101,7 +101,7 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="编码">
-                    <el-input v-model="form.equipmentCode"></el-input>
+                    <el-input v-model="form.equipmentCode" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="设备类别">
                     <el-select   v-model="form.categoryId" placeholder="请选择">
@@ -114,7 +114,7 @@
                     </el-select >
                 </el-form-item>
                 <el-form-item label="规格型号">
-                    <el-input v-model="form.specification"></el-input>
+                    <el-input v-model="form.specification" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="单价(元)">
                     <el-input-number v-model="form.price"></el-input-number>
@@ -128,13 +128,13 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="厂商">
-                    <el-input  v-model="form.manufacturer"></el-input>
+                    <el-input  v-model="form.manufacturer" maxlength="100"></el-input>
                 </el-form-item>
                 <el-form-item label="放置位置">
-                    <el-input  v-model="form.position"></el-input>
+                    <el-input  v-model="form.position" maxlength="100"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note"></el-input>
+                    <el-input type="textarea" v-model="form.note" maxlength="200"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -150,7 +150,7 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="编码">
-                    <el-input v-model="form.equipmentCode"></el-input>
+                    <el-input v-model="form.equipmentCode" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="设备类别">
                     <el-select   v-model="form.categoryId" placeholder="请选择">
@@ -163,7 +163,7 @@
                     </el-select >
                 </el-form-item>
                 <el-form-item label="规格型号">
-                    <el-input v-model="form.specification"></el-input>
+                    <el-input v-model="form.specification" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="单价(元)">
                     <el-input-number v-model="form.price"></el-input-number>
@@ -177,13 +177,13 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="厂商">
-                    <el-input  v-model="form.manufacturer"></el-input>
+                    <el-input  v-model="form.manufacturer" maxlength="100"></el-input>
                 </el-form-item>
                 <el-form-item label="放置位置">
-                    <el-input  v-model="form.position"></el-input>
+                    <el-input  v-model="form.position" maxlength="100"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note"></el-input>
+                    <el-input type="textarea" v-model="form.note" maxlength="2000"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

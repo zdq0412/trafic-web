@@ -131,7 +131,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -172,7 +172,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -222,7 +222,7 @@
                     </td>
                     <td>
                         <span v-if="editable">
-                            <textarea type="text" v-model="detail.checkedOrg"></textarea>
+                            <textarea type="text" maxlength="100"  v-model="detail.checkedOrg"></textarea>
                         </span>
                         <span v-else>
                             {{detail.checkedOrg}}
@@ -230,21 +230,21 @@
                     </td>
                     <td style="text-align: left;padding-left:3px;">
                         <span v-if="editable">
-                            <textarea type="text" v-model="detail.hiddenDanger" rows="5"></textarea>
+                            <textarea type="text"  maxlength="500"  v-model="detail.hiddenDanger" rows="5"></textarea>
                         </span>
                         <span v-else v-html="detail.hiddenDanger" >
                         </span>
                     </td>
                     <td>
                         <span v-if="editable">
-                            <textarea type="text" v-model="detail.correctiveAction" rows="5"></textarea>
+                            <textarea type="text"  maxlength="500"  v-model="detail.correctiveAction" rows="5"></textarea>
                         </span>
                         <span v-else v-html="detail.correctiveAction">
                         </span>
                     </td>
                     <td>
                         <span v-if="editable">
-                            <input type="text" v-model="detail.timelimit" />
+                            <input type="text"  maxlength="100"  v-model="detail.timelimit" />
                         </span>
                         <span v-else>
                             {{detail.timelimit}}
@@ -252,7 +252,7 @@
                     </td>
                     <td>
                         <span v-if="editable">
-                            <input type="text" v-model="detail.person" />
+                            <input type="text"  maxlength="20"  v-model="detail.person" />
                         </span>
                         <span v-else>
                             {{detail.person}}
@@ -288,7 +288,7 @@
                     </td>
                     <td>
                         <span v-if="editable">
-                            <textarea type="text" v-model="detail.detailNote" rows="5"></textarea>
+                            <textarea type="text"  maxlength="500"  v-model="detail.detailNote" rows="5"></textarea>
                         </span>
                         <span v-else v-html="detail.detailNote">
                         </span>

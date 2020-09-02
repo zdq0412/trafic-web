@@ -131,7 +131,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -172,7 +172,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -218,31 +218,31 @@
                     </td>
                     <td style="width:10%">会议地点</td>
                     <td class="per25">
-                        <input v-if="editable" v-model="meetingTemplate.meetingPlace"  />
+                        <input v-if="editable"  maxlength="100"  v-model="meetingTemplate.meetingPlace"  />
                         <div v-else>{{meetingTemplate.meetingPlace}}</div>
                     </td>
                     <td style="width:10%">主持人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.president"  />
+                        <input v-if="editable"  maxlength="10"  v-model="meetingTemplate.president"  />
                         <div v-else>{{meetingTemplate.president}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td style="width: 15%;">会议名称或主要议题</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="meetingTemplate.meetingName" />
+                        <input v-if="editable"  maxlength="100"  v-model="meetingTemplate.meetingName" />
                         <div v-else>{{meetingTemplate.meetingName}}</div>
                     </td>
                     <td style="width:10%">记录人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="meetingTemplate.recorder" />
+                        <input v-if="editable"  maxlength="50" v-model="meetingTemplate.recorder" />
                         <div v-else>{{meetingTemplate.recorder}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td>出席人</td>
                     <td colspan="5">
-                        <input v-if="editable" v-model="meetingTemplate.attendants" />
+                        <input v-if="editable"  maxlength="500"  v-model="meetingTemplate.attendants" />
                         <div v-else>{{meetingTemplate.attendants}}</div>
                     </td>
                 </tr>
@@ -251,7 +251,7 @@
                 </tr>
                 <tr>
                     <td colspan="6">
-                        <textarea v-if="editable" v-model="meetingTemplate.content" rows="8" ></textarea>
+                        <textarea v-if="editable"  maxlength="500"  v-model="meetingTemplate.content" rows="8" ></textarea>
                         <div v-else v-html="meetingTemplate.content"></div>
                     </td>
                 </tr>
@@ -260,7 +260,7 @@
                 </tr>
                 <tr>
                     <td colspan="6">
-                        <textarea v-if="editable" v-model="meetingTemplate.finalDecision" rows="8" ></textarea>
+                        <textarea v-if="editable"  maxlength="500"  v-model="meetingTemplate.finalDecision" rows="8" ></textarea>
                         <div v-else v-html="meetingTemplate.finalDecision"></div>
                     </td>
                 </tr>

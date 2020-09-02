@@ -127,7 +127,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500"  v-model="form.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -187,7 +187,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500"  v-model="form.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

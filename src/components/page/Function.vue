@@ -76,13 +76,13 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="图标">
-                    <el-input v-model="form.icon"></el-input>
+                    <el-input v-model="form.icon"  maxlength="20" ></el-input>
                 </el-form-item>
                 <el-form-item label="路径">
-                    <el-input v-model="form.index"></el-input>
+                    <el-input v-model="form.index"  maxlength="100" ></el-input>
                 </el-form-item>
                 <el-form-item label="优先级">
-                    <el-input-number v-model="form.priority"></el-input-number>
+                    <el-input-number v-model="form.priority"  maxlength="10" ></el-input-number>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -101,13 +101,13 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="图标">
-                    <el-input v-model="form.icon"></el-input>
+                    <el-input v-model="form.icon"  maxlength="20" ></el-input>
                 </el-form-item>
                 <el-form-item label="路径">
-                    <el-input v-model="form.index"></el-input>
+                    <el-input v-model="form.index"  maxlength="100" ></el-input>
                 </el-form-item>
                 <el-form-item label="优先级">
-                    <el-input-number v-model="form.priority"></el-input-number>
+                    <el-input-number v-model="form.priority"  maxlength="10" ></el-input-number>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

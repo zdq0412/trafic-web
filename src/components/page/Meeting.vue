@@ -116,7 +116,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -140,7 +140,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -224,31 +224,31 @@
                             </td>
                             <td style="width:10%">会议地点</td>
                             <td class="per25">
-                                <input v-if="editable" v-model="meeting.meetingPlace"  />
+                                <input v-if="editable"  maxlength="200" v-model="meeting.meetingPlace"  />
                                 <div v-else>{{meeting.meetingPlace}}</div>
                             </td>
                             <td style="width:10%">主持人</td>
                             <td class="per20">
-                                <input v-if="editable" v-model="meeting.president"  />
+                                <input v-if="editable"  maxlength="50" v-model="meeting.president"  />
                                 <div v-else>{{meeting.president}}</div>
                             </td>
                         </tr>
                         <tr>
                             <td style="width: 15%;">会议名称或主要议题</td>
                             <td colspan="3">
-                                <input v-if="editable" v-model="meeting.meetingName" />
+                                <input v-if="editable"  maxlength="100" v-model="meeting.meetingName" />
                                 <div v-else>{{meeting.meetingName}}</div>
                             </td>
                             <td style="width:10%">记录人</td>
                             <td class="per20">
-                                <input v-if="editable" v-model="meeting.recorder" />
+                                <input v-if="editable"  maxlength="50" v-model="meeting.recorder" />
                                 <div v-else>{{meeting.recorder}}</div>
                             </td>
                         </tr>
                         <tr>
                             <td>出席人</td>
                             <td colspan="5">
-                                <input v-if="editable" v-model="meeting.attendants" />
+                                <input v-if="editable"  maxlength="500" v-model="meeting.attendants" />
                                 <div v-else>{{meeting.attendants}}</div>
                             </td>
                         </tr>
@@ -257,7 +257,7 @@
                         </tr>
                         <tr>
                             <td colspan="6">
-                                <textarea v-if="editable" v-model="meeting.content"  style="height:744mm;"></textarea>
+                                <textarea v-if="editable"  maxlength="2000" v-model="meeting.content"  style="height:744mm;"></textarea>
                                 <div v-else v-html="meeting.content" style="height:744mm;"></div>
                             </td>
                         </tr>
@@ -266,7 +266,7 @@
                     <div style="width: 170mm;margin-left:20mm;margin-right:20mm;margin-top:20mm; text-align: center;border: 1px solid black;height:30px;line-height:30px;">
                         最后形成意见或决定</div>
                     <div style="width: 170mm;margin-left:20mm;margin-right:20mm;;text-align: center;border: 1px solid black;">
-                        <textarea v-if="editable" v-model="meeting.finalDecision" style="height:260mm;width:100%;"></textarea>
+                        <textarea v-if="editable"  maxlength="2000" v-model="meeting.finalDecision" style="height:260mm;width:100%;"></textarea>
                         <div v-else v-html="meeting.finalDecision" style="height:260mm;"></div>
                     </div>
                 </div>
@@ -411,19 +411,19 @@
                 <tr>
                     <td class="per30">会议主持人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="template.president"  placeholder="主持人"/>
+                        <input v-if="editable"  maxlength="50" v-model="template.president"  placeholder="主持人"/>
                         <div v-else>{{template.president}}</div>
                     </td>
                     <td class="per30">会议记录人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="template.recorder" placeholder="记录人"/>
+                        <input v-if="editable"  maxlength="50" v-model="template.recorder" placeholder="记录人"/>
                         <div v-else>{{template.recorder}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">到场人员</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="template.attendants" placeholder="到场人员"/>
+                        <input v-if="editable"  maxlength="500" v-model="template.attendants" placeholder="到场人员"/>
                         <div v-else>{{template.attendants}}</div>
                     </td>
                 </tr>
@@ -442,35 +442,35 @@
                 <tr>
                     <td class="per30">会议主题</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="template.theme" placeholder="会议主题" />
+                        <input v-if="editable"  maxlength="100" v-model="template.theme" placeholder="会议主题" />
                         <div v-else>{{template.theme}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议内容</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="template.content" rows="5" placeholder="会议内容"></textarea>
+                        <textarea v-if="editable"  maxlength="2000" v-model="template.content" rows="5" placeholder="会议内容"></textarea>
                         <div v-else v-html="template.content"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">需解决问题</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="template.problems" rows="5" placeholder="需解决问题"></textarea>
+                        <textarea v-if="editable"  maxlength="2000" v-model="template.problems" rows="5" placeholder="需解决问题"></textarea>
                         <div v-else v-html="template.problems"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">解决办法与工作安排</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="template.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
+                        <textarea v-if="editable"  maxlength="2000" v-model="template.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
                         <div v-else v-html="template.methods"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">备注</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="template.templateNote" rows="5" placeholder="备注"></textarea>
+                        <textarea v-if="editable"  maxlength="500" v-model="template.templateNote" rows="5" placeholder="备注"></textarea>
                         <div v-else v-html="template.templateNote"></div>
                     </td>
                 </tr>

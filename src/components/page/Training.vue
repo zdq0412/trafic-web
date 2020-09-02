@@ -121,7 +121,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" type="textarea" maxlength="500" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -149,7 +149,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -209,26 +209,26 @@
                         <tr>
                             <td>活动名称</td>
                             <td colspan="3">
-                                <input v-if="editable" v-model="training.trainingName"  />
+                                <input v-if="editable" maxlength="100" v-model="training.trainingName"  />
                                 <div v-else>{{training.trainingName}}</div>
                             </td>
                         </tr>
                         <tr>
                             <td>参加对象</td>
                             <td colspan="3">
-                                <input v-if="editable" v-model="training.attendants" />
+                                <input v-if="editable" maxlength="200" v-model="training.attendants" />
                                 <div v-else>{{training.attendants}}</div>
                             </td>
                         </tr>
                         <tr>
                             <td style="text-space: 30px;">地点</td>
                             <td>
-                                <input v-if="editable" v-model="training.trainingPlace" />
+                                <input v-if="editable" maxlength="100" v-model="training.trainingPlace" />
                                 <div v-else>{{training.trainingPlace}}</div>
                             </td>
                             <td style="text-space: 30px;">主讲人</td>
                             <td>
-                                <input v-if="editable" v-model="training.president" />
+                                <input v-if="editable" maxlength="10" v-model="training.president" />
                                 <div v-else>{{training.president}}</div>
                             </td>
                         </tr>
@@ -236,15 +236,15 @@
                             <td>参加人数</td>
                             <td style="text-align: left;">
                                 <span>应到:</span>
-                                <input v-if="editable" v-model="training.attendance" style="width:50px;"/>
+                                <input v-if="editable" maxlength="200" v-model="training.attendance" style="width:50px;"/>
                                 <span v-else>{{training.attendance}}</span>
                                 <span>实到:</span>
-                                <input v-if="editable" v-model="training.realAttendance" style="width:50px;"/>
+                                <input v-if="editable" maxlength="200" v-model="training.realAttendance" style="width:50px;"/>
                                 <span v-else>{{training.realAttendance}}</span>
                             </td>
                             <td style="text-space: 30px;">记录人</td>
                             <td style="width:250px;">
-                                <input v-if="editable" v-model="training.recorder" />
+                                <input v-if="editable" maxlength="10" v-model="training.recorder" />
                                 <div v-else>{{training.recorder}}</div>
                             </td>
                         </tr>
@@ -255,7 +255,7 @@
                         </tr>
                         <tr>
                             <td colspan="4">
-                                <textarea v-if="editable" v-model="training.content" style="height:744mm;" ></textarea>
+                                <textarea v-if="editable" maxlength="2000" v-model="training.content" style="height:744mm;" ></textarea>
                                 <div v-else v-html="training.content" style="height:744mm;"></div>
                             </td>
                         </tr>
@@ -300,8 +300,10 @@
                         </tr>
                         <tr v-for="emp in emps" >
                             <td>{{emp.name}}</td>
-                            <td>{{emp.department.name}}</td>
-                            <td>{{emp.position.name}}</td>
+                            <td v-if="emp.department">{{emp.department.name}}</td>
+                            <td v-else></td>
+                            <td v-if="emp.position">{{emp.position.name}}</td>
+                            <td v-else></td>
                             <td>{{emp.tel}}</td>
                             <td></td>
                         </tr>
@@ -466,7 +468,7 @@
                 <tr>
                     <td class="per30">会议名称</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="training.trainingName" placeholder="会议名称"/>
+                        <input v-if="editable" maxlength="100" v-model="training.trainingName" placeholder="会议名称"/>
                         <div v-else>{{training.trainingName}}</div>
                     </td>
                 </tr>
@@ -477,73 +479,73 @@
                     </td>
                     <td class="per30">会议地点</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="training.trainingPlace" placeholder="会议地点" />
+                        <input v-if="editable" maxlength="100" v-model="training.trainingPlace" placeholder="会议地点" />
                         <div v-else>{{training.trainingPlace}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议主持人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="training.president"  placeholder="主持人"/>
+                        <input v-if="editable" maxlength="100" v-model="training.president"  placeholder="主持人"/>
                         <div v-else>{{training.president}}</div>
                     </td>
                     <td class="per30">会议记录人</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="training.recorder" placeholder="记录人"/>
+                        <input v-if="editable" maxlength="100" v-model="training.recorder" placeholder="记录人"/>
                         <div v-else>{{training.recorder}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">到场人员</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="training.attendants" placeholder="到场人员"/>
+                        <input v-if="editable" maxlength="100" v-model="training.attendants" placeholder="到场人员"/>
                         <div v-else>{{training.attendants}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">到场人数</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="training.attendance" placeholder="到场人数"/>
+                        <input v-if="editable" maxlength="100" v-model="training.attendance" placeholder="到场人数"/>
                         <div v-else>{{training.attendance}}</div>
                     </td>
                     <td class="per30">缺席人数</td>
                     <td class="per20">
-                        <input v-if="editable" v-model="training.absent" placeholder="缺席人数"/>
+                        <input v-if="editable" maxlength="100" v-model="training.absent" placeholder="缺席人数"/>
                         <div v-else>{{training.absent}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议主题</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="training.theme" placeholder="会议主题" />
+                        <input v-if="editable" maxlength="200" v-model="training.theme" placeholder="会议主题" />
                         <div v-else>{{training.theme}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">会议内容</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="training.content" rows="5" placeholder="会议内容"></textarea>
+                        <textarea v-if="editable" maxlength="2000" v-model="training.content" rows="5" placeholder="会议内容"></textarea>
                         <div v-else v-html="training.content"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">需解决问题</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="training.problems" rows="5" placeholder="需解决问题"></textarea>
+                        <textarea v-if="editable" maxlength="2000" v-model="training.problems" rows="5" placeholder="需解决问题"></textarea>
                         <div v-else v-html="training.problems"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">解决办法与工作安排</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="training.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
+                        <textarea v-if="editable" maxlength="2000" v-model="training.methods" rows="5" placeholder="解决办法和工作安排"></textarea>
                         <div v-else v-html="training.methods"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per30">备注</td>
                     <td colspan="3">
-                        <textarea v-if="editable" v-model="training.templateNote" rows="5" placeholder="备注"></textarea>
+                        <textarea v-if="editable" maxlength="500" v-model="training.templateNote" rows="5" placeholder="备注"></textarea>
                         <div v-else v-html="training.templateNote"></div>
                     </td>
                 </tr>

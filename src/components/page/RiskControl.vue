@@ -163,13 +163,13 @@
                                 <el-input-number v-model="form.criterion" number></el-input-number>
                             </el-form-item>
                             <el-form-item label="风险等级" prop="riskLevel">
-                                <el-input v-model="form.riskLevel"></el-input>
+                                <el-input v-model="form.riskLevel"  maxlength="100"></el-input>
                             </el-form-item>
                             <el-form-item label="四色标识" prop="fourColor">
                                 <el-color-picker v-model="form.fourColor"></el-color-picker>
                             </el-form-item>
                             <el-form-item label="控制措施" prop="measures">
-                                <el-input v-model="form.measures" type="textarea"></el-input>
+                                <el-input v-model="form.measures"  maxlength="500" type="textarea"></el-input>
                             </el-form-item>
                             <el-form-item label="实施期限" prop="timeLimit">
                                 <el-input v-model="form.timeLimit"></el-input>
@@ -197,13 +197,13 @@
                                 <el-input-number v-model="form.criterion" number></el-input-number>
                             </el-form-item>
                             <el-form-item label="风险等级" prop="riskLevel">
-                                <el-input v-model="form.riskLevel"></el-input>
+                                <el-input v-model="form.riskLevel"  maxlength="100"></el-input>
                             </el-form-item>
                             <el-form-item label="四色标识" prop="fourColor">
                                 <el-color-picker v-model="form.fourColor"></el-color-picker>
                             </el-form-item>
                             <el-form-item label="控制措施" prop="measures">
-                                <el-input v-model="form.measures" type="textarea"></el-input>
+                                <el-input v-model="form.measures"  maxlength="500"  type="textarea"></el-input>
                             </el-form-item>
                             <el-form-item label="实施期限" prop="timeLimit">
                                 <el-input v-model="form.timeLimit"></el-input>

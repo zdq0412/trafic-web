@@ -133,16 +133,16 @@
                     <el-input-number v-model="form.sumOfMoney"></el-input-number>
                 </el-form-item>
                 <el-form-item label="票据号码">
-                    <el-input v-model="form.billNo"></el-input>
+                    <el-input v-model="form.billNo"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="内容摘要">
-                    <el-input v-model="form.content" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.content"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
                 <!--<el-form-item label="经办人">
                     <el-input v-model="form.operator"></el-input>
                 </el-form-item>-->
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -175,16 +175,16 @@
                     <el-input-number v-model="form.sumOfMoney"></el-input-number>
                 </el-form-item>
                 <el-form-item label="票据号码">
-                    <el-input v-model="form.billNo"></el-input>
+                    <el-input v-model="form.billNo"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="内容摘要">
-                    <el-input v-model="form.content" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.content"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
                 <!--<el-form-item label="经办人">
                     <el-input v-model="form.operator"></el-input>
                 </el-form-item-->
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

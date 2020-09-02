@@ -131,7 +131,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -172,7 +172,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -207,28 +207,28 @@
                 <tr>
                     <td class="per20">受检单位(部门、车辆)</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.checkObject"></textarea>
+                        <textarea v-if="editable"  maxlength="100"  v-model="securityCheckTemplate.checkObject"></textarea>
                         <div v-else>{{securityCheckTemplate.checkObject}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per20">参加监督检查的单位(部门)及人员</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.deptAndEmp"></textarea>
+                        <textarea v-if="editable"  maxlength="500"  v-model="securityCheckTemplate.deptAndEmp"></textarea>
                         <div v-else>{{securityCheckTemplate.deptAndEmp}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per20">监督检查的主要内容</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.content" ></textarea>
+                        <textarea v-if="editable"  maxlength="500"  v-model="securityCheckTemplate.content" ></textarea>
                         <div v-else v-html="securityCheckTemplate.content"></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="per20">监督检查中查出的问题</td>
                     <td class="per80">
-                        <textarea v-if="editable" v-model="securityCheckTemplate.problems"  rows="5"></textarea>
+                        <textarea v-if="editable"  maxlength="500"  v-model="securityCheckTemplate.problems"  rows="5"></textarea>
                         <div v-else v-html="securityCheckTemplate.problems"></div>
                     </td>
                 </tr>
@@ -238,7 +238,7 @@
                         <table style="width: 100%;">
                             <tr>
                                 <td style="border: none;">
-                                    <textarea v-if="editable" v-model="securityCheckTemplate.suggestion"  rows="5"></textarea>
+                                    <textarea v-if="editable"  maxlength="500"  v-model="securityCheckTemplate.suggestion"  rows="5"></textarea>
                                     <div v-else v-html="securityCheckTemplate.suggestion"></div>
                                 </td>
                             </tr>
@@ -254,7 +254,7 @@
                         <table style="width:100%;">
                             <tr>
                                 <td  style="border: none;">
-                                    <textarea v-if="editable" v-model="securityCheckTemplate.result" rows="5"></textarea>
+                                    <textarea v-if="editable"  maxlength="500"  v-model="securityCheckTemplate.result" rows="5"></textarea>
                                     <div v-else v-html="securityCheckTemplate.result"></div>
                                 </td>
                             </tr>

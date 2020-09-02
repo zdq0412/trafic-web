@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i>各种安全活动
+                    <i class="el-icon-lx-cascades"></i>其他安全活动
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -99,7 +99,7 @@
                     </div>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500" v-model="form.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -135,7 +135,7 @@
                     </div>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500" v-model="form.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

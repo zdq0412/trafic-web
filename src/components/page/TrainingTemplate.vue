@@ -131,7 +131,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500"   type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -172,7 +172,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"   maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -207,26 +207,26 @@
                 <tr>
                     <td>活动名称</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="trainingTemplate.trainingName"  />
+                        <input v-if="editable"  maxlength="50"   v-model="trainingTemplate.trainingName"  />
                         <div v-else>{{trainingTemplate.trainingName}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td>参加对象</td>
                     <td colspan="3">
-                        <input v-if="editable" v-model="trainingTemplate.attendants" />
+                        <input v-if="editable"  maxlength="200"   v-model="trainingTemplate.attendants" />
                         <div v-else>{{trainingTemplate.attendants}}</div>
                     </td>
                 </tr>
                 <tr>
                     <td style="text-space: 30px;">地点</td>
                     <td>
-                        <input v-if="editable" v-model="trainingTemplate.trainingPlace" />
+                        <input v-if="editable"  maxlength="200"   v-model="trainingTemplate.trainingPlace" />
                         <div v-else>{{trainingTemplate.trainingPlace}}</div>
                     </td>
                     <td style="text-space: 30px;">主讲人</td>
                     <td>
-                        <input v-if="editable" v-model="trainingTemplate.president" />
+                        <input v-if="editable"  maxlength="50"   v-model="trainingTemplate.president" />
                         <div v-else>{{trainingTemplate.president}}</div>
                     </td>
                 </tr>
@@ -234,15 +234,15 @@
                     <td>参加人数</td>
                     <td>
                         <span>应到:</span>
-                        <input v-if="editable" v-model="trainingTemplate.attendance" />
+                        <input v-if="editable"  maxlength="10"   v-model="trainingTemplate.attendance" />
                         <span v-else>{{trainingTemplate.attendance}}</span>
                         <span>实到:</span>
-                        <input v-if="editable" v-model="trainingTemplate.realAttendance" />
+                        <input v-if="editable"   maxlength="10"   v-model="trainingTemplate.realAttendance" />
                         <span v-else>{{trainingTemplate.realAttendance}}</span>
                     </td>
                     <td style="text-space: 30px;">记录人</td>
                     <td>
-                        <input v-if="editable" v-model="trainingTemplate.recorder" />
+                        <input v-if="editable"   maxlength="50"   v-model="trainingTemplate.recorder" />
                         <div v-else>{{trainingTemplate.recorder}}</div>
                     </td>
                 </tr>
@@ -253,7 +253,7 @@
                 </tr>
                 <tr>
                     <td colspan="4">
-                        <textarea v-if="editable" v-model="trainingTemplate.content" rows="8" ></textarea>
+                        <textarea v-if="editable"   maxlength="500"   v-model="trainingTemplate.content" rows="8" ></textarea>
                         <div v-else v-html="trainingTemplate.content"></div>
                     </td>
                 </tr>

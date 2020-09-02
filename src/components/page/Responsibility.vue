@@ -103,13 +103,13 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog" @open="loadData">
-            <el-form ref="form" :responsibility="responsibility" :model="form" label-width="90px">
+            <el-form ref="form" :rules="responsibility" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -177,13 +177,13 @@
             </span>
         </el-dialog>
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" @open="loadData">
-            <el-form ref="form" :model="form" :responsibility="responsibility"  label-width="90px">
+            <el-form ref="form" :model="form" :rules="responsibility"  label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -202,22 +202,12 @@
             <div id="printContent">
                 <div v-html="form.content"></div>
             </div>
-            <!--<div style="margin-top: 10px;">
-                <el-card shadow="hover" v-if="notices.length>0">
-                    <div slot="header" class="clearfix">
-                        <span style="font-weight: bold;">发文历史</span>
-                    </div>
-                    <el-row v-for="(notice,index) in notices" style="color: red;margin: 5px;">
-                        <el-col :span="1"><div>{{index+1}}</div></el-col>
-                        <el-col :span="23"><div>{{notice.publishDate | formatDate}}</div></el-col>
-                    </el-row>
-                </el-card>
-            </div>-->
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
                 <el-button type="warning" v-print="printObj">打印</el-button>
                  <el-button type="success" @click="handleExecute" v-if="form.content && Object.keys(org).length>0">发文执行</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
+                <div style="color:red;margin-top:5px;font-size:12px;">如需打印功能请使用火狐或谷歌浏览器!</div>
             </span>
         </el-dialog>
         <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="60%">
@@ -228,7 +218,7 @@
         </el-dialog>
         <!--编辑文本内容-->
         <el-dialog title="编辑内容" :visible.sync="editContentVisible" width="60%">
-            <el-form ref="form" :responsibility="responsibility" :model="form" label-width="100px">
+            <el-form ref="form" :rules="responsibility" :model="form" label-width="100px">
                 <vue-editor id="editor" v-model="form.content" :editor-toolbar="customToolbar" useCustomImageHandler></vue-editor>
             </el-form>
             <span slot="footer" class="dialog-footer">

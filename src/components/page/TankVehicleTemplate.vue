@@ -131,7 +131,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -172,7 +172,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -193,7 +193,7 @@
                 <tr>
                     <td class="per20" style="text-align: center;">车 号</td>
                     <td colspan="2">
-                        <input v-if="editable" v-model="tankVehicleTemplate.carNo" placeholder="车号"/>
+                        <input v-if="editable" maxlength="20"  v-model="tankVehicleTemplate.carNo" placeholder="车号"/>
                         <div v-else>{{tankVehicleTemplate.carNo}}</div>
                     </td>
                     <td class="per20" style="text-align: center;">检查时间</td>
@@ -204,7 +204,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem1" style="display: inline-block;">
-                                <input v-if="!tankVehicleTemplate.checkItem1" v-model="tankVehicleTemplate.checkItem1Msg" :placeholder="placeholderTxt"/>
+                                <input v-if="!tankVehicleTemplate.checkItem1"  maxlength="100"  v-model="tankVehicleTemplate.checkItem1Msg" :placeholder="placeholderTxt"/>
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -220,7 +220,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem2">
-                                <input v-if="!tankVehicleTemplate.checkItem2" v-model="tankVehicleTemplate.checkItem2Msg" :placeholder="placeholderTxt"/>
+                                <input v-if="!tankVehicleTemplate.checkItem2"  maxlength="100"   v-model="tankVehicleTemplate.checkItem2Msg" :placeholder="placeholderTxt"/>
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -235,7 +235,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem3">
-                                <input v-if="!tankVehicleTemplate.checkItem3" v-model="tankVehicleTemplate.checkItem3Msg" :placeholder="placeholderTxt"/>
+                                <input v-if="!tankVehicleTemplate.checkItem3"  maxlength="100"   v-model="tankVehicleTemplate.checkItem3Msg" :placeholder="placeholderTxt"/>
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -250,7 +250,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem4">
-                                <input v-if="!tankVehicleTemplate.checkItem4" v-model="tankVehicleTemplate.checkItem4Msg" :placeholder="placeholderTxt" />
+                                <input v-if="!tankVehicleTemplate.checkItem4"  maxlength="100"   v-model="tankVehicleTemplate.checkItem4Msg" :placeholder="placeholderTxt" />
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -265,7 +265,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem5">
-                                <input v-if="!tankVehicleTemplate.checkItem5" v-model="tankVehicleTemplate.checkItem5Msg" :placeholder="placeholderTxt"/>
+                                <input v-if="!tankVehicleTemplate.checkItem5"  maxlength="100"   v-model="tankVehicleTemplate.checkItem5Msg" :placeholder="placeholderTxt"/>
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -280,7 +280,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem6">
-                                <input v-if="!tankVehicleTemplate.checkItem6" v-model="tankVehicleTemplate.checkItem6Msg" :placeholder="placeholderTxt" />
+                                <input v-if="!tankVehicleTemplate.checkItem6"  maxlength="100"   v-model="tankVehicleTemplate.checkItem6Msg" :placeholder="placeholderTxt" />
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -295,7 +295,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem7">
-                                <input v-if="!tankVehicleTemplate.checkItem7" v-model="tankVehicleTemplate.checkItem7Msg" :placeholder="placeholderTxt"/>
+                                <input v-if="!tankVehicleTemplate.checkItem7"  maxlength="100"   v-model="tankVehicleTemplate.checkItem7Msg" :placeholder="placeholderTxt"/>
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -310,7 +310,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem8">
-                                <input v-if="!tankVehicleTemplate.checkItem8" v-model="tankVehicleTemplate.checkItem8Msg" :placeholder="placeholderTxt" />
+                                <input v-if="!tankVehicleTemplate.checkItem8"  maxlength="100"   v-model="tankVehicleTemplate.checkItem8Msg" :placeholder="placeholderTxt" />
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -325,7 +325,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem9">
-                                <input v-if="!tankVehicleTemplate.checkItem9" v-model="tankVehicleTemplate.checkItem9Msg" :placeholder="placeholderTxt" />
+                                <input v-if="!tankVehicleTemplate.checkItem9"  maxlength="100"   v-model="tankVehicleTemplate.checkItem9Msg" :placeholder="placeholderTxt" />
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -340,7 +340,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem10">
-                                <input v-if="!tankVehicleTemplate.checkItem10" v-model="tankVehicleTemplate.checkItem10Msg" :placeholder="placeholderTxt"/>
+                                <input v-if="!tankVehicleTemplate.checkItem10"  maxlength="100"   v-model="tankVehicleTemplate.checkItem10Msg" :placeholder="placeholderTxt"/>
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -355,7 +355,7 @@
                     <td colspan="2">
                         <div v-if="editable">
                             <el-checkbox v-model="tankVehicleTemplate.checkItem11">
-                                <input v-if="!tankVehicleTemplate.checkItem11" v-model="tankVehicleTemplate.checkItem11Msg" :placeholder="placeholderTxt"/>
+                                <input v-if="!tankVehicleTemplate.checkItem11"  maxlength="100"   v-model="tankVehicleTemplate.checkItem11Msg" :placeholder="placeholderTxt"/>
                             </el-checkbox>
                         </div>
                         <div v-else>
@@ -368,7 +368,7 @@
                 <tr>
                     <td class="per20" style="text-align: center;">处理意见</td>
                     <td colspan="4">
-                        <textarea v-if="editable" v-model="tankVehicleTemplate.suggestion" rows="5"></textarea>
+                        <textarea v-if="editable" v-model="tankVehicleTemplate.suggestion"  maxlength="500"   rows="5"></textarea>
                         <div v-else v-html="tankVehicleTemplate.suggestion"></div>
                     </td>
                 </tr>

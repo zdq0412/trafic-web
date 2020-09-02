@@ -76,7 +76,7 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
             <el-form ref="form" :model="form" :rules="rules"  label-width="120px">
                 <el-form-item label="车牌号码" prop="carNum">
-                    <el-input v-model="form.carNum"></el-input>
+                    <el-input v-model="form.carNum"  maxlength="10"></el-input>
                 </el-form-item>
                 <el-form-item label="行驶时间" prop="driveDate">
                     <el-date-picker style="width: 100%;"
@@ -87,19 +87,19 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="驾驶员姓名">
-                    <el-input v-model="form.driverName"></el-input>
+                    <el-input v-model="form.driverName"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="货物名称">
-                    <el-input v-model="form.goodsName"></el-input>
+                    <el-input v-model="form.goodsName"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="运营路线">
-                    <el-input v-model="form.driveLines" type="textarea"></el-input>
+                    <el-input v-model="form.driveLines"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="车辆运行状况">
-                    <el-input v-model="form.carStatus" type="textarea"></el-input>
+                    <el-input v-model="form.carStatus"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="GPS运行状况">
-                    <el-input v-model="form.gpsStatus" type="textarea"></el-input>
+                    <el-input v-model="form.gpsStatus"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="有无违法违章行为">
                     <el-select v-model="form.illegal" placeholder="请选择">
@@ -112,7 +112,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -124,7 +124,7 @@
         <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
             <el-form ref="form" :model="form" :rules="rules"  label-width="120px">
                 <el-form-item label="车牌号码" prop="carNum">
-                    <el-input v-model="form.carNum"></el-input>
+                    <el-input v-model="form.carNum"  maxlength="10"></el-input>
                 </el-form-item>
                 <el-form-item label="行驶时间" prop="driveDate">
                     <el-date-picker style="width: 100%;"
@@ -135,19 +135,19 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="驾驶员姓名">
-                    <el-input v-model="form.driverName"></el-input>
+                    <el-input v-model="form.driverName"  maxlength="10"></el-input>
                 </el-form-item>
                 <el-form-item label="货物名称">
-                    <el-input v-model="form.goodsName"></el-input>
+                    <el-input v-model="form.goodsName"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="运营路线">
-                    <el-input v-model="form.driveLines" type="textarea"></el-input>
+                    <el-input v-model="form.driveLines"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="车辆运行状况">
-                    <el-input v-model="form.carStatus" type="textarea"></el-input>
+                    <el-input v-model="form.carStatus"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="GPS运行状况">
-                    <el-input v-model="form.gpsStatus" type="textarea"></el-input>
+                    <el-input v-model="form.gpsStatus"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="有无违法违章行为">
                     <el-select v-model="form.illegal" placeholder="请选择">
@@ -160,7 +160,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea"></el-input>
+                    <el-input v-model="form.note"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

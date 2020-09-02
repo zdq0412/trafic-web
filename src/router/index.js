@@ -139,7 +139,7 @@ export default new Router({
                 {
                   path:'/dangerGoodsCheckTemplate',
                   component:()=>import('../components/page/DangerGoodsCheckTemplate.vue'),
-                  meta:{title:'危险货物自查模板'}
+                  meta:{title:'模板'}
                 },
                 {
                   path:'/tankVehicle',

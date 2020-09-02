@@ -107,7 +107,7 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="tel">
-                    <el-input v-model="form.tel"></el-input>
+                    <el-input v-model="form.tel"  maxlength="11"></el-input>
                 </el-form-item>
                 <el-form-item label="所在企业">
                     <el-select v-model="form.orgId" @change="$set(form,orgId)">
@@ -145,7 +145,7 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="tel">
-                    <el-input v-model="form.tel"></el-input>
+                    <el-input v-model="form.tel"  maxlength="11"></el-input>
                 </el-form-item>
                 <el-form-item label="所在企业">
                     <el-select v-model="form.orgId" @change="$set(form,orgId)">

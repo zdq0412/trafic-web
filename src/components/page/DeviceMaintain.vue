@@ -96,13 +96,13 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="内容" prop="content">
-                    <el-input v-model="form.content"  type="textarea"></el-input>
+                    <el-input v-model="form.content" maxlength="2000" show-word-limit  type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="价格">
                     <el-input-number v-model="form.price"  ></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" type="textarea" maxlength="500" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -122,13 +122,13 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="内容" prop="content">
-                    <el-input v-model="form.content"  type="textarea"></el-input>
+                    <el-input v-model="form.content" maxlength="2000" show-word-limit="" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="价格">
                     <el-input-number v-model="form.price"  ></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note" maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

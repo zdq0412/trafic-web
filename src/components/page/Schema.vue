@@ -61,10 +61,10 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="优先级">
-                    <el-input-number v-model="form.priority" number></el-input-number>
+                    <el-input-number v-model="form.priority"  maxlength="10" ></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -80,10 +80,10 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="优先级">
-                    <el-input-number v-model="form.priority"></el-input-number>
+                    <el-input-number v-model="form.priority"  maxlength="10" ></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

@@ -78,19 +78,19 @@
                     </el-col>
                     <el-col>
                         <el-form-item label="简称" prop="shortName">
-                            <el-input v-model="form.shortName"></el-input>
+                            <el-input v-model="form.shortName"  maxlength="10" ></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="联系人">
-                            <el-input v-model="form.contact"></el-input>
+                            <el-input v-model="form.contact"  maxlength="20" ></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col>
                         <el-form-item label="手机号" prop="tel">
-                            <el-input v-model="form.tel"></el-input>
+                            <el-input v-model="form.tel"  maxlength="11" ></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -121,21 +121,21 @@
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="法人">
-                            <el-input v-model="form.legalPerson"></el-input>
+                            <el-input v-model="form.legalPerson"  maxlength="100" ></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="地址">
-                            <el-input v-model="form.addr"></el-input>
+                            <el-input v-model="form.addr"  maxlength="100" ></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="备注">
-                            <el-input type="textarea" v-model="form.note"></el-input>
+                            <el-input type="textarea"  maxlength="500" v-model="form.note"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -158,19 +158,19 @@
                     </el-col>
                     <el-col>
                         <el-form-item label="简称" prop="shortName">
-                            <el-input v-model="form.shortName"></el-input>
+                            <el-input v-model="form.shortName"  maxlength="10" ></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="联系人">
-                            <el-input v-model="form.contact"></el-input>
+                            <el-input v-model="form.contact"  maxlength="20" ></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col>
                         <el-form-item label="手机号" prop="tel">
-                            <el-input v-model="form.tel"></el-input>
+                            <el-input v-model="form.tel"  maxlength="11" ></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -200,21 +200,21 @@
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="法人">
-                            <el-input v-model="form.legalPerson" style="width:45%;"></el-input>
+                            <el-input v-model="form.legalPerson"  maxlength="50" style="width:45%;"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="地址">
-                            <el-input v-model="form.addr"></el-input>
+                            <el-input v-model="form.addr"  maxlength="100" ></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="备注">
-                            <el-input type="textarea" v-model="form.note"></el-input>
+                            <el-input type="textarea"  maxlength="500"  v-model="form.note"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>

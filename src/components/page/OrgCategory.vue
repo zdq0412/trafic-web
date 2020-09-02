@@ -76,10 +76,10 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="提取标准%" prop="safetyCostRatio">
-                    <el-input-number v-model="form.safetyCostRatio" placeholder="安全生产费用提取标准"></el-input-number>
+                    <el-input-number v-model="form.safetyCostRatio"  maxlength="10"  placeholder="安全生产费用提取标准"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -95,10 +95,10 @@
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="提取标准%" prop="safetyCostRatio">
-                    <el-input-number v-model="form.safetyCostRatio" placeholder="安全生产费用提取标准"></el-input-number>
+                    <el-input-number v-model="form.safetyCostRatio"  maxlength="10"  placeholder="安全生产费用提取标准"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="form.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -108,7 +108,7 @@
         </el-dialog>
         <!-- 新增授权对话框 -->
         <el-dialog title="授权" :visible.sync="grantFunctionVisible" width="30%">
-            <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+            <el-checkbox v-model="checkAll"  @change="handleCheckAllChange">全选</el-checkbox>
             <div style="height:500px;overflow: auto;">
                 <function-tree ref="functionTree" v-if="grantFunctionVisible" :paramType="param" :param="orgCategoryId"></function-tree>
             </div>
@@ -244,6 +244,7 @@
                 this.idx = index;
                 this.grantFunctionVisible = true;
                 this.orgCategoryId = row.id;
+                this.checkAll = false;
             },
             // 保存编辑
             saveEdit() {
