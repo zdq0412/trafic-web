@@ -760,7 +760,7 @@
         margin: 20px;
         padding-bottom: 20px;
         font-weight: bold;
-        color:red;
+        color:#0156B4;
     }
     .introduction{
         line-height:200%;

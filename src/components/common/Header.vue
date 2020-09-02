@@ -95,6 +95,7 @@
             findUser(){
                 this.$axios.get("/user/userOrAreaManager/"+localStorage.getItem("username")).then(res=>{
                     this.user = res.data.data;
+                    console.log(this.user);
                 }).catch(error=>console.log(error))
             },
             handlePhotoChange(file,fileList){
