@@ -318,9 +318,13 @@
                 this.$refs.upload_add.clearFiles();
             },
             handleUpdateSuccess(res, file) {
-                this.editVisible= false;
-                this.getData();
-                this.isSelectFile = false;
+                if(res.data.result.resultCode===200){
+                    this.editVisible= false;
+                    this.getData();
+                    this.isSelectFile = false;
+                }else{
+                    this.$message.error(res.data.result.message);
+                }
             },
             beforeAvatarUpload(file) {
                 const isLt2M = file.size / 1024 / 1024 < 2;
@@ -496,9 +500,14 @@
                             this.$refs.upload_add.submit();
                         }else{
                             this.$axios.post("/employee/addEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
-                                this.addVisible= false;
-                                this.getData();
-                                this.isSelectFile = false;
+                                if(res.data.result.resultCode!=200){
+                                    this.$message.error(res.data.result.message);
+                                }else{
+                                    this.addVisible= false;
+                                    this.getData();
+                                    this.isSelectFile = false;
+                                }
+
                             }).catch(error=>{
                                 console.log(error);
                             });
