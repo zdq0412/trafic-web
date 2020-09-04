@@ -29,7 +29,7 @@
                         >查看</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column label="身份证">
+                <!--<el-table-column label="身份证">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
@@ -37,7 +37,7 @@
                                 @click="lookup(scope.$index, scope.row,'idcard')"
                         >查看</el-button>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
                 <el-table-column label="劳动合同">
                     <template slot-scope="scope">
                         <el-button
