@@ -349,7 +349,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+               // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             checkContent(index,row){//查看模板内容
                 this.showTemplateContentVisible = true;

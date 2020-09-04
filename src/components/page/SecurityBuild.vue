@@ -15,6 +15,12 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
+                <el-button
+                        type="warning"
+                        icon="el-icon-search"
+                        class="handle-del mr10"
+                        @click="findTemplates"
+                >查找模板</el-button>
                 <!--<el-input v-model="query.name" placeholder="名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
             </div>
@@ -143,7 +149,54 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-
+        <!--查看系统模板-->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <!--<template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>-->
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button v-if="scope.row.url"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   style="color:#67C23A"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -159,6 +212,16 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+
+                templateVisible:false,
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
+                template:{},
+                templatesVisible:false,
+
                 dialogImageUrl:'',
                 dialogVisible:false,
                 uploadUrl:'',
@@ -201,6 +264,23 @@
             this.getData();
         },
         methods: {
+            downloadTemplate(index,row){
+                // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
+            },
+            //查找模板
+            findTemplates(){
+                this.$axios.get("/securityBuildTemplate/securityBuildTemplatesByPage",{
+                    params:{
+                        page:this.templates.pageIndex,
+                        limit:this.templates.pageSize
+                    }
+                }).then(res => {
+                    this.templatesData = res.data.data;
+                    this.templates.pageTotal = res.data.count;
+                    this.templatesVisible = true;
+                }).catch(error => console.log(error));
+            },
             fileupload_edit(){
                 this.$refs.uploadBtn.$el.click();
             },
@@ -208,7 +288,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             download(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+               // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){

@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 培训管理
+                    <i class="el-icon-lx-cascades"></i>宣传教育培训
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -393,7 +393,7 @@
             <span slot="footer" class="dialog-footer"  style="position:fixed;bottom: 30px;left:45%;">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
                 <el-button v-if="!editable" type="warning" v-print="printObj">打印</el-button>
-                <el-button v-else type="primary" @click="saveContent">保存</el-button>
+                <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
@@ -705,6 +705,7 @@
                                 this.templatesVisible=false;
                                 this.showContentVisible = true;
                                 this.editable=true;
+                                this.training = res.data.data;
                             }).catch(error=>console.log(error));
                     })
                     .catch(() => {});
@@ -712,6 +713,7 @@
             checkContent(index,row){//查看模板内容
                 this.showTemplateContentVisible = true;
                 this.template = row;
+                this.editable = false;
             },
             uploadTemplate(index,row){
                 this.$refs.uploadFile.clearFiles();
@@ -719,7 +721,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+                //window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             handleAvatarSuccess(res, file) {
                 this.$message.success("上传成功!");
@@ -733,7 +736,7 @@
                     return false
                 }
                 if(!isWord){
-                    this.$message.error('只能上传work文档!');
+                    this.$message.error('只能上传word文档!');
                     return false;
                 }
                 return  true;
@@ -910,6 +913,12 @@
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.content='';
+                        if(!this.form.realAttendance){
+                            this.form.realAttendance = 0;
+                        }
+                        if(!this.form.attendance){
+                            this.form.attendance = 0;
+                        }
                         this.$axios.put("/training/training?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;

@@ -359,7 +359,7 @@
             <span slot="footer" class="dialog-footer">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
                 <el-button v-if="!editable" type="warning" v-print="printObj">打印</el-button>
-                <el-button v-else type="primary" @click="saveContent">保存</el-button>
+                <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
@@ -720,6 +720,7 @@
                                 this.templatesVisible=false;
                                 this.showContentVisible = true;
                                 this.editable=true;
+                                this.tankVehicle = res.data.data;
                             }).catch(error=>console.log(error));
                     })
                     .catch(() => {});
@@ -734,7 +735,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+               // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             handleAvatarSuccess(res, file) {
                 this.$message.success("上传成功!");

@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 安全检查
+                    <i class="el-icon-lx-cascades"></i> 日常安全检查
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -43,7 +43,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="creator" label="创建人"></el-table-column>
-                <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="checkDate" label="检查时间" :formatter="datetimeFormatter"></el-table-column>
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
@@ -107,7 +107,7 @@
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="检查时间" prop="meetingDate">
+                <el-form-item label="检查时间" prop="checkDate">
                     <el-date-picker
                             v-model="form.checkDate"
                             type="datetime"
@@ -131,7 +131,7 @@
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="检查时间" prop="meetingDate">
+                <el-form-item label="检查时间" prop="checkDate">
                     <el-date-picker
                             v-model="form.checkDate"
                             type="datetime"
@@ -269,7 +269,7 @@
             <span slot="footer" class="dialog-footer">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
                 <el-button v-if="!editable" type="warning" v-print="printObj">打印</el-button>
-                <el-button v-else type="primary" @click="saveContent">保存</el-button>
+                <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
@@ -396,7 +396,7 @@
 </template>
 
 <script>
-    import  {getDate,getDateTime,getTime} from "../common/utils";
+    import  {getDate,getDateTime} from "../common/utils";
     import { VueEditor } from "vue2-editor";
     export default {
         components:{
@@ -458,6 +458,9 @@
                     ],
                     content:[
                         { required: true, message: '请输入文本内容', trigger: 'blur' }
+                    ],
+                    checkDate:[
+                        {required:true,message:'请选择检查日期'}
                     ]
                 }
             };
@@ -525,6 +528,7 @@
                                 this.templatesVisible=false;
                                 this.showContentVisible = true;
                                 this.editable=true;
+                                this.securityCheck = res.data.data;
                             }).catch(error=>console.log(error));
                     })
                     .catch(() => {});
@@ -539,7 +543,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+                //window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             handleAvatarSuccess(res, file) {
                 this.$message.success("上传成功!");
@@ -553,7 +558,7 @@
                     return false
                 }
                 if(!isWord){
-                    this.$message.error('只能上传work文档!');
+                    this.$message.error('只能上传word文档!');
                     return false;
                 }
                 return  true;
@@ -649,6 +654,13 @@
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
                     return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
+            },
+            datetimeFormatter(row, column, cellValue, index){
+                if(cellValue){
+                    return getDateTime(new Date(cellValue));
                 }else{
                     return '';
                 }
@@ -801,7 +813,7 @@
     td input,td textarea{
         border: none;
         font-size: 20px;
-        width: 99%;
+        width: 98%;
         padding: 3px;
     }
 

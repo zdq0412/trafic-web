@@ -412,7 +412,7 @@
                     return false
                 }
                 if(!isWord){
-                    this.$message.error('只能上传work文档!');
+                    this.$message.error('只能上传word文档!');
                     return false;
                 }
                 return  true;
@@ -423,7 +423,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+                //window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             checkContent(index,row){//查看模板内容
                this.showTemplateContentVisible = true;

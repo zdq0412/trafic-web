@@ -572,7 +572,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             download(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+               // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             handleAvatarSuccess(res, file) {
                 this.$message.success("上传成功!");

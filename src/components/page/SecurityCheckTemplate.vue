@@ -111,7 +111,7 @@
                             <el-cascader
                                     v-model="form.area"
                                     :options="areas"
-                                    :props="{label:'name',value:'id'}"
+                                    :props="{label:'name',value:'id',checkStrictly: true}"
                                     @change="handleChange"></el-cascader>
                         </el-form-item>
                     </el-col>
@@ -152,7 +152,7 @@
                             <el-cascader
                                     v-model="form.area"
                                     :options="areas"
-                                    :props="{label:'name',value:'id'}"
+                                    :props="{label:'name',value:'id',checkStrictly: true}"
                                     @change="handleChange"></el-cascader>
                         </el-form-item>
                     </el-col>
@@ -359,7 +359,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+                //window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             handleAvatarSuccess(res, file) {
                 this.$message.success("上传成功!");
@@ -373,7 +374,7 @@
                     return false
                 }
                 if(!isWord){
-                    this.$message.error('只能上传work文档!');
+                    this.$message.error('只能上传word文档!');
                     return false;
                 }
                 return  true;
@@ -513,10 +514,16 @@
                 }
                 if(row.province && row.city && row.region){
                     this.form.area=[row.province.id,row.city.id,row.region.id];
+                    this.form.provinceId=row.province.id;
+                    this.form.cityId = row.city.id;
+                    this.form.regionId = row.region.id;
                 }else if(row.province && row.city){
                     this.form.area=[row.province.id,row.city.id];
+                    this.form.provinceId=row.province.id;
+                    this.form.cityId = row.city.id;
                 }else if(row.province){
                     this.form.area=[row.province.id];
+                    this.form.provinceId=row.province.id;
                 }
             },
             // 保存编辑

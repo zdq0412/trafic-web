@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i>设备点检记录
+                    <i class="el-icon-lx-cascades"></i>事故处理记录模板
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -15,13 +15,7 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
-                <el-button
-                        type="warning"
-                        icon="el-icon-search"
-                        class="handle-del mr10"
-                        @click="findTemplates"
-                >查找模板</el-button>
-                <!--<el-input v-model="query.name" placeholder="名称" class="handle-input mr10"></el-input>
+                <!--<el-input v-model="query.name" placeholder="模板名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
             </div>
             <el-table
@@ -42,6 +36,10 @@
                 </el-table-column>
                 <el-table-column prop="name" label="名称"></el-table-column>
                 <el-table-column prop="filename" label="文件名称"></el-table-column>
+                <el-table-column prop="orgCategory.name" label="企业类别"></el-table-column>
+                <el-table-column prop="province.name" label="省"></el-table-column>
+                <el-table-column prop="city.name" label="市"></el-table-column>
+                <el-table-column prop="region.name" label="区"></el-table-column>
                 <el-table-column prop="createDate" label="上传日期" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
@@ -50,7 +48,7 @@
                                 type="text"
                                 icon="el-icon-download"
                                 class="download"
-                                @click="download(scope.$index, scope.row)"
+                                @click="downloadTemplate(scope.$index, scope.row)"
                         >下载</el-button>
                         <el-button
                                 type="text"
@@ -78,8 +76,8 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
@@ -104,8 +102,33 @@
 
                     </div>
                 </el-form-item>
+                <el-row type="flex" class="row-bg" v-if="!haveOrg">
+                    <el-col >
+                        <el-form-item label="省市区">
+                            <el-cascader
+                                    v-model="form.area"
+                                    :options="areas"
+                                    :props="{label:'name',value:'id',checkStrictly: true}"
+                                    @change="handleAreaChange"></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row v-if="!haveOrg">
+                    <el-col>
+                        <el-form-item label="企业类别">
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                                <el-option
+                                        v-for="item in orgCategories"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
                 <el-form-item label="备注">
-                    <el-input type="textarea" maxlength="500" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500"  v-model="form.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -114,8 +137,8 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" >
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
+            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
@@ -140,8 +163,33 @@
 
                     </div>
                 </el-form-item>
+                <el-row type="flex" class="row-bg" v-if="!haveOrg">
+                    <el-col >
+                        <el-form-item label="省市区">
+                            <el-cascader
+                                    v-model="form.area"
+                                    :options="areas"
+                                    :props="{label:'name',value:'id',checkStrictly: true}"
+                                    @change="handleAreaChange"></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row v-if="!haveOrg">
+                    <el-col>
+                        <el-form-item label="企业类别">
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                                <el-option
+                                        v-for="item in orgCategories"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
                 <el-form-item label="备注">
-                    <el-input type="textarea" maxlength="500" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500"  v-model="form.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -150,54 +198,6 @@
             </span>
         </el-dialog>
 
-        <!--查看系统模板-->
-        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
-            <el-table
-                    :data="templatesData"
-            >
-                <el-table-column
-                        label="序号"
-                        type="index"
-                        width="50"
-                        align="center">
-                    <template scope="scope">
-                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="name" label="名称">
-                </el-table-column>
-                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="creator"  label="创建人"></el-table-column>
-                <el-table-column prop="note" label="备注"  width="150" >
-                    <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
-                    <template slot-scope="scope">
-                        <el-button v-if="scope.row.url"
-                                   type="text"
-                                   icon="el-icon-download"
-                                   style="color:#67C23A"
-                                   @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="pagination">
-                <el-pagination
-                        background
-                        layout="total, prev, pager, next"
-                        :current-page="templates.pageIndex"
-                        :page-size="templates.pageSize"
-                        :total="templates.pageTotal"
-                        @current-change="handleTemplatesPageChange"
-                ></el-pagination>
-            </div>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
-            </span>
-        </el-dialog>
     </div>
 </template>
 
@@ -218,21 +218,15 @@
                 uploadUrl:'',
                 modifyUrl:'',
                 filename:'',
-                templatesData:[],
-                templateVisible:false,
-                templates: {
-                    pageIndex: 1,
-                    pageSize: 10,
-                    pageTotal:0
-                },
-                template:{},
-                templatesVisible:false,
                 isSelectUploadFile:false,
                 roleId:'',
                 headers:{
                     token : localStorage.getItem("token")
                 },
                 imageUrl:'',
+                org:{},
+                orgCategories:[],
+                areas:[],
                 ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
                 baseUrl:'',
                 tableData: [],
@@ -258,27 +252,32 @@
         },
         created() {
             this.baseUrl = this.$baseURL;
-            this.uploadUrl = this.$baseURL + "/deviceCheck/deviceCheck";
-            this.modifyUrl = this.$baseURL + "/deviceCheck/updateDeviceCheck";
+            this.uploadUrl = this.$baseURL + "/accidentRecordTemplate/accidentRecordTemplate";
+            this.modifyUrl = this.$baseURL + "/accidentRecordTemplate/updateAccidentRecordTemplate";
             this.getData();
+            this.$axios.get("/user/haveOrg").then(res =>{
+                if(res.data.data){
+                    this.haveOrg = true;
+                    this.org = res.data.data;
+                }
+            }).catch(error=>console.log(error));
         },
         methods: {
-            downloadTemplate(index,row){
-               // window.location.href=this.$baseURL + "/" + row.url;
-                window.open(this.$baseURL + "/" + row.url);
-            },
-            //查找模板
-            findTemplates(){
-                this.$axios.get("/deviceCheckTemplate/deviceCheckTemplatesByPage",{
+            loadSelectData(){
+                this.$axios.get("/orgCategory/orgCategorys").then(res => {
+                    this.orgCategories = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+                this.$axios.get("/category/categorys",{
                     params:{
-                        page:this.templates.pageIndex,
-                        limit:this.templates.pageSize
+                        type:'区域'
                     }
                 }).then(res => {
-                    this.templatesData = res.data.data;
-                    this.templates.pageTotal = res.data.count;
-                    this.templatesVisible = true;
-                }).catch(error => console.log(error));
+                    this.areas = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             fileupload_edit(){
                 this.$refs.uploadBtn.$el.click();
@@ -286,7 +285,7 @@
             upload(){
                 this.$refs.fileUploadBtn.$el.click();
             },
-            download(index,row){
+            downloadTemplate(index,row){
                // window.location.href=this.$baseURL + "/" + row.url;
                 window.open(this.$baseURL + "/" + row.url);
             },
@@ -300,6 +299,18 @@
             handleChange(file){
                 this.filename = file.name;
                 this.isSelectUploadFile = true;
+            },
+            handleAreaChange(file){
+                if(this.form.area&&this.form.area.length>0){
+                    this.form.provinceId=this.form.area[0];
+                    if(this.form.area.length==2){
+                        this.form.cityId=this.form.area[1];
+                    }
+                    if(this.form.area.length==3){
+                        this.form.cityId=this.form.area[1];
+                        this.form.regionId=this.form.area[2];
+                    }
+                }
             },
             handleAvatarSuccess(res, file) {
                 this.addVisible= false;
@@ -333,7 +344,7 @@
                 return true;
             },
             getData() {
-                this.$axios.get("/deviceCheck/deviceChecksByPage", {
+                this.$axios.get("/accidentRecordTemplate/accidentRecordTemplatesByPage", {
                     params: {
                         page: this.query.pageIndex,
                         limit: this.query.pageSize,
@@ -359,7 +370,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/deviceCheck/deviceCheck/" + this.form.id).then(res => {
+                        this.$axios.delete("/accidentRecordTemplate/accidentRecordTemplate/" + this.form.id).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -381,11 +392,21 @@
                 this.filename = row.filename;
                 this.isSelectUploadFile = false;
 
-                if(row.beginDate){
-                    this.form.beginDate = getDate(new Date(row.beginDate));
+                if(row.orgCategory){
+                    this.form.orgCategoryId = row.orgCategory.id;
                 }
-                if(row.endDate){
-                    this.form.endDate = getDate(new Date(row.endDate));
+                if(row.province && row.city && row.region){
+                    this.form.area=[row.province.id,row.city.id,row.region.id];
+                    this.form.provinceId=row.province.id;
+                    this.form.cityId = row.city.id;
+                    this.form.regionId = row.region.id;
+                }else if(row.province && row.city){
+                    this.form.area=[row.province.id,row.city.id];
+                    this.form.provinceId=row.province.id;
+                    this.form.cityId = row.city.id;
+                }else if(row.province){
+                    this.form.area=[row.province.id];
+                    this.form.provinceId=row.province.id;
                 }
             },
             handleAdd(){
@@ -404,7 +425,7 @@
                         if(this.isSelectUploadFile)
                             this.$refs.uploadFileEdit.submit();
                         else{
-                            this.$axios.post("/deviceCheck/updateDeviceCheckNoFile",this.$qs.stringify(this.form))
+                            this.$axios.post("/accidentRecordTemplate/updateAccidentRecordTemplateNoFile",this.$qs.stringify(this.form))
                                 .then(res=>{
                                     this.editVisible = false;
                                     this.getData();
@@ -439,11 +460,6 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageIndex', val);
                 this.getData();
-            },
-            // 分页导航
-            handleTemplatesPageChange(val) {
-                this.$set(this.templates, 'pageIndex', val);
-                this.findTemplates();
             }
         }
     };

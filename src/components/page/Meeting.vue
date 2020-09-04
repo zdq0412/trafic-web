@@ -655,7 +655,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+               // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             handleAvatarSuccess(res, file) {
                 this.$message.success("上传成功!");
@@ -669,7 +670,7 @@
                     return false
                 }
                 if(!isWord){
-                    this.$message.error('只能上传work文档!');
+                    this.$message.error('只能上传word文档!');
                     return false;
                 }
                 return  true;
@@ -688,14 +689,17 @@
                                 this.templatesVisible=false;
                                 this.showContentVisible = true;
                                 this.editable=true;
+                                this.meeting = res.data.data;
                             }).catch(error=>console.log(error));
                     })
                     .catch(() => {});
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+               // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             checkContent(index,row){//查看模板内容
+                this.editable = false;
                 this.showTemplateContentVisible = true;
                 this.template = row;
             },

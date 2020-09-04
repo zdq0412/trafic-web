@@ -69,7 +69,7 @@
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
-                            <el-form-item label="部门电话">
+                            <el-form-item label="部门电话" prop="tel">
                                 <el-input v-model="form.tel" maxlength="20"></el-input>
                             </el-form-item>
                         </el-col>
@@ -111,7 +111,7 @@
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
-                            <el-form-item label="部门电话">
+                            <el-form-item label="部门电话" prop="tel">
                                 <el-input v-model="form.tel" maxlength="20"></el-input>
                             </el-form-item>
                         </el-col>
@@ -296,14 +296,13 @@
         data() {
             let checkTel=(rule, value, callback) =>{
                 if(value){
-                    var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
-                    if (!myreg.test(value)) {
-                        callback(new Error("不是有效的手机号码格式!"));
+                    let tel=/^[1][3,4,5,7,8][0-9]{9}$/;
+                    let phone = /^((0\d{2,3})-)(\d{7,8})(-(\d{3,}))?$/;
+                    if (!tel.test(value) && !phone.test(value)) {
+                        callback(new Error("不是有效的电话格式!"));
                     } else {
                         callback();
                     }
-                }  else{
-                    callback(new Error("请输入手机号"));
                 }
             };
             return {
@@ -337,9 +336,7 @@
                         required:true,message:'请输入部门名称',trigger:'blur'
                     }],
                     tel:[{
-                        required:true,message:'请输入手机号',trigger:'blur'
-                    },{
-                        validator:checkTel,trigger:'blur'
+                        validator:checkTel,trigger:'blur',message:'部门电话格式不正确'
                     }]
                 }
             };

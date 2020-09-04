@@ -77,6 +77,31 @@ export default new Router({
                   meta:{title:'职业健康记录模板'}
                 },
                 {
+                  path:'/securityBuildTemplate',
+                  component:()=>import('../components/page/SecurityBuildTemplate.vue'),
+                  meta:{title:'安全文化建设模板'}
+                },
+                {
+                  path:'/securityMonthTemplate',
+                  component:()=>import('../components/page/SecurityMonthTemplate.vue'),
+                  meta:{title:'安全生产月模板'}
+                },
+                {
+                  path:'/securityActivityTemplate',
+                  component:()=>import('../components/page/SecurityActivityTemplate.vue'),
+                  meta:{title:'其他安全活动模板'}
+                },
+                {
+                  path:'/accidentRecordTemplate',
+                  component:()=>import('../components/page/AccidentRecordTemplate.vue'),
+                  meta:{title:'事故处理记录模板'}
+                },
+                {
+                  path:'/fourRecordTemplate',
+                  component:()=>import('../components/page/FourRecordTemplate.vue'),
+                  meta:{title:'四不放过记录模板'}
+                },
+                {
                   path:'/healthyRecord',
                   component:()=>import('../components/page/HealthyRecord.vue'),
                   meta:{title:'职业健康记录'}
@@ -169,12 +194,12 @@ export default new Router({
                 {
                   path:'/trainingTemplate',
                   component:()=>import('../components/page/TrainingTemplate.vue'),
-                  meta:{title:'培训模板'}
+                  meta:{title:'宣传教育培训模板'}
                 },
                 {
                   path:'/training',
                   component:()=>import('../components/page/Training.vue'),
-                  meta:{title:'培训管理'}
+                  meta:{title:'宣传教育培训'}
                 },
                 {
                   path:'/responsibilityTemplate',
@@ -304,6 +329,12 @@ export default new Router({
                     path: '/schema',
                     component: () => import( '../components/page/Schema.vue'),
                     meta: { title: '模式管理' }
+                },
+                {
+                    // vue-schart组件
+                    path: '/riskLevel',
+                    component: () => import( '../components/page/RiskLevel.vue'),
+                    meta: { title: '风险等级' }
                 },
                 {
                     path: '/404',

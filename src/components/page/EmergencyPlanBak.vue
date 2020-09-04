@@ -281,7 +281,8 @@
                 this.findTemplates();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+               // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             //查找模板
             findTemplates(){
@@ -317,10 +318,12 @@
                 this.$refs.bakUploadBtn.$el.click();
             },
             downloadPreplan(index,row){
-                window.location.href=this.$baseURL + "/" + row.prePlanUrl;
+               // window.location.href=this.$baseURL + "/" + row.prePlanUrl;
+                window.open(this.$baseURL + "/" + row.prePlanUrl);
             },
             downloadBak(index,row){
-                window.location.href=this.$baseURL + "/" + row.keepOnRecordUrl;
+               // window.location.href=this.$baseURL + "/" + row.keepOnRecordUrl;
+                window.open(this.$baseURL + "/" + row.keepOnRecordUrl);
             },
             handleAvatarSuccess(res, file) {
                 this.$message.success("上传成功!");

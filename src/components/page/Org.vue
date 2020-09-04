@@ -68,7 +68,7 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="名称" prop="name">
@@ -97,7 +97,7 @@
 
                 <el-row type="flex" class="row-bg" >
                     <el-col >
-                        <el-form-item label="省市区">
+                        <el-form-item label="省市区" prop="area">
                             <el-cascader  v-model="form.area"
                                          :options="areas"
                                           :props="{label:'name',value:'id'}"
@@ -105,7 +105,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col>
-                        <el-form-item label="企业类别">
+                        <el-form-item label="企业类别" prop="orgCategoryId">
                             <el-select v-model="form.orgCategoryId" placeholder="请选择"
                                       @change="$set(form,orgCategoryId)" style="width: 100%;" >
                                 <el-option
@@ -148,7 +148,7 @@
         <!-- 新增弹出框 -->
         <el-dialog title="新增" :visible.sync="addVisible" width="40%"
                   @open="loadSelectData" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="名称" prop="name">
@@ -176,7 +176,7 @@
                 </el-row>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
-                        <el-form-item label="省市区">
+                        <el-form-item label="省市区" prop="area">
                             <el-cascader
                                     v-model="form.area"
                                     :options="areas"
@@ -185,7 +185,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col>
-                        <el-form-item label="企业类别">
+                        <el-form-item label="企业类别" prop="orgCategoryId">
                             <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
                                 <el-option
                                         v-for="item in orgCategories"
@@ -275,6 +275,12 @@
                         required:true,message:'请输入手机号',trigger:'blur'
                     },{
                         validator:checkTel,trigger:'blur'
+                    }],
+                    orgCategoryId:[{
+                        required:true,message:"请选择企业类别",trigger:['blur','change']
+                    }],
+                    area:[{
+                        required:true,message:"请选择省市区",trigger:['blur','change']
                     }]
                 }
             };

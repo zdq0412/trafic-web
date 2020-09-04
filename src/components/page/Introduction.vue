@@ -86,8 +86,8 @@
                         ref="orgDocTable"
                         header-cell-class-name="table-header"
                 >
+                    <el-table-column prop="docNum" label="证书编号"></el-table-column>
                     <el-table-column prop="name" label="名称"></el-table-column>
-                    <el-table-column prop="docNum" label="文件编号"></el-table-column>
                     <el-table-column prop="url" label="照片" align="center">
                         <template slot-scope="scope">
                             <el-image

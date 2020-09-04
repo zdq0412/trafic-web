@@ -89,14 +89,6 @@
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="实施日期" prop="implementDate">
-                    <el-date-picker
-                            v-model="form.implementDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
-                </el-form-item>
                 <el-form-item label="发文部门">
                     <el-input v-model="form.publishDepartment"  maxlength="50"></el-input>
                 </el-form-item>
@@ -142,14 +134,6 @@
                 <el-form-item label="发布日期" prop="publishDate">
                     <el-date-picker
                             v-model="form.publishDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            placeholder="选择日期">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="实施日期" prop="implementDate">
-                    <el-date-picker
-                            v-model="form.implementDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -272,9 +256,6 @@
                     ],
                     content:[
                         { required: true, message: '请输入文本内容', trigger: 'blur' }
-                    ],
-                    implementDate:[
-                        { required: true, message: '请选择实施日期', trigger: 'blur' }
                     ]
                 }
             };
@@ -392,17 +373,25 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                this.$refs["form"].clearValidate();
                 if(row.publishDate){
                     this.form.publishDate = getDate(new Date(row.publishDate));
                 }
-                if(row.implementDate){
-                    this.form.implementDate = getDate(new Date(row.implementDate));
-                }
+
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
                 }
-                this.form.area=[row.province.id,row.city.id,row.region.id];
+
+                if(row.province){
+                    this.form.area = [row.province.id];
+                }
+
+                if(row.city){
+                    this.form.area = [row.province.id,row.city.id];
+                }
+
+                if(row.region){
+                    this.form.area = [row.province.id,row.city.id,row.region.id];
+                }
             },
             // 保存编辑
             saveEdit() {

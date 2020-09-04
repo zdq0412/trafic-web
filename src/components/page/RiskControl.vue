@@ -66,11 +66,12 @@
                         <el-upload
                                 style="display: none;"
                                 :action="uploadUrl"
-                                :limit="1"
+                                :file-list="fileList"
                                 :auto-upload="true"
                                 accept=".jpeg,.png,.bmp,.jpg,.JPEG,.PNG,.BMP,.JPG"
                                 :on-success="handleAvatarSuccess"
                                 :before-upload="beforeAvatarUpload"
+                                :on-change="handleChange"
                                 :headers="headers"
                         >
                             <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">点击上传</el-button>
@@ -89,8 +90,9 @@
                 <el-card shadow="hover" style="height:403px;">
                     <div slot="header" class="clearfix">
                         <span>危险源清单</span>
-                        <el-button style="float: right; padding: 3px 0" type="text" @click="handleAdd">添加</el-button>
+                       <el-button style="margin-left:20px;padding: 3px 0" type="text" @click="handleAdd">添加</el-button>
                     </div>
+                    <!--<el-button style="padding: 3px 0;margin-bottom: 3px;" type="text" @click="handleAdd">添加</el-button>-->
                     <el-table
                             :data="tableData"
                             border
@@ -111,7 +113,7 @@
                         <el-table-column prop="name" label="危险源名称"></el-table-column>
                         <el-table-column prop="happen" label="发生可能性(L)"></el-table-column>
                         <el-table-column prop="consequence" label="后果严重性(S)"></el-table-column>
-                        <el-table-column prop="criterion" label="判定准则(R)"></el-table-column>
+                        <el-table-column prop="criterion" label="风险值(R)"></el-table-column>
                         <el-table-column prop="riskLevel" label="安全风险等级"></el-table-column>
                         <el-table-column prop="fourColor" label="四色标识">
                            <template slot-scope="scope">
@@ -154,12 +156,12 @@
                                           show-word-limit></el-input>
                             </el-form-item>
                             <el-form-item label="发生可能性" prop="happen">
-                                <el-input-number v-model="form.happen" number></el-input-number>
+                                <el-input-number v-model="form.happen" :precision="0"  :max="5" :min="1" step="1"></el-input-number>
                             </el-form-item>
                             <el-form-item label="后果严重性" prop="consequence">
-                                <el-input-number v-model="form.consequence" number></el-input-number>
+                                <el-input-number v-model="form.consequence" :precision="0"  :max="5" :min="1" step="1"></el-input-number>
                             </el-form-item>
-                            <el-form-item label="判定准则" prop="criterion">
+                           <!-- <el-form-item label="判定准则" prop="criterion">
                                 <el-input-number v-model="form.criterion" number></el-input-number>
                             </el-form-item>
                             <el-form-item label="风险等级" prop="riskLevel">
@@ -167,12 +169,18 @@
                             </el-form-item>
                             <el-form-item label="四色标识" prop="fourColor">
                                 <el-color-picker v-model="form.fourColor"></el-color-picker>
-                            </el-form-item>
+                            </el-form-item>-->
                             <el-form-item label="控制措施" prop="measures">
                                 <el-input v-model="form.measures"  maxlength="500" type="textarea"></el-input>
                             </el-form-item>
                             <el-form-item label="实施期限" prop="timeLimit">
-                                <el-input v-model="form.timeLimit"></el-input>
+                                <el-input v-model="form.timeLimit"  maxlength="500"  type="textarea"></el-input>
+                                <!--<el-select v-model="form.timeLimit">
+                                    <el-option label="立刻" value="立刻"></el-option>
+                                    <el-option label="立即或近期整改" value="立即或近期整改"></el-option>
+                                    <el-option label="2年内治理" value="2年内治理"></el-option>
+                                    <el-option label="有条件、有经费时治理、需保存记录" value="有条件、有经费时治理、需保存记录"></el-option>
+                                </el-select>-->
                             </el-form-item>
                         </el-form>
                         <span slot="footer" class="dialog-footer">
@@ -188,12 +196,12 @@
                                           show-word-limit></el-input>
                             </el-form-item>
                             <el-form-item label="发生可能性" prop="happen">
-                                <el-input-number v-model="form.happen" number></el-input-number>
+                                <el-input-number v-model="form.happen" :precision="0"  :max="5" :min="1" step="1"></el-input-number>
                             </el-form-item>
                             <el-form-item label="后果严重性" prop="consequence">
-                                <el-input-number v-model="form.consequence" number></el-input-number>
+                                <el-input-number v-model="form.consequence" :precision="0"  :max="5" :min="1" step="1"></el-input-number>
                             </el-form-item>
-                            <el-form-item label="判定准则" prop="criterion">
+                            <!--<el-form-item label="判定准则" prop="criterion">
                                 <el-input-number v-model="form.criterion" number></el-input-number>
                             </el-form-item>
                             <el-form-item label="风险等级" prop="riskLevel">
@@ -201,12 +209,18 @@
                             </el-form-item>
                             <el-form-item label="四色标识" prop="fourColor">
                                 <el-color-picker v-model="form.fourColor"></el-color-picker>
-                            </el-form-item>
+                            </el-form-item>-->
                             <el-form-item label="控制措施" prop="measures">
                                 <el-input v-model="form.measures"  maxlength="500"  type="textarea"></el-input>
                             </el-form-item>
                             <el-form-item label="实施期限" prop="timeLimit">
-                                <el-input v-model="form.timeLimit"></el-input>
+                                <el-input v-model="form.timeLimit"  maxlength="500"  type="textarea"></el-input>
+                                <!--<el-select v-model="form.timeLimit">
+                                    <el-option label="立刻" value="立刻"></el-option>
+                                    <el-option label="立即或近期整改" value="立即或近期整改"></el-option>
+                                    <el-option label="2年内治理" value="2年内治理"></el-option>
+                                    <el-option label="有条件、有经费时治理、需保存记录" value="有条件、有经费时治理、需保存记录"></el-option>
+                                </el-select>-->
                             </el-form-item>
                         </el-form>
                         <span slot="footer" class="dialog-footer">
@@ -235,20 +249,11 @@
                     consequence:[{
                         required:true,message:'请输入后果严重性',trigger:'blur'
                     }],
-                    criterion:[{
-                        required:true,message:'请输入判定准则',trigger:'blur'
-                    }],
-                    riskLevel:[{
-                        required:true,message:'请输入安全风险等级',trigger:'blur'
-                    }],
                     measures:[{
                         required:true,message:'请输入控制措施',trigger:'blur'
                     }],
                     timeLimit:[{
-                        required:true,message:'请输入实施期限',trigger:'blur'
-                    }],
-                    fourColor:[{
-                        required:true,message:'请选择四色标识',trigger:'blur'
+                        required:true,message:'请输入实施期限',trigger:['blur','change']
                     }]
                 },
                 query: {
@@ -256,6 +261,7 @@
                     pageSize: 10
                 },
                 pageTotal: 0,
+                fileList:[],
                 tableData: [],
                 addVisible:false,
                 editVisible:false,
@@ -417,7 +423,6 @@
                 })
             },
             handleAvatarSuccess(res, file) {
-                console.log(res);
                 if(res.result.resultCode==200){
                     this.loadFourColorPic();
                 }else{
@@ -469,6 +474,9 @@
                     const date = new Date(now - (6 - index) * 86400000);
                     item.name = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
                 });
+            },
+            handleChange(file,fileList){
+                this.fileList = fileList.slice(-1);
             },
             handleUpload(){
                 this.$refs.fileUploadBtn.$el.click();

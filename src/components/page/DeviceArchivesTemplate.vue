@@ -107,7 +107,7 @@
                             <el-cascader
                                     v-model="form.area"
                                     :options="areas"
-                                    :props="{label:'name',value:'id'}"
+                                    :props="{label:'name',value:'id',checkStrictly: true}"
                                     @change="handleAreaChange"></el-cascader>
                         </el-form-item>
                     </el-col>
@@ -167,7 +167,7 @@
                             <el-cascader
                                     v-model="form.area"
                                     :options="areas"
-                                    :props="{label:'name',value:'id'}"
+                                    :props="{label:'name',value:'id',checkStrictly: true}"
                                     @change="handleAreaChange"></el-cascader>
                         </el-form-item>
                     </el-col>
@@ -283,7 +283,8 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             downloadTemplate(index,row){
-                window.location.href=this.$baseURL + "/" + row.url;
+                //window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
             },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
