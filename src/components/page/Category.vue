@@ -54,6 +54,12 @@
                 <el-table-column prop="name" label="类别名称"></el-table-column>
                 <el-table-column prop="type" label="类型"></el-table-column>
                 <el-table-column prop="createDate" label="创建日期" :formatter="formatDate"></el-table-column>
+                <el-table-column prop="deleted" label="状态">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.deleted" style="color:red;">已停用</span>
+                        <span v-else>正常</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -62,12 +68,18 @@
                                 icon="el-icon-edit"
                                 @click="handleEdit(scope.$index, scope.row)"
                         >编辑</el-button>
-                        <el-button
+                        <el-button v-if="scope.row.deleted"
                                 type="text"
-                                icon="el-icon-delete"
-                                class="red"
-                                @click="handleDelete(scope.$index, scope.row)"
-                        >删除</el-button>
+                                icon="el-icon-video-play"
+                                style="color:green;"
+                                @click="handleDelete(scope.$index, scope.row,'play')"
+                        >启用</el-button>
+                        <el-button v-else
+                                   type="text"
+                                   icon="el-icon-video-pause"
+                                   class="red"
+                                   @click="handleDelete(scope.$index, scope.row,'pause')"
+                        >停用</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -247,17 +259,21 @@
                 this.getData();
             },
             // 删除操作
-            handleDelete(index, row) {
+            handleDelete(index, row,operType) {
                 this.form=row;
+                this.form.operType = operType;
                 // 二次确认删除
-                this.$confirm('确定要删除吗？', '提示', {
+                this.$confirm('确定执行该操作吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/category/category/" + this.form.id).then(res => {
-
-                            this.$message.success('删除成功');
-                            this.getData();
+                        this.$axios.post("/category/categoryStatus",this.$qs.stringify(this.form)).then(res => {
+                            if(res.data.result.resultCode===200){
+                                this.$message.success('操作成功');
+                                this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
+                            }
                         }) .catch(error =>{
                             console.log(error);
                         });

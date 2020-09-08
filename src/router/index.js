@@ -316,7 +316,7 @@ export default new Router({
                     // markdown组件
                     path: '/category',
                     component: () => import('../components/page/Category.vue'),
-                    meta: { title: '数据字典管理' }
+                    meta: { title: '类别管理' }
                 },
                 {
                     // 图片上传组件

@@ -47,12 +47,18 @@
                                 icon="el-icon-edit"
                                 @click="handleEdit(scope.$index, scope.row)"
                         >编辑</el-button>
-                        <el-button
-                                type="text"
-                                icon="el-icon-delete"
-                                class="red"
-                                @click="handleDelete(scope.$index, scope.row)"
-                        >删除</el-button>
+                        <el-button v-if="scope.row.deleted"
+                                   type="text"
+                                   icon="el-icon-video-play"
+                                   style="color:green;"
+                                   @click="handleDelete(scope.$index, scope.row,'play')"
+                        >启用</el-button>
+                        <el-button v-else
+                                   type="text"
+                                   icon="el-icon-video-pause"
+                                   class="red"
+                                   @click="handleDelete(scope.$index, scope.row,'pause')"
+                        >停用</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -217,18 +223,18 @@
                 this.getData();
             },
             // 删除操作
-            handleDelete(index, row) {
+            handleDelete(index, row,operType) {
                 this.form = row;
+                this.form.operType = operType;
                 // 二次确认删除
-                this.$confirm('确定要删除吗？', '提示', {
+                this.$confirm('确定执行该操作吗？', '提示', {
                     type: 'warning'
-                })
-                    .then(() => {
-                        this.$axios.delete("/orgCategory/orgCategory/" + this.form.id).then(res => {
-                            this.$message.success('删除成功');
+                }).then(() => {
+                        this.$axios.post("/orgCategory/orgCategoryStatus",this.$qs.stringify(this.form)).then(res => {
+                            this.$message.success('操作成功');
                             this.getData();
                         }) .catch(error =>{
-                            console.log(error);
+                            this.$message.error(res.data.result.message);
                         });
                     })
                     .catch(() => {});
