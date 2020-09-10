@@ -139,7 +139,7 @@ export default new Router({
                 {
                   path:'/rulesTemplate',
                   component:()=>import('../components/page/RuleTemplate.vue'),
-                  meta:{title:'安全规章制度'}
+                  meta:{title:'企业制度模板'}
                 },
                 {
                   path:'/securityCheckTemplate',
@@ -259,7 +259,7 @@ export default new Router({
                 {
                   path:'/rules',
                   component:()=>import('../components/page/Rules.vue'),
-                  meta:{title:'安全规章制度'}
+                  meta:{title:'企业制度'}
                 },
                 {
                   path:'/notification',

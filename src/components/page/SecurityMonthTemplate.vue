@@ -85,7 +85,7 @@
                 <el-form-item label="文件">
                     <el-upload style="display: none;"
                                :action="modifyUrl"
-                               :limit="1"
+                               :file-list="fileList"
                                :auto-upload="false"
                                ref="uploadFileEdit"
                                :data="form"
@@ -116,7 +116,7 @@
                 <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;"  @change="$set(form,orgCategoryId)">
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -146,7 +146,7 @@
                 <el-form-item label="文件">
                     <el-upload style="display: none;"
                                :action="uploadUrl"
-                               :limit="1"
+                               :file-list="fileList"
                                :auto-upload="false"
                                ref="uploadFile"
                                :data="form"
@@ -202,6 +202,7 @@
 
 <script>
     import {getDate} from "../common/utils";
+    import {validateUploadFile} from "../common/validate";
 
     export default {
         name: 'basetable',
@@ -216,6 +217,7 @@
                 dialogVisible:false,
                 uploadUrl:'',
                 modifyUrl:'',
+                fileList:[],
                 filename:'',
                 isSelectUploadFile:false,
                 roleId:'',
@@ -295,9 +297,10 @@
                     return '';
                 }
             },
-            handleChange(file){
+            handleChange(file,fileList){
                 this.filename = file.name;
                 this.isSelectUploadFile = true;
+                this.fileList = fileList.slice(-1);
             },
             handleAreaChange(file){
                 if(this.form.area&&this.form.area.length>0){
@@ -415,7 +418,7 @@
                 }
                 this.form = {};
                 this.filename='';
-
+                this.fileList=[];
             },
             // 保存编辑
             saveEdit() {
@@ -445,6 +448,10 @@
             },
             // 保存新增
             saveAdd() {
+                if(!validateUploadFile(this.fileList)){
+                    this.$message.error('请选择上传文件!');
+                    return false;
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {

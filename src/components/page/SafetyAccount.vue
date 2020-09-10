@@ -750,6 +750,7 @@
                 this.$refs["form"].clearValidate();
             },
             loadData(){
+
                 this.$axios.get("/safetyProductionCostPlan/safetyProductionCostPlan").then(res=>{
                     this.safetyProductionCostPlans = res.data;
                 }).catch(error=>console.log(error))

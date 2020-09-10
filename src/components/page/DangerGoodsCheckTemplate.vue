@@ -119,7 +119,7 @@
                 <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;"  @change="$set(form,orgCategoryId)">
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -610,6 +610,7 @@
                         this.form.content='';
                         this.$axios.put("/dangerGoodsCheckTemplate/dangerGoodsCheckTemplate?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
+                                this.$message.success("编辑成功!");
                                 this.editVisible = false;
                                 this.getData();
                             } else {

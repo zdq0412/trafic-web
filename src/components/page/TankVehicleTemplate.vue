@@ -119,7 +119,7 @@
                 <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;"  @change="$set(form,orgCategoryId)">
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -536,6 +536,7 @@
             handleAdd(){
                 this.form = {};
                 this.addVisible = true;
+                this.fileList = [];
             },
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){

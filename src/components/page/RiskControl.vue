@@ -87,7 +87,7 @@
         </el-row>
         <el-row :gutter="20">
             <el-col :span="24">
-                <el-card shadow="hover" style="height:403px;">
+                <el-card shadow="hover" style="height:430px;">
                     <div slot="header" class="clearfix">
                         <span>危险源清单</span>
                        <el-button style="margin-left:20px;padding: 3px 0" type="text" @click="handleAdd">添加</el-button>
@@ -258,7 +258,7 @@
                 },
                 query: {
                     pageIndex: 1,
-                    pageSize: 10
+                    pageSize: 5
                 },
                 pageTotal: 0,
                 fileList:[],
@@ -545,6 +545,10 @@
         color: rgb(242, 94, 67);
     }
 
+    .red{
+        color:red;
+    }
+
     .user-info {
         display: flex;
         align-items: center;
@@ -552,7 +556,7 @@
         border-bottom: 2px solid #ccc;
         margin-bottom: 20px;
     }
-
+/*
     .user-avator {
         width: 120px;
         height: 120px;
@@ -564,28 +568,28 @@
         flex: 1;
         font-size: 14px;
         color: #999;
-    }
+    }*/
 
     .user-info-cont div:first-child {
         font-size: 30px;
         color: #222;
     }
 
-    .user-info-list {
+   /* .user-info-list {
         font-size: 14px;
         color: #999;
         line-height: 25px;
-    }
+    }*/
 
     .user-info-list span {
         margin-left: 70px;
     }
-
+/*
     .mgb20 {
         margin-bottom: 20px;
     }
 
     .todo-item {
         font-size: 14px;
-    }
+    }*/
 </style>

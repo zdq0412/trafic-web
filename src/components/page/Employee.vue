@@ -42,6 +42,7 @@
                 <el-table-column prop="idnum" label="身份证"></el-table-column>
                 <el-table-column prop="department.name" label="所在部门"></el-table-column>
                 <el-table-column prop="position.name" label="职务"></el-table-column>
+                <el-table-column prop="user.role.name" label="角色"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
@@ -111,7 +112,6 @@
                     <el-cascader  v-model="departmentIds"
                                   :options="depts"
                                   :props="{label:'name',value:'id',checkStrictly: true}"
-                                  clearable
                                   @change="changeDepartment"
                     ></el-cascader>
                 </el-form-item>
@@ -318,7 +318,7 @@
                 this.$refs.upload_add.clearFiles();
             },
             handleUpdateSuccess(res, file) {
-                if(res.data.result.resultCode===200){
+                if(res.result.resultCode===200){
                     this.editVisible= false;
                     this.getData();
                     this.isSelectFile = false;
@@ -425,7 +425,7 @@
                 this.isSelectFile = false;
 
                 if(row.department){
-                    this.$axios.get("/department/findParent",{
+                    this.$axios.get("/department/findParentDepartments",{
                         params:{
                             id:row.department.id
                         }

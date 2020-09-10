@@ -109,7 +109,7 @@
                 <el-form-item label="手机号" prop="tel">
                     <el-input v-model="form.tel"  maxlength="11"></el-input>
                 </el-form-item>
-                <el-form-item label="所在企业">
+                <el-form-item label="所在企业" v-if="!haveOrg">
                     <el-select v-model="form.orgId" @change="$set(form,orgId)">
                         <el-option
                                 v-for="item in orgs"
@@ -147,7 +147,7 @@
                 <el-form-item label="手机号" prop="tel">
                     <el-input v-model="form.tel"  maxlength="11"></el-input>
                 </el-form-item>
-                <el-form-item label="所在企业">
+                <el-form-item label="所在企业" v-if="!haveOrg">
                     <el-select v-model="form.orgId" @change="$set(form,orgId)">
                         <el-option
                                 v-for="item in orgs"
@@ -184,7 +184,7 @@
             };
             return {
                 query: {
-                    name: '',
+                    username: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
@@ -202,6 +202,7 @@
                 status:false,
                 orgs:[],
                 roles:[],
+                haveOrg:false,
                 rules:{
                     username: [
                         { required: true, message: '请输入用户名', trigger: 'blur' }
@@ -217,6 +218,12 @@
         },
         created() {
             this.getData();
+            this.$axios.get("/user/haveOrg").then(res =>{
+                if(res.data.data){
+                    this.haveOrg = true;
+                    this.org = res.data.data;
+                }
+            }).catch(error=>console.log(error));
         },
         methods: {
             disabledUser(index,row){
@@ -268,11 +275,13 @@
                 }).catch(error => {
                     console.log(error);
                 });
-                this.$axios.get("/org/orgs").then(res => {
-                    this.orgs = res.data.data;
-                }).catch(error => {
-                    console.log(error);
-                });
+                if(!this.haveOrg){
+                    this.$axios.get("/org/orgs").then(res => {
+                        this.orgs = res.data.data;
+                    }).catch(error => {
+                        console.log(error);
+                    });
+                }
             },
             resetPassword(index, row){
                 this.$axios.get("/user/resetPassword",{
@@ -294,7 +303,7 @@
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
-                        name : this.query.username
+                        username : this.query.username
                     }
                 }).then(res => {
                     this.tableData = res.data.data;

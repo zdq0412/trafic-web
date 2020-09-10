@@ -23,8 +23,7 @@
                     border
                     class="table"
                     ref="multipleTable"
-                    header-cell-class-name="table-header"
-            >
+                    header-cell-class-name="table-header">
                 <el-table-column prop="username" label="用户名"></el-table-column>
                 <el-table-column prop="province.name" label="省"></el-table-column>
                 <el-table-column prop="city.name" label="市"></el-table-column>
@@ -57,7 +56,6 @@
                 ></el-pagination>
             </div>
         </div>
-
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">

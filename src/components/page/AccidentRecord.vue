@@ -79,9 +79,9 @@
         </div>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件">
@@ -90,7 +90,7 @@
                                :file-list="fileList"
                                :auto-upload="false"
                                ref="uploadFileEdit"
-                               :data="form"
+                               :data="editableForm"
                                :accept="ext"
                                :on-change="handleChange"
                                :on-success="handleUpdateSuccess"
@@ -105,11 +105,11 @@
                     </div>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea"  maxlength="500" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500" v-model="editableForm.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="cancelEdit">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
@@ -241,6 +241,7 @@
                 pageTotal: 0,
                 haveOrg:false,
                 form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 imgUrl:'',
@@ -263,6 +264,10 @@
             this.getData();
         },
         methods: {
+            cancelEdit(){
+                this.editVisible = false;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
+            },
             downloadTemplate(index,row){
                 window.open(this.$baseURL + "/" + row.url);
             },
@@ -377,6 +382,7 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 this.filename = row.filename;
                 this.isSelectUploadFile = false;
@@ -395,10 +401,10 @@
                 }
                 this.form = {};
                 this.filename='';
-
             },
             // 保存编辑
             saveEdit() {
+                this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         if(this.isSelectUploadFile)

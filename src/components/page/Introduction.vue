@@ -51,12 +51,12 @@
                               <i class="el-icon-edit" style="font-size: 30px;"></i>
                             </span>
                     <span  @click="handleRemove(orgImg)" style="margin-left: 20px;cursor:pointer;">
-                              <i class="el-icon-delete" style="font-size: 30px;color:white;"></i>
+                              <i class="el-icon-delete" style="font-size: 30px;"></i>
                             </span>
                 </div>
             </div>
             <div style="display: inline-block;margin-left: 10px;">
-                <div  class="avatar-uploader" style="height: 200px;width:200px;" @click="uploadVisible=true">
+                <div  class="avatar-uploader" style="height: 200px;width:200px;" @click="uploadVisible=true;orgImg={};editableOrgImg=JSON.parse(JSON.stringify(orgImg));imageUrl='';">
                     <i class="el-icon-plus avatar-uploader-iconBtn"></i>
                 </div>
             </div>
@@ -177,17 +177,17 @@
         </el-dialog>
         <!--编辑企业资质-->
         <el-dialog title="编辑" :visible.sync="editOrgDocVisible" width="30%" >
-            <el-form ref="form" :rules="rules" :model="orgDoc" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="editableOrgDoc" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="orgDoc.name" maxlength="50"
+                    <el-input v-model="editableOrgDoc.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件编号" prop="docNum">
-                    <el-input v-model="orgDoc.docNum" maxlength="50"></el-input>
+                    <el-input v-model="editableOrgDoc.docNum" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="照片" >
                     <div>
-                        <el-input style="display: none;" v-model="orgDoc.myImage"></el-input>
+                        <el-input style="display: none;" v-model="editableOrgDoc.myImage"></el-input>
                         <el-upload
                                 class="avatar-uploader"
                                 ref="upload_modify"
@@ -207,7 +207,7 @@
                 </el-form-item>
                 <el-form-item label="有效期开始" prop="beginDate">
                     <el-date-picker
-                            v-model="orgDoc.beginDate"
+                            v-model="editableOrgDoc.beginDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -215,7 +215,7 @@
                 </el-form-item>
                 <el-form-item label="有效期结束" prop="endDate">
                     <el-date-picker
-                            v-model="orgDoc.endDate"
+                            v-model="editableOrgDoc.endDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -223,12 +223,10 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editOrgDocVisible=false">取 消</el-button>
+                <el-button @click="cancelEditOrgDoc">取 消</el-button>
                 <el-button type="primary" @click="saveEditOrgDoc">确 定</el-button>
             </span>
         </el-dialog>
-
-
         <!--上传图片-->
         <el-dialog title="上传" :visible.sync="uploadVisible" width="30%" >
             <el-form ref="form" :rules="rules" :model="orgImg" label-width="50px">
@@ -260,109 +258,109 @@
         </el-dialog>
 
         <el-dialog title="编辑企业基础信息" :visible.sync="titleVisible" width="60%">
-            <el-form ref="form" :rules="rules" :model="org" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="editableOrg" label-width="100px">
                 <el-col>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="org.name" maxlength="50"
+                                <el-input v-model="editableOrg.name" maxlength="50"
                                           show-word-limit></el-input>
                             </el-form-item>
                         </el-col>
                         <el-col>
                             <el-form-item label="简称" prop="shortName">
-                                <el-input v-model="org.shortName" maxlength="10"></el-input>
+                                <el-input v-model="editableOrg.shortName" maxlength="10"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="联系人">
-                                <el-input v-model="org.contact" maxlength="10"></el-input>
+                                <el-input v-model="editableOrg.contact" maxlength="10"></el-input>
                             </el-form-item>
                         </el-col>
                         <el-col>
                             <el-form-item label="手机号" prop="tel">
-                                <el-input v-model="org.tel" maxlength="11"></el-input>
+                                <el-input v-model="editableOrg.tel" maxlength="11"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="地址">
-                                <el-input v-model="org.addr" maxlength="100"></el-input>
+                                <el-input v-model="editableOrg.addr" maxlength="100"></el-input>
                             </el-form-item>
                         </el-col>
                         <el-col>
                             <el-form-item label="法人">
-                                <el-input v-model="org.legalPerson" maxlength="50"></el-input>
+                                <el-input v-model="editableOrg.legalPerson" maxlength="50"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="备注">
-                                <el-input type="textarea" v-model="org.note" maxlength="2000"></el-input>
+                                <el-input type="textarea" v-model="editableOrg.note" maxlength="2000"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                 </el-col>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="titleVisible = false">取 消</el-button>
+                <el-button @click="cancelEditOrg">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <el-dialog title="编辑图片名称" :visible.sync="imgVisible" width="40%">
-            <el-form ref="form" :rules="rules" :model="orgImg" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="editableOrgImg" label-width="100px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="图片名称" prop="name">
-                            <el-input v-model="orgImg.name" maxlength="50" show-word-limit></el-input>
+                            <el-input v-model="editableOrgImg.name" maxlength="50" show-word-limit></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="imgVisible = false">取 消</el-button>
+                <el-button @click="imgVisible = false;editableOrgImg=JSON.parse(JSON.stringify(orgImg));">取 消</el-button>
                 <el-button type="primary" @click="saveEditImg">确 定</el-button>
             </span>
         </el-dialog>
         <el-dialog title="编辑企业简介" :visible.sync="introductionVisible" width="60%">
-            <el-form ref="form" :rules="rules" :model="org" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="editableOrg" label-width="100px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="企业简介" prop="name" >
                             <!--<el-input type="textarea"  rows="15" v-model="org.introduction"></el-input>-->
-                            <vue-editor id="editor" maxlength="2000" v-model="org.introduction" :editor-toolbar="customToolbar" useCustomImageHandler @image-added="handleImageAdded"></vue-editor>
+                            <vue-editor id="editor" maxlength="2000" v-model="editableOrg.introduction" :editor-toolbar="customToolbar" useCustomImageHandler @image-added="handleImageAdded"></vue-editor>
                         </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="introductionVisible = false">取 消</el-button>
+                <el-button @click="introductionVisible = false;editableOrg=JSON.parse(JSON.stringify(org));">取 消</el-button>
                 <el-button type="primary" @click="saveIntroduction">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="编辑基本信息" :visible.sync="headVisible" width="60%">
-            <el-form ref="form" :rules="rules" :model="org" label-width="100px">
+        <el-dialog title="编辑举报信息" :visible.sync="headVisible" width="60%">
+            <el-form ref="form" :rules="rules" :model="editableOrg" label-width="100px">
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="安全举报邮箱">
-                            <el-input v-model="org.email" maxlength="50"></el-input>
+                            <el-input v-model="editableOrg.email" maxlength="50"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row type="flex" class="row-bg">
                     <el-col>
                         <el-form-item label="安全举报电话">
-                            <el-input v-model="org.reportTel" maxlength="50"></el-input>
+                            <el-input v-model="editableOrg.reportTel" maxlength="50"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="headVisible = false">取 消</el-button>
+                <el-button @click="headVisible = false;editableOrg=JSON.parse(JSON.stringify(org));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
@@ -420,8 +418,11 @@
                 headVisible:false,
                 introductionVisible:false,
                 org:{},
+                editableOrg:{},
                 orgImg:{},
+                editableOrgImg:{},
                 orgDoc:{},
+                editableOrgDoc:{},
                 imageUrl:'',
                 imgVisible:false,
                 dialogVisible:false,
@@ -479,6 +480,14 @@
             this.uploadUrl = this.$baseURL + "/orgImg/photos";
         },
         methods: {
+            cancelEditOrgDoc(){
+                this.editOrgDocVisible=false;
+                this.editableOrgDoc = JSON.parse(JSON.stringify(this.orgDoc));
+            },
+            cancelEditOrg(){
+                this.titleVisible = false;
+                this.editableOrg = JSON.parse(JSON.stringify(this.org));
+            },
             // 删除操作
             handleDelete(index, row) {
                 this.form = row;
@@ -502,6 +511,7 @@
                     });
             },
             saveEditOrgDoc(){
+                this.orgDoc = this.editableOrgDoc;
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         if(this.isSelectFile) {
@@ -645,14 +655,17 @@
                 switch (command) {
                     case 'name':{
                         this.titleVisible = true;
+                        this.editableOrg = JSON.parse(JSON.stringify(this.org));
                         break;
                     }
                     case 'introduction':{
                         this.introductionVisible = true;
+                        this.editableOrg = JSON.parse(JSON.stringify(this.org));
                         break;
                     }
                     case 'baseInfo':{
                         this.headVisible=true;
+                        this.editableOrg = JSON.parse(JSON.stringify(this.org));
                         break;
                     }
                 }
@@ -660,6 +673,7 @@
             handleEdit(orgImg){
                 this.image = 'edit';
                 this.orgImg = orgImg;
+                this.editableOrgImg = JSON.parse(JSON.stringify(this.orgImg));
                 this.imgVisible = true;
                 this.isSelectFile=false;
             },
@@ -667,11 +681,13 @@
                 this.uploadOrgDocUrl = this.$baseURL + "/orgDoc/updateOrgDoc";
                 this.editOrgDocVisible=true;
                 this.orgDoc = row;
+                this.editableOrgDoc = JSON.parse(JSON.stringify(this.orgDoc));
+                this.isSelectFile = false;
                 if(row.beginDate){
-                    this.orgDoc.beginDate=getDate(new Date(row.beginDate));
+                    this.editableOrgDoc.beginDate=getDate(new Date(row.beginDate));
                 }
                 if(row.endDate){
-                    this.orgDoc.endDate=getDate(new Date(row.endDate));
+                    this.editableOrgDoc.endDate=getDate(new Date(row.endDate));
                 }
                 this.imageUrl = this.$baseURL + "/" + row.url;
             },
@@ -692,7 +708,7 @@
             },
             saveEditImg(){
                 this.$refs.form.validate(validate=>{
-                    console.log(this.orgImg);
+                    this.orgImg = this.editableOrgImg;
                     if(validate){
                         this.$axios.put("/orgImg/orgImg?" + this.$qs.stringify(this.orgImg)).then(res => {
                             if (res.data.result.resultCode == 200) {
@@ -708,6 +724,7 @@
                 });
             },
             saveEdit(){
+                this.org = this.editableOrg;
                 this.$refs.form.validate(validate=>{
                     if(validate){
                         this.$axios.post("/org/updateOrg" ,this.$qs.stringify(this.org)).then(res => {
@@ -726,6 +743,7 @@
                 });
             },
             saveIntroduction(){
+                this.org = this.editableOrg;
                 this.$refs.form.validate(validate=>{
                     if(validate){
                         if(this.org.establishedTime){
@@ -815,5 +833,8 @@
     .table-td-thumb{
         height:50px;
         width:50px;
+    }
+    .red{
+        color:red;
     }
 </style>

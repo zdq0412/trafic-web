@@ -33,6 +33,12 @@
                         <div>{{scope.row.safetyCostRatio}}%</div>
                     </template>
                 </el-table-column>
+                <el-table-column prop="deleted" label="状态">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.deleted" style="color:red;">已停用</span>
+                        <span v-else>正常</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
@@ -76,20 +82,20 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="提取标准%" prop="safetyCostRatio">
-                    <el-input-number v-model="form.safetyCostRatio"  maxlength="10"  placeholder="安全生产费用提取标准"></el-input-number>
+                    <el-input-number v-model="editableForm.safetyCostRatio"  maxlength="10"  placeholder="安全生产费用提取标准"></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="cancelEdit()">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
@@ -152,6 +158,7 @@
                 grantFunctionVisible:false,
                 pageTotal: 0,
                 form: {},
+                editableForm:{},
                 idx: -1,
                 id: -1,
                 rules:{
@@ -168,6 +175,10 @@
             this.getData();
         },
         methods: {
+            cancelEdit(){
+                this.editVisible = false;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
+            },
             handleCheckAllChange(val) {
                 if (this.checkAll) {
                     this.$refs.functionTree.$refs.tree.setCheckedNodes(this.$refs.functionTree.functions);
@@ -243,6 +254,7 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
             },
             // 授权操作
@@ -254,10 +266,12 @@
             },
             // 保存编辑
             saveEdit() {
+                this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.$axios.put("/orgCategory/orgCategory?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
+                                this.$message.success("修改成功!");
                                 this.editVisible = false;
                                 this.getData();
                             } else {

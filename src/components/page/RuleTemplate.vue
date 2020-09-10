@@ -119,7 +119,7 @@
                 <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" @change="$set(form,orgCategoryId)">
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -160,7 +160,7 @@
                 <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" @change="$set(form,orgCategoryId)">
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -294,7 +294,7 @@
             },
             beforeAvatarUpload(file) {
                 const isLt5M = file.size / 1024 / 1024 < 5;
-                const isWord = file.type==='application/msword';
+                const isWord = (file.type === 'application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
                 if (!isLt5M) {
                     this.$message.error('上传文件大小不能超过 5MB!');
                     return false

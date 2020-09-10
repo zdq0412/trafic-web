@@ -145,7 +145,7 @@
                         <el-input v-model="form.prePlanName" maxlength="50"
                                   show-word-limit></el-input>
                     </el-form-item>
-                    <el-form-item label="编制日期" >
+                    <el-form-item label="编制日期"  prop="writeDate">
                         <el-date-picker
                                 v-model="form.writeDate"
                                 type="date"
@@ -157,7 +157,7 @@
                         <el-input v-model="form.keepOnRecordName" maxlength="50"
                                   show-word-limit></el-input>
                     </el-form-item>
-                    <el-form-item label="备案日期"  v-if="form.keepOnRecord">
+                    <el-form-item label="备案日期"  v-if="form.keepOnRecord" prop="keepOnRecordDate">
                         <el-date-picker
                                 v-model="form.keepOnRecordDate"
                                 type="date"
@@ -178,7 +178,7 @@
                     <el-input v-model="form.prePlanName" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="编制日期" >
+                <el-form-item label="编制日期">
                     <el-date-picker
                             v-model="form.writeDate"
                             type="date"
@@ -200,7 +200,7 @@
                     <el-input v-model="form.keepOnRecordName" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="备案日期">
+                <el-form-item label="备案日期" prop="keepOnRecordDate">
                     <el-date-picker
                             v-model="form.keepOnRecordDate"
                             type="date"
@@ -218,11 +218,46 @@
 </template>
 
 <script>
-    import {getDateTime,getDate} from "../common/utils";
+    import {getDate} from "../common/utils";
 
     export default {
         name: 'basetable',
         data() {
+            //编制时间
+            let writeDate=(rule, value, callback) =>{
+                if(value){
+                    if(this.form.keepOnRecordDate){
+                        let writeDate = new Date(value);
+                        let keepOnRecordDate = new Date(this.form.keepOnRecordDate);
+                        if(writeDate.getTime()>=keepOnRecordDate.getTime()){
+                            callback(new Error("编制日期不能大于备案日期!"));
+                        }else{
+                            callback();
+                        }
+                    }else{
+                        callback();
+                    }
+                }  else{
+                    callback();
+                }
+            };
+            let keepOnRecordDate=(rule, value, callback) =>{
+                if(value){
+                    if(this.form.writeDate){
+                        let writeDate = new Date(this.form.writeDate);
+                        let keepOnRecordDate = new Date(value);
+                        if(writeDate.getTime()>=keepOnRecordDate.getTime()){
+                            callback(new Error("备案日期不能小于编制日期!"));
+                        }else{
+                            callback();
+                        }
+                    }else{
+                        callback();
+                    }
+                }  else{
+                    callback();
+                }
+            };
             return {
                 query: {
                     pageIndex: 1,
@@ -262,6 +297,12 @@
                     ],
                     keepOnRecordName: [
                         { required: true, message: '请输入备案名称', trigger: 'blur' }
+                    ],
+                    keepOnRecordDate: [
+                        { validator:keepOnRecordDate, trigger: 'blur' }
+                    ],
+                    writeDate: [
+                        { validator:writeDate, trigger: 'blur' }
                     ]
                 }
             };

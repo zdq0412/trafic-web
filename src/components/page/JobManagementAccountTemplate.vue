@@ -127,7 +127,7 @@
                 <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;"  @change="$set(form,orgCategoryId)">
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -223,6 +223,7 @@
 
 <script>
     import {getDate} from "../common/utils";
+    import {validateUploadFile} from "../common/validate";
 
     export default {
         name: 'basetable',
@@ -452,7 +453,7 @@
                 }
                 this.form = {};
                 this.filename='';
-
+                this.fileList=[];
             },
             // 保存编辑
             saveEdit() {
@@ -482,6 +483,10 @@
             },
             // 保存新增
             saveAdd() {
+                if(!validateUploadFile(this.fileList)){
+                    this.$message.error('请选择上传文件!');
+                    return false;
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {

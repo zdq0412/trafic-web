@@ -166,7 +166,6 @@
                         style="width: 100%;"
                         row-key="id"
                         border
-                        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
                 >
                     <el-table-column prop="name" label="职位名称"></el-table-column>
                     <el-table-column prop="department.name" label="所在部门"></el-table-column>
@@ -299,10 +298,12 @@
                     let tel=/^[1][3,4,5,7,8][0-9]{9}$/;
                     let phone = /^((0\d{2,3})-)(\d{7,8})(-(\d{3,}))?$/;
                     if (!tel.test(value) && !phone.test(value)) {
-                        callback(new Error("不是有效的电话格式!"));
+                        callback(new Error("有效的电话格式为11位的手机号和合法的座机号,如:0573-82583659"));
                     } else {
                         callback();
                     }
+                }else{
+                    callback();
                 }
             };
             return {
@@ -313,7 +314,7 @@
                 },
                 positionQuery: {
                     pageIndex: 1,
-                    pageSize:10
+                    pageSize:5
                 },
                 pids:[],
                 deptIds:[],
@@ -336,7 +337,7 @@
                         required:true,message:'请输入部门名称',trigger:'blur'
                     }],
                     tel:[{
-                        validator:checkTel,trigger:'blur',message:'部门电话格式不正确'
+                        validator:checkTel,trigger:'blur',message:'有效的电话格式为11位的手机号和合法的座机号,如:0573-82583659'
                     }]
                 }
             };
@@ -364,8 +365,8 @@
                 this.$axios.get("/position/positionsByPage",{
                     params:{
                         departmentId:departmentId,
-                        page:this.query.pageIndex,
-                        limit:this.query.pageSize
+                        page:this.positionQuery.pageIndex,
+                        limit:this.positionQuery.pageSize
                     }
                 }).then(res => {
                     this.positions = res.data.data;
@@ -419,41 +420,22 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.get("/department/children",{
-                            params:{
-                                parentId:row.id
+                        this.$axios.delete("/department/department/" + this.form.id).then(res => {
+                            if (res.data.result.resultCode == 200) {
+                                this.$message.success('删除成功');
+                                this.getData();
+                                this.getPositionByDepartmentId(this.row.id);
+                                this.row = {};
+                            } else {
+                                this.$message.error(res.data.result.message);
                             }
-                        }).then(res=>{
-                            if(res.data.result.resultCode!==200){
-                                this.$axios.delete("/department/department/" + this.form.id).then(res => {
-                                    this.$message.success('删除成功');
-                                    this.getData();
-                                    this.getPositionByDepartmentId(this.row.id);
-                                    this.row = {};
-                                }) .catch(error =>{
-                                    console.log(error);
-                                });
-                            }else{
-                                this.$confirm('该部门存在子部门,删除该部门的同时也会删除所有子部门，确定删除吗？', '提示', {
-                                    type: 'warning'
-                                })
-                                    .then(() => {
-                                        this.$axios.delete("/department/department/" + this.form.id).then(res => {
-                                            this.$message.success('删除成功');
-                                            this.getData();
-                                            this.getPositionByDepartmentId(this.row.id);
-                                            this.row = {};
-                                        }) .catch(error =>{
-                                            console.log(error);
-                                        });
-                                    });
-                            }
-                        }).catch(error=>console.log(error));
-                    })
-                    .catch(() => {});
+                        }).catch(error => {
+                            console.log(error);
+                        })
+                    });
             },
             // 删除操作
-            handlePositionDelete(index, row) {
+            handlePositionDelete(index, row){
                 this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
@@ -492,15 +474,15 @@
                 this.form = row;
                 this.editPositionVisible = true;
                 if(row.department){
-                    this.$axios.get("/department/findParent",{
+                    this.$axios.get("/department/findParentDepartments",{
                         params:{
                             id:row.department.id
                         }
                     }).then(res=>{
+                        console.log(res.data);
                         this.deptIds=res.data;
                     }).catch(error=>console.log(error));
                 }
-
             },
             // 保存编辑
             saveEdit() {
@@ -509,7 +491,7 @@
                 }
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.$axios.put("/department/department?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/department/updateDepartment" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
@@ -596,7 +578,7 @@
             // 分页导航
             handlePositionPageChange(val) {
                 this.$set(this.positionQuery, 'pageIndex', val);
-                this.getData();
+                this.getPositionByDepartmentId(this.row.id);
             }
         }
     };

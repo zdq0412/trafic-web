@@ -238,6 +238,40 @@
         },
         name: 'basetable',
         data() {
+            let publishDate=(rule, value, callback) =>{
+                if(value){
+                    if(this.form.implementDate){
+                        let publishDate = new Date(value);
+                        let implementDate = new Date(this.form.implementDate);
+                        if(publishDate.getTime()>=implementDate.getTime()){
+                            callback(new Error("发布日期不能大于实施日期!"));
+                        }else{
+                            callback();
+                        }
+                    }else{
+                        callback();
+                    }
+                }  else{
+                    callback(new Error("请选择发布日期!"));
+                }
+            };
+            let implementDate=(rule, value, callback) =>{
+                if(value){
+                    if(this.form.publishDate){
+                        let publishDate = new Date(this.form.publishDate);
+                        let implementDate = new Date(value);
+                        if(publishDate.getTime()>=implementDate.getTime()){
+                            callback(new Error("实施日期不能小于发布日期!"));
+                        }else{
+                            callback();
+                        }
+                    }else{
+                        callback();
+                    }
+                }  else{
+                    callback(new Error("请选择实施日期!"));
+                }
+            };
             return {
                 customToolbar: [
                     ["bold", "italic", "underline"]
@@ -268,9 +302,6 @@
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' }
                     ],
-                    publishDate:[
-                        { required: true, message: '请选择发布日期', trigger: 'blur' }
-                    ],
                     area: [{ type:'array', required: true, message: '请选择区域', trigger:['blur','change'] }],
                     orgCategoryId: [{ required: true, message: '请选择企业类别', trigger: ['blur','change'] }],
                     timeliness:[
@@ -279,8 +310,15 @@
                     content:[
                         { required: true, message: '请输入文本内容', trigger: 'blur' }
                     ],
+                    publishDate:[
+                        { required: true, message: '请选择发布日期', trigger: 'blur' },{
+                            validator:publishDate,trigger:'blur'
+                        }
+                    ],
                     implementDate:[
-                        { required: true, message: '请选择实施日期', trigger: 'blur' }
+                        { required: true, message: '请选择实施日期', trigger: 'blur' },{
+                            validator:implementDate,trigger:'blur'
+                        }
                     ]
                 }
             };
