@@ -41,6 +41,9 @@
                 <el-table-column prop="implementDate" label="实施日期" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="publishDepartment" label="发文部门"></el-table-column>
                 <el-table-column prop="num" label="发文字号"></el-table-column>
+                <el-table-column prop="province.name" label="省" v-if="!haveOrg"></el-table-column>
+                <el-table-column prop="city.name" label="市" v-if="!haveOrg"></el-table-column>
+                <el-table-column prop="region.name" label="区" v-if="!haveOrg"></el-table-column>
                 <el-table-column prop="timeliness" label="时效性"></el-table-column>
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
@@ -49,12 +52,12 @@
                 </el-table-column>
                 <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
-                        <el-button v-if="scope.row.org"
+                        <el-button v-if="!haveOrg"
                                 type="text"
                                 icon="el-icon-edit"
                                 @click="handleEdit(scope.$index, scope.row)"
                         >编辑</el-button>
-                        <el-button v-if="scope.row.org"
+                        <el-button v-if="!haveOrg"
                                 type="text"
                                 icon="el-icon-delete"
                                 class="red"
@@ -104,7 +107,7 @@
                     <el-cascader
                             v-model="form.area"
                             :options="areas"
-                            :props="{label:'name',value:'id'}"
+                            :props="{label:'name',value:'id',checkStrictly: true}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别" v-if="!haveOrg" >
@@ -162,7 +165,7 @@
                     <el-cascader
                             v-model="form.area"
                             :options="areas"
-                            :props="{label:'name',value:'id'}"
+                            :props="{label:'name',value:'id',checkStrictly: true}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别" v-if="!haveOrg">
@@ -423,8 +426,13 @@
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
                     this.form.provinceId=this.form.area[0];
+                    if(this.form.area.length==1){
+                        this.form.cityId='';
+                        this.form.regionId='';
+                    }
                     if(this.form.area.length==2){
                         this.form.cityId=this.form.area[1];
+                        this.form.regionId='';
                     }
                     if(this.form.area.length==3){
                         this.form.cityId=this.form.area[1];
@@ -495,7 +503,19 @@
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
                 }
-                this.form.area=[row.province.id,row.city.id,row.region.id];
+                if(row.province && row.city && row.region){
+                    this.form.area=[row.province.id,row.city.id,row.region.id];
+                    this.form.provinceId=row.province.id;
+                    this.form.cityId = row.city.id;
+                    this.form.regionId = row.region.id;
+                }else if(row.province && row.city){
+                    this.form.area=[row.province.id,row.city.id];
+                    this.form.provinceId=row.province.id;
+                    this.form.cityId = row.city.id;
+                }else if(row.province){
+                    this.form.area=[row.province.id];
+                    this.form.provinceId=row.province.id;
+                }
             },
             // 保存编辑
             saveEdit() {

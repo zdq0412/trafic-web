@@ -366,6 +366,7 @@
                         formData.append("templateId",row.id);
                         this.$axios.post("/responsibility/template",formData)
                             .then(res=>{
+                                this.form = res.data.data;
                                 this.getData();
                                 this.templatesVisible=false;
                                 this.showContentVisible = true;

@@ -440,8 +440,13 @@
             handleChange(){
                 if(this.form.area&&this.form.area.length>0){
                     this.form.provinceId=this.form.area[0];
+                    if(this.form.area.length==1){
+                        this.form.cityId='';
+                        this.form.regionId='';
+                    }
                     if(this.form.area.length==2){
                         this.form.cityId=this.form.area[1];
+                        this.form.regionId='';
                     }
                     if(this.form.area.length==3){
                         this.form.cityId=this.form.area[1];
