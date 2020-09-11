@@ -27,7 +27,7 @@
                 <el-table-column prop="equipmentCode" label="编码"></el-table-column>
                 <el-table-column prop="name" label="名称"></el-table-column>
                 <el-table-column prop="specification" label="规格型号"></el-table-column>
-                <el-table-column prop="price" label="单价"></el-table-column>
+                <el-table-column prop="price" label="单价(元)"></el-table-column>
                 <el-table-column prop="category.name" label="类别"></el-table-column>
                 <el-table-column prop="buyDate" label="购置日期" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="manufacturer" label="厂商"></el-table-column>

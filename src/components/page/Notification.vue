@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 企业发文通知-<span style="color:red;">{{(org.province==null?'':org.province.name)+(org.city==null?'':org.city.name)+(org.region==null?'':org.region.name)}}
+                    <i class="el-icon-lx-cascades"></i> 企业发文-<span style="color:red;">{{(org.province==null?'':org.province.name)+(org.city==null?'':org.city.name)+(org.region==null?'':org.region.name)}}
                     {{org.orgCategory==null?'':org.orgCategory.name}}类</span>
                 </el-breadcrumb-item>
             </el-breadcrumb>
@@ -91,23 +91,6 @@
                 </el-form-item>
                 <el-form-item label="发文部门">
                     <el-input v-model="form.publishDepartment"  maxlength="50"></el-input>
-                </el-form-item>
-                <el-form-item label="区域" v-if="!haveOrg" prop="area">
-                    <el-cascader
-                            v-model="form.area"
-                            :options="areas"
-                            :props="{label:'name',value:'id'}"
-                            @change="handleChange"></el-cascader>
-                </el-form-item>
-                <el-form-item label="企业类别" v-if="!haveOrg" prop="orgCategoryId">
-                    <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
-                        <el-option
-                                v-for="item in orgCategories"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
@@ -236,8 +219,7 @@
                 editContentVisible:false,
                 pageTotal: 0,
                 haveOrg:false,
-                form: {
-                },
+                form: {},
                 idx: -1,
                 org:{},
                 id: -1,
@@ -375,22 +357,6 @@
                 this.editVisible = true;
                 if(row.publishDate){
                     this.form.publishDate = getDate(new Date(row.publishDate));
-                }
-
-                if(row.orgCategory){
-                    this.form.orgCategoryId = row.orgCategory.id;
-                }
-
-                if(row.province){
-                    this.form.area = [row.province.id];
-                }
-
-                if(row.city){
-                    this.form.area = [row.province.id,row.city.id];
-                }
-
-                if(row.region){
-                    this.form.area = [row.province.id,row.city.id,row.region.id];
                 }
             },
             // 保存编辑

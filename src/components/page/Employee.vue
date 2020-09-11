@@ -76,16 +76,16 @@
         </el-dialog>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+            <el-form ref="form" :rules="rules" :model="editableForm" label-width="70px">
                 <el-form-item label="姓名" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="tel">
-                    <el-input v-model="form.tel" maxlength="11"></el-input>
+                    <el-input v-model="editableForm.tel" maxlength="11"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证" prop="idnum">
-                    <el-input v-model="form.idnum" maxlength="18"></el-input>
+                    <el-input v-model="editableForm.idnum" maxlength="18"></el-input>
                 </el-form-item>
                 <el-form-item label="大头照">
                     <div>
@@ -116,7 +116,7 @@
                     ></el-cascader>
                 </el-form-item>
                 <el-form-item label="职务">
-                    <el-select v-model="form.positionId" placeholder="请选择">
+                    <el-select v-model="editableForm.positionId" placeholder="请选择">
                         <el-option
                                 v-for="item in positions"
                                 :key="item.id"
@@ -126,10 +126,10 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea" maxlength="200" v-model="form.note"></el-input>
+                    <el-input type="textarea" maxlength="200" v-model="editableForm.note"></el-input>
                 </el-form-item>
                 <el-form-item label="角色">
-                    <el-select v-model="form.roleId" @change="$set(form,roleId)">
+                    <el-select v-model="editableForm.roleId" @change="$set(editableForm,roleId)">
                         <el-option v-for="item in roles"
                                    :key="item.id"
                                    :label="item.name"
@@ -268,6 +268,7 @@
                 depts:[],
                 departmentIds:[],
                 form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 roles:[],
@@ -411,6 +412,7 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 if(this.form.photo) {
                     this.imageUrl =this.$baseURL + "/" + this.form.photo;
                 }else{
@@ -419,7 +421,7 @@
                 this.editVisible = true;
                 if (row.user) {
                     if(row.user.role){
-                        this.form.roleId = row.user.role.id;
+                        this.editableForm.roleId = row.user.role.id;
                     }
                 }
                 this.isSelectFile = false;
@@ -438,7 +440,6 @@
                                 }
                             }).then(res => {
                                 this.positions = res.data;
-                                this.form.positionId=row.position.id;
                             }).catch(error => {
                                 console.log(error);
                             });
@@ -446,6 +447,9 @@
                     }).catch(error=>console.log(error));
                 }
 
+                if(row.position){
+                    this.editableForm.positionId = row.position.id;
+                }
             },
             handleAdd(){
                 this.addVisible = true;
@@ -458,6 +462,7 @@
             },
             // 保存编辑
             saveEdit() {
+                this.form = this.editableForm;
                 if(this.departmentIds && this.departmentIds.length>0){
                     this.form.departmentId=this.departmentIds[this.departmentIds.length-1];
                 }

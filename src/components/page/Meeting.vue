@@ -479,8 +479,6 @@
                 <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>
-
-
        <!-- <div v-if="showContentVisible" style="position:absolute;left: 0;right:0;text-align: center; bottom:0;z-index: 9999;">
             <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
             <el-button v-if="!editable" type="warning" v-print="'#printContent'">打印</el-button>
@@ -523,7 +521,6 @@
                 endMeetingDate:'',
                 orgCategories:[],
                 emps:[],
-                areas:[],
                 editable:false,
                 notices:[],
                 tableData: [],
@@ -534,9 +531,7 @@
                 pageTotal: 0,
                 haveOrg:false,
                 meeting:{},
-                form: {
-                    area:[]
-                },
+                form:{},
                 idx: -1,
                 org:{},
                 headers:{
@@ -723,22 +718,6 @@
                     this.templatesVisible = true;
                 }).catch(error => console.log(error));
             },
-            loadSelectData(){
-                this.$axios.get("/orgCategory/orgCategorys").then(res => {
-                    this.orgCategories = res.data.data;
-                }).catch(error => {
-                    console.log(error);
-                });
-                this.$axios.get("/category/categorys",{
-                    params:{
-                        type:'区域'
-                    }
-                }).then(res => {
-                    this.areas = res.data.data;
-                }).catch(error => {
-                    console.log(error);
-                });
-            },
             editContent(){
                 this.editable=true;
                 if(this.meeting.endMeetingDate){
@@ -798,18 +777,6 @@
                 this.form = {};
                 this.addVisible = true;
             },
-            handleChange(){
-                if(this.form.area&&this.form.area.length>0){
-                    this.form.provinceId=this.form.area[0];
-                    if(this.form.area.length==2){
-                        this.form.cityId=this.form.area[1];
-                    }
-                    if(this.form.area.length==3){
-                        this.form.cityId=this.form.area[1];
-                        this.form.regionId=this.form.area[2];
-                    }
-                }
-            },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
                     return getDate(new Date(cellValue));
@@ -817,17 +784,9 @@
                     return '';
                 }
             },
-            timeFormatter(row, column, cellValue, index){
-                if(cellValue){
-                    return getTime(new Date(cellValue));
-                }else{
-                    return '';
-                }
-            },
             closeDialog(){
                 this.$refs["form"].clearValidate();
             },
-            // 获取 easy-mock 的模拟数据
             getData() {
                 this.$axios.get("/meeting/meetingsByPage",{
                     params:{
@@ -871,17 +830,6 @@
                 this.idx = index;
                 this.form = row;
                 this.editVisible = true;
-                if(row.orgCategory){
-                    this.form.orgCategoryId = row.orgCategory.id;
-                }
-                if(row.province && row.city && row.region){
-                    this.form.area=[row.province.id,row.city.id,row.region.id];
-                }else if(row.province && row.city){
-                    this.form.area=[row.province.id,row.city.id];
-                }else if(row.province){
-                    this.form.area=[row.province.id];
-                }
-
                 if(row.meetingDate){
                     this.form.meetingDate=getDateTime(new Date(row.meetingDate));
                 }

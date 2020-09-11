@@ -140,26 +140,26 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
                     <el-form-item label="预案名称" prop="prePlanName">
-                        <el-input v-model="form.prePlanName" maxlength="50"
+                        <el-input v-model="editableForm.prePlanName" maxlength="50"
                                   show-word-limit></el-input>
                     </el-form-item>
                     <el-form-item label="编制日期"  prop="writeDate">
                         <el-date-picker
-                                v-model="form.writeDate"
+                                v-model="editableForm.writeDate"
                                 type="date"
                                 value-format="yyyy-MM-dd"
                                 placeholder="选择日期">
                         </el-date-picker>
                     </el-form-item>
-                    <el-form-item label="备案名称" prop="keepOnRecordName" v-if="form.keepOnRecord">
-                        <el-input v-model="form.keepOnRecordName" maxlength="50"
+                    <el-form-item label="备案名称" prop="keepOnRecordName" v-if="editableForm.keepOnRecord">
+                        <el-input v-model="editableForm.keepOnRecordName" maxlength="50"
                                   show-word-limit></el-input>
                     </el-form-item>
-                    <el-form-item label="备案日期"  v-if="form.keepOnRecord" prop="keepOnRecordDate">
+                    <el-form-item label="备案日期"  v-if="editableForm.keepOnRecord" prop="keepOnRecordDate">
                         <el-date-picker
-                                v-model="form.keepOnRecordDate"
+                                v-model="editableForm.keepOnRecordDate"
                                 type="date"
                                 value-format="yyyy-MM-dd"
                                 placeholder="选择日期">
@@ -287,8 +287,8 @@
                 addVisible: false,
                 preplanVisible: false,
                 pageTotal: 0,
-                form: {
-                },
+                form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 rules:{
@@ -455,13 +455,14 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm=JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.writeDate){
-                    this.form.writeDate = getDate(new Date(row.writeDate));
+                    this.editableForm.writeDate = getDate(new Date(row.writeDate));
                 }
                 if(row.keepOnRecord){
                     if(row.keepOnRecordDate){
-                        this.form.keepOnRecordDate = getDate(new Date(row.keepOnRecordDate));
+                        this.editableForm.keepOnRecordDate = getDate(new Date(row.keepOnRecordDate));
                     }
                 }
             },
@@ -469,6 +470,7 @@
             handlePreplan(index, row) {
                 this.idx = index;
                 this.form = row;
+                //this.form=JSON.parse(JSON.stringify(this.form));
                 this.preplanVisible = true;
                 if(row.keepOnRecordDate){
                     this.form.keepOnRecordDate = getDate(new Date(row.keepOnRecordDate));
@@ -476,6 +478,7 @@
             },
             // 保存编辑
             saveEdit() {
+                this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.form.emergencyPlanBakId=this.emergencyPlanBakId;

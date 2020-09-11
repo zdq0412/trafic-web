@@ -139,6 +139,7 @@
                         <el-upload
                                 class="avatar-uploader"
                                 ref="upload_add"
+                                :file-list="fileList"
                                 :data="orgDocData"
                                 :action="uploadOrgDocUrl"
                                 :headers="headers"
@@ -171,27 +172,28 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="addOrgDocVisible=false">取 消</el-button>
+                <el-button @click="addOrgDocVisible=false;fileList=[];">取 消</el-button>
                 <el-button type="primary" @click="saveAddOrgDoc">确 定</el-button>
             </span>
         </el-dialog>
         <!--编辑企业资质-->
         <el-dialog title="编辑" :visible.sync="editOrgDocVisible" width="30%" >
-            <el-form ref="form" :rules="rules" :model="editableOrgDoc" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="orgDoc" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="editableOrgDoc.name" maxlength="50"
+                    <el-input v-model="orgDoc.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件编号" prop="docNum">
-                    <el-input v-model="editableOrgDoc.docNum" maxlength="50"></el-input>
+                    <el-input v-model="orgDoc.docNum" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="照片" >
                     <div>
-                        <el-input style="display: none;" v-model="editableOrgDoc.myImage"></el-input>
+                        <el-input style="display: none;" v-model="orgDoc.myImage"></el-input>
                         <el-upload
                                 class="avatar-uploader"
                                 ref="upload_modify"
                                 :data="orgDocData"
+                                :file-list="fileList"
                                 :action="uploadOrgDocUrl"
                                 :headers="headers"
                                 accept="image/*"
@@ -207,7 +209,7 @@
                 </el-form-item>
                 <el-form-item label="有效期开始" prop="beginDate">
                     <el-date-picker
-                            v-model="editableOrgDoc.beginDate"
+                            v-model="orgDoc.beginDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -215,7 +217,7 @@
                 </el-form-item>
                 <el-form-item label="有效期结束" prop="endDate">
                     <el-date-picker
-                            v-model="editableOrgDoc.endDate"
+                            v-model="orgDoc.endDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -238,6 +240,7 @@
                             class="avatar-uploader"
                             ref="upload"
                             :data="updata"
+                            :file-list="fileList"
                             :action="uploadUrl"
                             :headers="headers"
                             accept="image/*"
@@ -370,6 +373,8 @@
 <script>
     import {getDate} from "../common/utils";
     import { VueEditor } from "vue2-editor";
+    import {validateUploadFile} from "../common/validate";
+
     export default {
         name: 'introduction',
         components:{
@@ -422,12 +427,12 @@
                 orgImg:{},
                 editableOrgImg:{},
                 orgDoc:{},
-                editableOrgDoc:{},
                 imageUrl:'',
                 imgVisible:false,
                 dialogVisible:false,
                 dialogImageUrl:'',
                 orgImgs:[],
+                fileList:[],
                 addOrgDocVisible:false,
                 editOrgDocVisible:false,
                 orgDocs:[],
@@ -481,8 +486,9 @@
         },
         methods: {
             cancelEditOrgDoc(){
+                this.fileList=[];
                 this.editOrgDocVisible=false;
-                this.editableOrgDoc = JSON.parse(JSON.stringify(this.orgDoc));
+                this.orgDoc = JSON.parse(JSON.stringify(this.orgDoc));
             },
             cancelEditOrg(){
                 this.titleVisible = false;
@@ -511,7 +517,6 @@
                     });
             },
             saveEditOrgDoc(){
-                this.orgDoc = this.editableOrgDoc;
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         if(this.isSelectFile) {
@@ -531,6 +536,10 @@
                 });
             },
             saveAddOrgDoc(){
+                if(!validateUploadFile(this.fileList)){
+                    this.$message.error("请选择上传文件!");
+                    return false;
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {
@@ -558,8 +567,13 @@
             resetForm() {
                 this.uploadVisible = false;
                 this.imageUrl = '';
+                this.fileList = [];
             },
             saveAdd(){
+                if(!validateUploadFile(this.fileList)){
+                    this.$message.error("请选择上传文件!");
+                    return false;
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {
@@ -570,7 +584,8 @@
                     }
                 });
             },
-            handlePhotoChange(file){
+            handlePhotoChange(file,fileList){
+                this.fileList = fileList.slice(-1);
                 this.orgDoc.myImage = file.name;
                 this.imageUrl=URL.createObjectURL(file.raw);
                 this.isSelectFile = true;
@@ -581,6 +596,7 @@
             handleAvatarSuccess(res, file) {
                 this.uploadVisible= false;
                 this.getData();
+                this.fileList=[];
                 this.orgImg={};
                 this.imageUrl = '';
                 this.isSelectFile = false;
@@ -681,13 +697,12 @@
                 this.uploadOrgDocUrl = this.$baseURL + "/orgDoc/updateOrgDoc";
                 this.editOrgDocVisible=true;
                 this.orgDoc = row;
-                this.editableOrgDoc = JSON.parse(JSON.stringify(this.orgDoc));
                 this.isSelectFile = false;
                 if(row.beginDate){
-                    this.editableOrgDoc.beginDate=getDate(new Date(row.beginDate));
+                    this.orgDoc.beginDate=getDate(new Date(row.beginDate));
                 }
                 if(row.endDate){
-                    this.editableOrgDoc.endDate=getDate(new Date(row.endDate));
+                    this.orgDoc.endDate=getDate(new Date(row.endDate));
                 }
                 this.imageUrl = this.$baseURL + "/" + row.url;
             },

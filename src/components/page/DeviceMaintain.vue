@@ -30,7 +30,7 @@
             >
                 <el-table-column prop="operDate" label="保养/维修时间" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="content" label="保养/维修内容"></el-table-column>
-                <el-table-column prop="price" label="费用"></el-table-column>
+                <el-table-column prop="price" label="费用(元)"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
@@ -223,8 +223,7 @@
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
-                form: {
-                },
+                form:{},
                 idx: -1,
                 id: -1,
                 rules:{

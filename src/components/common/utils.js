@@ -20,19 +20,47 @@ function getTime(now){
 }
 
 function getSecond(date){
-    return date.getSeconds();
+    let dateStr = '';
+    let dateNum = date.getSeconds();
+    if(dateNum<10){
+        dateStr = '0' + dateNum;
+    }else{
+        dateStr = dateNum+'';
+    }
+    return dateStr;
 }
 
 function getMinute(date){
-    return date.getMinutes();
+    let dateStr = '';
+    let dateNum = date.getMinutes();
+    if(dateNum<10){
+        dateStr = '0' + dateNum;
+    }else{
+        dateStr = dateNum+'';
+    }
+    return dateStr;
 }
 
 function getHour(date){
-    return date.getHours();
+    let dateStr = '';
+    let dateNum = date.getHours();
+    if(dateNum<10){
+        dateStr = '0' + dateNum;
+    }else{
+        dateStr = dateNum+'';
+    }
+    return dateStr;
 }
 
 function getDateOfMonth(date){
-    return date.getDate();
+    let dateStr = '';
+    let dateNum = date.getDate();
+    if(dateNum<10){
+        dateStr = '0' + dateNum;
+    }else{
+        dateStr = dateNum+'';
+    }
+    return dateStr;
 }
 
 function getYear(date){
@@ -40,7 +68,14 @@ function getYear(date){
 }
 
 function getMonth(date){
-    return date.getMonth()+1;
+    let monthStr = '';
+    let month = date.getMonth()+1;
+    if(month<10){
+        monthStr = '0' + month;
+    }else{
+        monthStr = month+'';
+    }
+    return monthStr;
 }
 /**
  * 获取两个日期相差的年份

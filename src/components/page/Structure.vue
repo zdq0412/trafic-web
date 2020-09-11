@@ -59,18 +59,18 @@
             </div>
             <!-- 编辑弹出框 -->
             <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData" @close="closeDialog">
-                <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+                <el-form ref="form" :rules="rules" :model="editableForm" label-width="70px">
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="form.name" maxlength="30"></el-input>
+                                <el-input v-model="editableForm.name" maxlength="30"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="部门电话" prop="tel">
-                                <el-input v-model="form.tel" maxlength="20"></el-input>
+                                <el-input v-model="editableForm.tel" maxlength="20"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -199,11 +199,11 @@
             </div>
             <!-- 编辑弹出框 -->
             <el-dialog title="编辑" :visible.sync="editPositionVisible" width="40%" @open="loadSelectData" @close="closeDialog">
-                <el-form ref="form" :rules="rules" :model="form" label-width="80px">
+                <el-form ref="form" :rules="rules" :model="editableForm" label-width="80px">
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="form.name" maxlength="50"
+                                <el-input v-model="editableForm.name" maxlength="50"
                                           show-word-limit></el-input>
                             </el-form-item>
                         </el-col>
@@ -223,7 +223,7 @@
                         <el-col>
                             <el-form-item label="管理层">
                                 <el-switch
-                                        v-model="form.managementLayer"
+                                        v-model="editableForm.managementLayer"
                                         active-text="是"
                                         inactive-text="否">
                                 </el-switch>
@@ -233,7 +233,7 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="职位描述">
-                                <el-input type="textarea" maxlength="200" v-model="form.note"></el-input>
+                                <el-input type="textarea" maxlength="200" v-model="editableForm.note"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -328,6 +328,7 @@
                 pageTotal: 0,
                 positionPageTotal: 0,
                 form: {},
+                editableForm: {},
                 row:{},
                 deptName:'',
                 idx: -1,
@@ -374,7 +375,6 @@
                 }).catch(error => {
                     console.log(error);
                 });
-
             },
             // 点击行
             handleCurrentChange(currentRow) {
@@ -420,7 +420,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/department/department/" + this.form.id).then(res => {
+                        this.$axios.delete("/department/department/" + row.id).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -442,7 +442,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/position/position/" + this.form.id).then(res => {
+                        this.$axios.delete("/position/position/" + row.id).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getPositionByDepartmentId(this.row.id);
@@ -459,6 +459,7 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 this.$axios.get("/department/findParent",{
                     params:{
@@ -472,6 +473,7 @@
             handlePositionEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editPositionVisible = true;
                 if(row.department){
                     this.$axios.get("/department/findParentDepartments",{
@@ -489,6 +491,7 @@
                 if(this.pids && this.pids.length>0){
                     this.form.pid = this.pids[this.pids.length-1];
                 }
+                this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.$axios.post("/department/updateDepartment" , this.$qs.stringify(this.form)).then(res => {
@@ -510,12 +513,13 @@
                 if(this.deptIds && this.deptIds.length>0){
                     this.form.departmentId = this.deptIds[this.deptIds.length-1];
                 }
+                this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         this.$axios.post("/position/updatePosition" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editPositionVisible = false;
-                                this.getData();
+                                this.getPositionByDepartmentId(this.form.department.id);
                             } else {
                                 this.$message.error(res.data.result.message);
                             }

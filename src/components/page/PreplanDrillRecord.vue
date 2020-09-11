@@ -178,8 +178,7 @@
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
-                form: {
-                },
+                form: {},
                 idx: -1,
                 id: -1,
                 options: [{

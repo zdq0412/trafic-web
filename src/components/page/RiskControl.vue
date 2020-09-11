@@ -150,16 +150,16 @@
                     </div>
                     <!-- 编辑弹出框 -->
                     <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-                        <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                        <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="form.name" maxlength="50"
+                                <el-input v-model="editableForm.name" maxlength="50"
                                           show-word-limit></el-input>
                             </el-form-item>
                             <el-form-item label="发生可能性" prop="happen">
-                                <el-input-number v-model="form.happen" :precision="0"  :max="5" :min="1" step="1"></el-input-number>
+                                <el-input-number v-model="editableForm.happen" :precision="0"  :max="5" :min="1" step="1"></el-input-number>
                             </el-form-item>
                             <el-form-item label="后果严重性" prop="consequence">
-                                <el-input-number v-model="form.consequence" :precision="0"  :max="5" :min="1" step="1"></el-input-number>
+                                <el-input-number v-model="editableForm.consequence" :precision="0"  :max="5" :min="1" step="1"></el-input-number>
                             </el-form-item>
                            <!-- <el-form-item label="判定准则" prop="criterion">
                                 <el-input-number v-model="form.criterion" number></el-input-number>
@@ -171,10 +171,10 @@
                                 <el-color-picker v-model="form.fourColor"></el-color-picker>
                             </el-form-item>-->
                             <el-form-item label="控制措施" prop="measures">
-                                <el-input v-model="form.measures"  maxlength="500" type="textarea"></el-input>
+                                <el-input v-model="editableForm.measures"  maxlength="500" type="textarea"></el-input>
                             </el-form-item>
                             <el-form-item label="实施期限" prop="timeLimit">
-                                <el-input v-model="form.timeLimit"  maxlength="500"  type="textarea"></el-input>
+                                <el-input v-model="editableForm.timeLimit"  maxlength="500"  type="textarea"></el-input>
                                 <!--<el-select v-model="form.timeLimit">
                                     <el-option label="立刻" value="立刻"></el-option>
                                     <el-option label="立即或近期整改" value="立即或近期整改"></el-option>
@@ -269,6 +269,7 @@
                 fourColorPic:'',
                 uploadUrl:'',
                 form:{},
+                editableForm:{},
                 idx:-1,
                 headers:{
                     token : localStorage.getItem("token")
@@ -365,11 +366,13 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm=JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 this.$refs["form"].clearValidate();
             },
             // 保存编辑
             saveEdit() {
+                this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     console.log(this.form);
                     if (validate) {

@@ -275,6 +275,7 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.form=JSON.parse(JSON.stringify(this.form));
                 if(row.driveDate){
                     this.form.driveDate = getDateTime(new Date(row.driveDate))
                 }

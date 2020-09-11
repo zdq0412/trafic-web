@@ -79,14 +79,14 @@
         </div>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+            <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="作业管理类别">
-                    <el-select v-model="form.jobManagementAccountTypeId" placeholder="请选择"
-                               @change="$set(form,jobManagementAccountTypeId)" style="width: 100%;" >
+                    <el-select v-model="editableForm.jobManagementAccountTypeId" placeholder="请选择"
+                               @change="$set(editableForm,jobManagementAccountTypeId)" style="width: 100%;" >
                         <el-option
                                 v-for="item in categorys"
                                 :key="item.id"
@@ -116,7 +116,7 @@
                     </div>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea"  maxlength="500" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500" v-model="editableForm.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -224,6 +224,7 @@
 
 <script>
     import {getDate} from "../common/utils";
+    import {validateUploadFile} from "../common/validate";
 
     export default {
         name: 'basetable',
@@ -262,6 +263,7 @@
                 pageTotal: 0,
                 haveOrg:false,
                 form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 fileList:[],
@@ -412,17 +414,18 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm=JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 this.filename = row.filename;
                 this.isSelectUploadFile = false;
                 if(row.jobManagementAccountType){
-                    this.form.jobManagementAccountTypeId = row.jobManagementAccountType.id;
+                    this.editableForm.jobManagementAccountTypeId = row.jobManagementAccountType.id;
                 }
                 if(row.beginDate){
-                    this.form.beginDate = getDate(new Date(row.beginDate));
+                    this.editableForm.beginDate = getDate(new Date(row.beginDate));
                 }
                 if(row.endDate){
-                    this.form.endDate = getDate(new Date(row.endDate));
+                    this.editableForm.endDate = getDate(new Date(row.endDate));
                 }
             },
             closeDialog(){
@@ -439,6 +442,7 @@
             },
             // 保存编辑
             saveEdit() {
+                this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         if(this.isSelectUploadFile)
@@ -465,6 +469,10 @@
             },
             // 保存新增
             saveAdd() {
+                if(!validateUploadFile(this.fileList)){
+                    this.$message.error("请选择上传文件!");
+                    return false;
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {

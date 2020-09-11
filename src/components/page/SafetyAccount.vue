@@ -750,7 +750,6 @@
                 this.$refs["form"].clearValidate();
             },
             loadData(){
-
                 this.$axios.get("/safetyProductionCostPlan/safetyProductionCostPlan").then(res=>{
                     this.safetyProductionCostPlans = res.data;
                 }).catch(error=>console.log(error))
@@ -808,6 +807,7 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                //this.form=JSON.parse(JSON.stringify(this.form));
                 if(row.safetyProductionCostPlan){
                     this.form.safetyProductionCostPlanId = row.safetyProductionCostPlan.id;
                 }
@@ -819,7 +819,7 @@
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.$refs["form"].validate(validate => {
                     if (validate) {
                         this.form.org=null;
                         this.form.safetyProductionCostPlan=null;
@@ -841,7 +841,7 @@
             // 保存新增
             saveAdd(){
                 this.$refs["form"].clearValidate();
-                this.$refs.form.validate(validate =>{
+                this.$refs["form"].validate(validate =>{
                     if(validate){
                         this.$axios.post("/safetyProductionCostPlanDetail/safetyProductionCostPlanDetail",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
