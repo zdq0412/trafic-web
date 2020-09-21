@@ -62,7 +62,6 @@
                 params.append("newPassword",this.form.newPassword);
                 params.append("username",localStorage.getItem("username"));
                 this.$axios.post("/user/modifyPassword",params).then(response => {
-                    console.log(response.data);
                     //密码修改成功
                     if(response.data.result.resultCode==200){
                         this.$axios.get("/logout").then(response =>{

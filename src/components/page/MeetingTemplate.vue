@@ -49,18 +49,6 @@
                 </el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   accept=".doc,.docx"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -98,8 +86,20 @@
                 ></el-pagination>
             </div>
         </div>
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   accept=".doc,.docx"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @open="loadSelectData" @close="closeDialog">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%"  @open="loadSelectData" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -140,7 +140,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @open="loadSelectData" @close="closeDialog" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"   @open="loadSelectData" @close="closeDialog" >
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name" maxlength="50"
                               show-word-limit>
@@ -180,7 +180,7 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
+        <el-dialog title="备注" :visible.sync="noteVisible" width="40%">
             {{note}}
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
@@ -610,7 +610,7 @@
         width:20%;
     }
     .per30{
-        width:30%;
+        width:40%;
     }
 
     table tr td{

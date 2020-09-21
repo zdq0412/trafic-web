@@ -43,7 +43,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="creator" label="创建人"></el-table-column>
-                <el-table-column prop="trainingDate" label="开会时间" :formatter="datetimeFormatter"></el-table-column>
+                <el-table-column prop="trainingDate" label="培训时间" :formatter="datetimeFormatter"></el-table-column>
                 <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
@@ -52,18 +52,6 @@
                 </el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   :accept="ext"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -101,18 +89,30 @@
                 ></el-pagination>
             </div>
         </div>
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @open="loadSelectData" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%"  @open="loadSelectData" @close="closeDialog('editForm')">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="培训时间" prop="trainingDate">
                             <el-date-picker
-                                    v-model="form.trainingDate"
+                                    v-model="editableForm.trainingDate"
                                     type="datetime"
                                     value-format="yyyy-MM-dd HH:mm:ss"
                                     placeholder="选择培训时间">
@@ -121,16 +121,16 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" maxlength="500" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note" type="textarea" maxlength="500" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @close="closeDialog" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"   @close="closeDialog('form')" >
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -157,7 +157,7 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
+        <el-dialog title="备注" :visible.sync="noteVisible" width="40%">
             {{note}}
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
@@ -613,6 +613,7 @@
                 form: {
                     area:[]
                 },
+                editableForm:{},
                 idx: -1,
                 org:{},
                 id: -1,
@@ -818,7 +819,7 @@
                 });
             },
             showContent(row){
-                this.form = row;
+               // this.form = row;
                 this.training=row;
                 this.showContentVisible=true;
                 this.editable = false;
@@ -857,8 +858,8 @@
                     return '';
                 }
             },
-            closeDialog(){
-                this.$refs["form"].clearValidate();
+            closeDialog(form){
+                this.$refs[form].clearValidate();
             },
             // 获取 easy-mock 的模拟数据
             getData() {
@@ -903,21 +904,31 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
-                if(row.orgCategory){
+                if(row.trainingDate){
+                    this.form.trainingDate=getDateTime(new Date(row.trainingDate));
+                    this.editableForm.trainingDate=getDateTime(new Date(row.trainingDate));
+                }
+               /* if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
+                    this.editableForm.orgCategoryId = row.orgCategory.id;
                 }
                 if(row.province && row.city && row.region){
                     this.form.area=[row.province.id,row.city.id,row.region.id];
+                    this.editableForm.area=[row.province.id,row.city.id,row.region.id];
                 }else if(row.province && row.city){
                     this.form.area=[row.province.id,row.city.id];
+                    this.editableForm.area=[row.province.id,row.city.id];
                 }else if(row.province){
                     this.form.area=[row.province.id];
-                }
+                    this.editableForm.area=[row.province.id];
+                }*/
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.form.content='';
                         if(!this.form.realAttendance){
@@ -933,6 +944,7 @@
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });
@@ -998,7 +1010,7 @@
         width:20%;
     }
     .per30{
-        width:30%;
+        width:40%;
     }
 
     table tr td{

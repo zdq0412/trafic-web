@@ -151,13 +151,13 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="50%"  @close="closeDialog" @open="loadSelectData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="120px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="50%"  @close="closeDialog('editForm')" @open="loadSelectData">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="120px">
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="检查时间" prop="checkDate">
                             <el-date-picker
-                                    v-model="form.checkDate"
+                                    v-model="editableForm.checkDate"
                                     type="date"
                                     value-format="yyyy-MM-dd"
                                     placeholder="选择检查时间">
@@ -166,26 +166,26 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="被检单位名称">
-                    <el-input v-model="form.checkedOrg" maxlength="100"
+                    <el-input v-model="editableForm.checkedOrg" maxlength="100"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="存在的安全隐患">
-                    <el-input v-model="form.hiddenDanger" maxlength="500" type="textarea" ></el-input>
+                    <el-input v-model="editableForm.hiddenDanger" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
                 <el-form-item label="整改措施">
-                    <el-input v-model="form.correctiveAction" maxlength="500" type="textarea" ></el-input>
+                    <el-input v-model="editableForm.correctiveAction" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
                 <el-form-item label="整改时限">
-                    <el-input v-model="form.timelimit" maxlength="200"></el-input>
+                    <el-input v-model="editableForm.timelimit" maxlength="200"></el-input>
                 </el-form-item>
                 <el-form-item label="责任人">
-                    <el-input v-model="form.person" maxlength="50"></el-input>
+                    <el-input v-model="editableForm.person" maxlength="50"></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" >
                     <el-col >
                         <el-form-item label="整改到位时间">
                             <el-date-picker
-                                    v-model="form.endTime"
+                                    v-model="editableForm.endTime"
                                     type="date"
                                     value-format="yyyy-MM-dd"
                                     placeholder="请选择时间">
@@ -197,7 +197,7 @@
                     <el-col >
                         <el-form-item label="销号时间">
                             <el-date-picker
-                                    v-model="form.cancelDate"
+                                    v-model="editableForm.cancelDate"
                                     type="date"
                                     value-format="yyyy-MM-dd"
                                     placeholder="请选择时间">
@@ -206,7 +206,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="隐患严重程度" prop="severityId">
-                    <el-select   v-model="form.severityId" placeholder="请选择">
+                    <el-select   v-model="editableForm.severityId" placeholder="请选择">
                         <el-option
                                 v-for="item in severitys"
                                 :key="item.id"
@@ -216,7 +216,7 @@
                     </el-select >
                 </el-form-item>
                 <el-form-item label="隐患原因类别" prop="reasonCategoryId">
-                    <el-select   v-model="form.reasonCategoryId" placeholder="请选择">
+                    <el-select   v-model="editableForm.reasonCategoryId" placeholder="请选择">
                         <el-option
                                 v-for="item in reasonCategorys"
                                 :key="item.id"
@@ -226,16 +226,16 @@
                     </el-select >
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.detailNote" maxlength="500" type="textarea" ></el-input>
+                    <el-input v-model="editableForm.detailNote" maxlength="500" type="textarea" ></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form))">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="50%"  @close="closeDialog" @open="loadSelectData">
+        <el-dialog title="新增" :visible.sync="addVisible" width="50%"  @close="closeDialog('form')" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="120px">
                 <el-row type="flex" class="row-bg" >
                     <el-col >
@@ -319,7 +319,7 @@
             </span>
         </el-dialog>
         <!--整改-->
-        <el-dialog title="整改" :visible.sync="rectificationVisible" width="50%"  @close="closeDialog" @open="loadSelectData">
+        <el-dialog title="整改" :visible.sync="rectificationVisible" width="50%"  @close="closeDialog('form')" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="120px">
                 <el-form-item label="整改金额（元）" prop="rectificationFund">
                     <el-input-number v-model="form.rectificationFund" maxlength="10"></el-input-number>
@@ -377,15 +377,16 @@
                             <td>{{record[0]}}</td>
                             <td>{{record[1]}}</td>
                             <td>{{record[2]}}</td>
-                            <td>{{record[3]}}</td>
+                            <td>{{record[3] | twoPoint}}</td>
                             <td>{{record[4]}}</td>
                         </tr>
                     </table>
                 </div>
             </el-form>
             <span slot="footer" class="dialog-footer">
+                <el-button v-print="print_analysis" type="warning">打 印</el-button>
                 <el-button @click="analysisVisible=false">关 闭</el-button>
-                <el-button v-print="print_analysis">打 印</el-button>
+                <div style="color:red;margin-top:5px;font-size:12px;">如需打印功能请使用火狐或谷歌浏览器!</div>
             </span>
         </el-dialog>
         <!--隐患类型统计表-->
@@ -435,15 +436,16 @@
                             <td>{{record[0]}}</td>
                             <td>{{record[1]}}</td>
                             <td>{{record[2]}}</td>
-                            <td>{{record[3]}}</td>
+                            <td>{{record[3] | twoPoint}}</td>
                             <td>{{record[4]}}</td>
                         </tr>
                     </table>
                 </div>
             </el-form>
             <span slot="footer" class="dialog-footer">
+                <el-button  v-print="print_statistics" type="warning">打 印</el-button>
                 <el-button @click="statisticsVisible=false">关 闭</el-button>
-                <el-button  v-print="print_statistics">打 印</el-button>
+                <div style="color:red;margin-top:5px;font-size:12px;">如需打印功能请使用火狐或谷歌浏览器!</div>
             </span>
         </el-dialog>
         <!--显示打印内容-->
@@ -592,8 +594,8 @@
                 details:[],
                 statisticsVisible:false,//类型统计
                 analysisVisible:false,//治理分析
-                form: {
-                },
+                form: {},
+                editableForm: {},
                 idx: -1,
                 org:{},
                 id: -1,
@@ -621,6 +623,13 @@
                     return getDate(new Date(value));
                 }else{
                     return '';
+                }
+            },
+            twoPoint(value){
+                if(value){
+                    return parseFloat(value).toFixed(2);
+                }else{
+                    return 0;
                 }
             }
         },
@@ -664,8 +673,13 @@
                         c+=record[1]*record[3]/100;
                         d+=record[4];
                     }
-
-                    this.statisticsRecord.push(['全部',a,b,(c/a*100).toFixed(2),d]);
+                    let ratio = c/a*100;
+                    if(isNaN(ratio)){
+                        ratio=0;
+                    }else{
+                        ratio=ratio.toFixed(2);
+                    }
+                    this.statisticsRecord.push(['全部',a,b,ratio,d]);
                 }).catch(error=>console.log(error));
             },
             //分析
@@ -686,8 +700,13 @@
                         c+=record[1]*record[3]/100;
                         d+=record[4];
                     }
-
-                    this.analysisRecord.push(['全部',a,b,(c/a*100).toFixed(2),d]);
+                    let ratio = c/a*100;
+                    if(isNaN(ratio)){
+                        ratio=0;
+                    }else{
+                        ratio=ratio.toFixed(2);
+                    }
+                    this.analysisRecord.push(['全部',a,b,ratio,d]);
                 }).catch(error=>console.log(error));
             },
             saveRectification(){
@@ -735,7 +754,9 @@
             handleAdd(){
                 this.form = {};
                 this.addVisible = true;
-                this.$refs['form'].clearValidate();
+                if(this.$refs.form){
+                    this.$refs.form.clearValidate();
+                }
             },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
@@ -744,8 +765,8 @@
                     return '';
                 }
             },
-            closeDialog(){
-                this.$refs["form"].clearValidate();
+            closeDialog(form){
+                this.$refs[form].clearValidate();
             },
             searchRecord(){
                 this.getData();
@@ -795,35 +816,43 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.checkDate){
                     this.form.checkDate = getDate(new Date(row.checkDate));
+                    this.editableForm.checkDate = getDate(new Date(row.checkDate));
                 }
                 if(row.cancelDate){
                     this.form.cancelDate = getDate(new Date(row.cancelDate));
+                    this.editableForm.cancelDate = getDate(new Date(row.cancelDate));
                 }
                 if(row.endTime){
                     this.form.endTime = getDate(new Date(row.endTime));
+                    this.editableForm.endTime = getDate(new Date(row.endTime));
                 }
                 if(row.severity){
                     this.form.severityId = row.severity.id;
+                    this.editableForm.severityId = row.severity.id;
                 }
                 if(row.reasonCategory){
                     this.form.reasonCategoryId = row.reasonCategory.id;
+                    this.editableForm.reasonCategoryId = row.reasonCategory.id;
                 }
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form=JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.form.content='';
-                        this.$axios.put("/dangerGoodsCheckDetailRecord/dangerGoodsCheckDetailRecord?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/dangerGoodsCheckDetailRecord/updateDangerGoodsCheckDetailRecord" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });

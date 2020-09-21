@@ -88,18 +88,18 @@
                     <el-row type="flex" class="row-bg" >
                         <el-col >
                             <el-form-item label="部门职能">
-                                <el-input type="textarea" maxlength="200" show-word-limit v-model="form.business"></el-input>
+                                <el-input type="textarea" maxlength="200" show-word-limit v-model="editableForm.business"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
             </el-dialog>
             <!-- 新增弹出框 -->
-            <el-dialog title="新增" :visible.sync="addVisible" width="30%"
+            <el-dialog title="新增" :visible.sync="addVisible" width="40%"
                        @open="loadSelectData" @close="closeDialog">
                 <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                     <el-row type="flex" class="row-bg">
@@ -239,12 +239,12 @@
                     </el-row>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
-                <el-button @click="editPositionVisible = false">取 消</el-button>
+                <el-button @click="editPositionVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="savePositionEdit">确 定</el-button>
             </span>
             </el-dialog>
             <!-- 新增弹出框 -->
-            <el-dialog title="新增" :visible.sync="addPositionVisible" width="30%"
+            <el-dialog title="新增" :visible.sync="addPositionVisible" width="40%"
                        @open="loadSelectData" @close="closeDialog">
                 <el-form ref="form" :rules="rules" :model="form" label-width="80px">
                     <el-row type="flex" class="row-bg">

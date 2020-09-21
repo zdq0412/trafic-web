@@ -80,10 +80,10 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件">
@@ -108,7 +108,7 @@
                 </el-form-item>
                 <el-form-item label="有效期开始" >
                     <el-date-picker
-                            v-model="form.beginDate"
+                            v-model="editableForm.beginDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -116,23 +116,23 @@
                 </el-form-item>
                 <el-form-item label="有效期截止" >
                     <el-date-picker
-                            v-model="form.endDate"
+                            v-model="editableForm.endDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea"  maxlength="500" v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500" v-model="editableForm.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%" >
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -276,6 +276,7 @@
                 pageTotal: 0,
                 haveOrg:false,
                 form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 imgUrl:'',
@@ -413,15 +414,18 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 this.filename = row.filename;
                 this.isSelectUploadFile = false;
 
                 if(row.beginDate){
                     this.form.beginDate = getDate(new Date(row.beginDate));
+                    this.editableForm.beginDate = getDate(new Date(row.beginDate));
                 }
                 if(row.endDate){
                     this.form.endDate = getDate(new Date(row.endDate));
+                    this.editableForm.endDate = getDate(new Date(row.endDate));
                 }
             },
             handleAdd(){
@@ -435,7 +439,8 @@
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         if(this.isSelectUploadFile)
                             this.$refs.uploadFileEdit.submit();
@@ -447,6 +452,7 @@
                                     this.isSelectUploadFile=false;
                                 }).catch(error=>console.log(error))
                         }
+                        this.$refs.editForm.clearValidate();
                     } else {
                         return false;
                     }

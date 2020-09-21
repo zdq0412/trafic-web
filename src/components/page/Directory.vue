@@ -66,7 +66,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%"
                    @open="loadSchema" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">
@@ -99,7 +99,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"
                   @open="loadSchema" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">

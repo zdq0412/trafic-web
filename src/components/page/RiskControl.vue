@@ -51,7 +51,7 @@
                         <el-button style="float: right; padding: 3px 0px"
                                    type="text" @click="helpDialog=true">查看帮助</el-button>
 
-                        <el-dialog title="帮助" :visible.sync="helpDialog" width="30%">
+                        <el-dialog title="帮助" :visible.sync="helpDialog" width="40%">
                             <el-card shadow="hover" style="height:500px;">
                                 <div slot="header" class="clearfix">
                                     <span style="font-weight: bold;">帮助</span>
@@ -149,8 +149,8 @@
                         ></el-pagination>
                     </div>
                     <!-- 编辑弹出框 -->
-                    <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-                        <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
+                    <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog">
+                        <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="100px">
                             <el-form-item label="名称" prop="name">
                                 <el-input v-model="editableForm.name" maxlength="50"
                                           show-word-limit></el-input>
@@ -189,7 +189,7 @@
             </span>
                     </el-dialog>
                     <!-- 新增弹出框 -->
-                    <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
+                    <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog">
                         <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                             <el-form-item label="名称" prop="name">
                                 <el-input v-model="form.name" maxlength="50"
@@ -373,8 +373,7 @@
             // 保存编辑
             saveEdit() {
                 this.form = this.editableForm;
-                this.$refs.form.validate(validate => {
-                    console.log(this.form);
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.$axios.put("/hazardSourcesList/hazardSourcesList?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
@@ -383,6 +382,7 @@
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });

@@ -44,18 +44,6 @@
                 </el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   :accept="ext"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -93,18 +81,30 @@
                 ></el-pagination>
             </div>
         </div>
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="编码">
-                    <el-input v-model="form.equipmentCode" maxlength="50"></el-input>
+                    <el-input v-model="editableForm.equipmentCode" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="设备类别">
-                    <el-select   v-model="form.categoryId" placeholder="请选择">
+                    <el-select   v-model="editableForm.categoryId" placeholder="请选择">
                         <el-option
                                 v-for="item in categorys"
                                 :key="item.id"
@@ -114,36 +114,36 @@
                     </el-select >
                 </el-form-item>
                 <el-form-item label="规格型号">
-                    <el-input v-model="form.specification" maxlength="50"></el-input>
+                    <el-input v-model="editableForm.specification" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="单价(元)">
-                    <el-input-number v-model="form.price"></el-input-number>
+                    <el-input-number v-model="editableForm.price"></el-input-number>
                 </el-form-item>
                 <el-form-item label="购置日期" >
                     <el-date-picker
-                            v-model="form.buyDate"
+                            v-model="editableForm.buyDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="厂商">
-                    <el-input  v-model="form.manufacturer" maxlength="100"></el-input>
+                    <el-input  v-model="editableForm.manufacturer" maxlength="100"></el-input>
                 </el-form-item>
                 <el-form-item label="放置位置">
-                    <el-input  v-model="form.position" maxlength="100"></el-input>
+                    <el-input  v-model="editableForm.position" maxlength="100"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input type="textarea" v-model="form.note" maxlength="200"></el-input>
+                    <el-input type="textarea" v-model="editableForm.note" maxlength="200"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form))">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -219,6 +219,7 @@
                 addVisible: false,
                 pageTotal: 0,
                 form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 rules:{
@@ -333,13 +334,15 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.buyDate){
+                    this.editableForm.buyDate = getDate(new Date(row.buyDate));
                     this.form.buyDate = getDate(new Date(row.buyDate));
                 }
 
                 if(row.category){
-                    this.form.categoryId=row.category.id;
+                    this.editableForm.categoryId=row.category.id;
                 }
             },
             handleAdd(){
@@ -354,7 +357,8 @@
                 if(this.departmentIds && this.departmentIds.length>0){
                     this.form.departmentId=this.departmentIds[this.departmentIds.length-1];
                 }
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         if(this.isSelectFile) {
                             this.$refs.upload_edit.submit();

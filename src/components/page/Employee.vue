@@ -75,7 +75,7 @@
             <img style="width: 100%;" :src="imgUrl" alt="">
         </el-dialog>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="editableForm" label-width="70px">
                 <el-form-item label="姓名" prop="name">
                     <el-input v-model="editableForm.name" maxlength="50"
@@ -94,12 +94,12 @@
                                     class="avatar-uploader"
                                     ref="upload_edit"
                                     :data="updata"
-                                    :action="modifyUrl"
+                                    action=""
                                     :headers="headers"
                                     accept="image/*"
                                     :auto-upload="false"
                                     :on-change="handlePhotoChange"
-                                    :show-file-list="false"
+                                    :file-list="fileList"
                                     :on-success="handleUpdateSuccess"
                                     :before-upload="beforeAvatarUpload">
                                 <img v-if="imageUrl" :src="imageUrl" class="avatar">
@@ -143,7 +143,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="姓名" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -161,12 +161,12 @@
                                 class="avatar-uploader"
                                 ref="upload_add"
                                 :data="updata"
-                                :action="uploadUrl"
+                                action=""
                                 :headers="headers"
+                                :file-list="fileList"
                                 accept="image/*"
                                 :auto-upload="false"
                                 :on-change="handlePhotoChange"
-                                :show-file-list="false"
                                 :on-success="handleAvatarSuccess"
                                 :before-upload="beforeAvatarUpload">
                             <img v-if="imageUrl" :src="imageUrl" class="avatar">
@@ -257,8 +257,10 @@
                 headers:{
                     token : localStorage.getItem("token")
                 },
+                file:{},
                 imageUrl:'',
                 baseUrl:'',
+                fileList:[],
                 tableData: [],
                 editVisible: false,
                 addVisible: false,
@@ -267,7 +269,8 @@
                 positions:[],
                 depts:[],
                 departmentIds:[],
-                form: {},
+                form: {
+                },
                 editableForm: {},
                 idx: -1,
                 id: -1,
@@ -308,15 +311,23 @@
                 this.$set(this.form,'positionId','');
               this.getPositionByDepartmentId(value[value.length-1]);
             },
-            handlePhotoChange(file){
+            handlePhotoChange(file,fileList){
                 this.imageUrl=URL.createObjectURL(file.raw);
                 this.isSelectFile = true;
+                this.fileList=fileList.slice(-1);
             },
             handleAvatarSuccess(res, file) {
-                this.isSelectFile = false;
-                this.addVisible= false;
-                this.getData();
-                this.$refs.upload_add.clearFiles();
+                if(res.result.resultCode===200){
+                    this.isSelectFile = false;
+                    this.addVisible= false;
+                    this.getData();
+                    this.$refs.upload_add.clearFiles();
+                }else{
+                    this.$message.error(res.result.message);
+                    console.log(this.$refs)
+                    this.$refs.upload_add.clearFiles();
+                    console.log(this.$refs.upload_add)
+                }
             },
             handleUpdateSuccess(res, file) {
                 if(res.result.resultCode===200){
@@ -324,7 +335,7 @@
                     this.getData();
                     this.isSelectFile = false;
                 }else{
-                    this.$message.error(res.data.result.message);
+                    this.$message.error(res.result.message);
                 }
             },
             beforeAvatarUpload(file) {
@@ -421,6 +432,7 @@
                 this.editVisible = true;
                 if (row.user) {
                     if(row.user.role){
+                        this.form.roleId = row.user.role.id;
                         this.editableForm.roleId = row.user.role.id;
                     }
                 }
@@ -449,6 +461,7 @@
 
                 if(row.position){
                     this.editableForm.positionId = row.position.id;
+                    this.form.positionId = row.position.id;
                 }
             },
             handleAdd(){
@@ -462,14 +475,36 @@
             },
             // 保存编辑
             saveEdit() {
-                this.form = this.editableForm;
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
                 if(this.departmentIds && this.departmentIds.length>0){
                     this.form.departmentId=this.departmentIds[this.departmentIds.length-1];
                 }
                 this.$refs.form.validate(validate => {
                     if (validate) {
                         if(this.isSelectFile) {
-                            this.$refs.upload_edit.submit();
+                            let formData = new FormData();
+                            formData.append("id",this.form.id);
+                            formData.append("file",this.fileList[0].raw);
+                            formData.append("headers",this.headers);
+                            formData.append("name",this.form.name);
+                            formData.append("limit",this.query.pageSize);
+                            formData.append("page",this.query.pageIndex);
+                            formData.append("idnum",this.form.idnum);
+                            formData.append("tel",this.form.tel);
+                            formData.append("note",!this.form.note?'':this.form.note);
+                            formData.append("roleId",!this.form.roleId?'':this.form.roleId);
+                            formData.append("departmentId",!this.form.departmentId?"":this.form.departmentId);
+                            formData.append("positionId",!this.form.positionId?'':this.form.positionId);
+                            this.$axios.post("/employee/updateEmployee",formData).then(res=>{
+                                if(res.data.result.resultCode!==200){
+                                    this.$message.error(res.data.result.message);
+                                }else{
+                                    this.editVisible= false;
+                                    this.getData();
+                                    this.isSelectFile = false;
+                                    this.fileList=[];
+                                }
+                            }).catch(error=>console.log(error));
                         }else{
                             this.$axios.post("/employee/updateEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
                                 this.editVisible= false;
@@ -502,17 +537,39 @@
                     if (validate) {
                         //触发组件的action
                        if(this.isSelectFile){
-                            this.$refs.upload_add.submit();
+                           // this.$refs.upload_add.submit();
+                           let formData = new FormData();
+                           formData.append("uploadFile",this.fileList[0].raw);
+                           formData.append("headers",this.headers);
+                           formData.append("name",this.form.name);
+                           formData.append("limit",this.query.pageSize);
+                           formData.append("page",this.query.pageIndex);
+                           formData.append("idnum",this.form.idnum);
+                           formData.append("tel",this.form.tel);
+                           formData.append("note",!this.form.note?'':this.form.note);
+                           formData.append("roleId",!this.form.roleId?'':this.form.roleId);
+                           formData.append("departmentId",!this.form.departmentId?"":this.form.departmentId);
+                           formData.append("positionId",!this.form.positionId?'':this.form.positionId);
+                           this.$axios.post("/employee/addEmployee",formData).then(res=>{
+                               if(res.data.result.resultCode!==200){
+                                   this.$message.error(res.data.result.message);
+                               }else{
+                                   this.addVisible= false;
+                                   this.getData();
+                                   this.isSelectFile = false;
+                                   this.fileList=[];
+                               }
+                           }).catch(error=>console.log(error));
                         }else{
-                            this.$axios.post("/employee/addEmployeeNoPhoto",this.$qs.stringify(this.form)).then(res=>{
-                                if(res.data.result.resultCode!=200){
+                            this.$axios.post("/employee/addEmployeeNoPhoto",this.$qs.stringify(this.form))
+                                .then(res=>{
+                                if(res.data.result.resultCode!==200){
                                     this.$message.error(res.data.result.message);
                                 }else{
                                     this.addVisible= false;
                                     this.getData();
                                     this.isSelectFile = false;
                                 }
-
                             }).catch(error=>{
                                 console.log(error);
                             });

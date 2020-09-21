@@ -124,7 +124,7 @@
             <img style="width: 100%;" :src="dialogImageUrl" alt="">
         </el-dialog>
         <!--新增企业资质-->
-        <el-dialog title="新增" :visible.sync="addOrgDocVisible" width="30%" >
+        <el-dialog title="新增" :visible.sync="addOrgDocVisible" width="40%" >
             <el-form ref="form" :rules="rules" :model="orgDoc" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="orgDoc.name" maxlength="50"
@@ -147,7 +147,7 @@
                                 :auto-upload="false"
                                 :on-change="handlePhotoChange"
                                 :show-file-list="false"
-                                :on-success="handleAvatarSuccess"
+                                :on-success="handleSaveAvatarSuccess"
                                 :before-upload="beforeAvatarUpload">
                             <img v-if="imageUrl" :src="imageUrl" class="avatar">
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -177,14 +177,14 @@
             </span>
         </el-dialog>
         <!--编辑企业资质-->
-        <el-dialog title="编辑" :visible.sync="editOrgDocVisible" width="30%" >
-            <el-form ref="form" :rules="rules" :model="orgDoc" label-width="100px">
+        <el-dialog title="编辑" :visible.sync="editOrgDocVisible" width="40%" >
+            <el-form ref="editForm" :rules="rules" :model="editableOrgDoc" label-width="100px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="orgDoc.name" maxlength="50"
+                    <el-input v-model="editableOrgDoc.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="文件编号" prop="docNum">
-                    <el-input v-model="orgDoc.docNum" maxlength="50"></el-input>
+                    <el-input v-model="editableOrgDoc.docNum" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="照片" >
                     <div>
@@ -200,7 +200,7 @@
                                 :auto-upload="false"
                                 :on-change="handlePhotoChange"
                                 :show-file-list="false"
-                                :on-success="handleAvatarSuccess"
+                                :on-success="handleEditAvatarSuccess"
                                 :before-upload="beforeAvatarUpload">
                             <img v-if="imageUrl" :src="imageUrl" class="avatar">
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -209,7 +209,7 @@
                 </el-form-item>
                 <el-form-item label="有效期开始" prop="beginDate">
                     <el-date-picker
-                            v-model="orgDoc.beginDate"
+                            v-model="editableOrgDoc.beginDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -217,7 +217,7 @@
                 </el-form-item>
                 <el-form-item label="有效期结束" prop="endDate">
                     <el-date-picker
-                            v-model="orgDoc.endDate"
+                            v-model="editableOrgDoc.endDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -230,7 +230,7 @@
             </span>
         </el-dialog>
         <!--上传图片-->
-        <el-dialog title="上传" :visible.sync="uploadVisible" width="30%" >
+        <el-dialog title="上传" :visible.sync="uploadVisible" width="40%" >
             <el-form ref="form" :rules="rules" :model="orgImg" label-width="50px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="orgImg.name" maxlength="50"></el-input>
@@ -394,6 +394,17 @@
                     }else{
                         callback();
                     }
+                   /* if(this.editableOrgDoc.endDate){
+                        let beginDate = new Date(value);
+                        let endDate = new Date(this.editableOrgDoc.endDate);
+                        if(beginDate.getTime()>=endDate.getTime()){
+                            callback(new Error("开始日期不能大于等于结束日期!"));
+                        }else{
+                            callback();
+                        }
+                    }else{
+                        callback();
+                    }*/
                 }  else{
                     callback(new Error("请选择开始日期!"));
                 }
@@ -411,6 +422,18 @@
                     }else{
                         callback();
                     }
+
+                /*    if(this.editableOrgDoc.beginDate){
+                        let beginDate = new Date(this.editableOrgDoc.beginDate);
+                        let endDate = new Date(value);
+                        if(beginDate.getTime()>=endDate.getTime()){
+                            callback(new Error("结束日期不能小于等于开始日期!"));
+                        }else{
+                            callback();
+                        }
+                    }else{
+                        callback();
+                    }*/
                 }  else{
                     callback(new Error("请选择结束日期!"));
                 }
@@ -426,7 +449,7 @@
                 editableOrg:{},
                 orgImg:{},
                 editableOrgImg:{},
-                orgDoc:{},
+                orgDoc:{beginDate:'',endDate:''},
                 imageUrl:'',
                 imgVisible:false,
                 dialogVisible:false,
@@ -436,6 +459,7 @@
                 addOrgDocVisible:false,
                 editOrgDocVisible:false,
                 orgDocs:[],
+                editableOrgDoc:{},
                 uploadVisible:false,
                 introduction:'',
                 isSelectFile:false,
@@ -488,7 +512,8 @@
             cancelEditOrgDoc(){
                 this.fileList=[];
                 this.editOrgDocVisible=false;
-                this.orgDoc = JSON.parse(JSON.stringify(this.orgDoc));
+                this.editableOrgDoc = JSON.parse(JSON.stringify(this.orgDoc));
+                this.$refs.editForm.clearValidate();
             },
             cancelEditOrg(){
                 this.titleVisible = false;
@@ -517,7 +542,8 @@
                     });
             },
             saveEditOrgDoc(){
-                this.$refs.form.validate(validate => {
+                this.orgDoc = JSON.parse(JSON.stringify(this.editableOrgDoc));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         if(this.isSelectFile) {
                             this.$refs.upload_modify.submit();
@@ -526,6 +552,8 @@
                                 this.editOrgDocVisible= false;
                                 this.getData();
                                 this.isSelectFile = false;
+                                this.orgDoc={};
+                                this.$refs['editForm'].clearValidate();
                             }).catch(error=>{
                                 console.log(error);
                             });
@@ -594,6 +622,31 @@
                 }
             },
             handleAvatarSuccess(res, file) {
+                this.orgDoc={};
+                this.uploadVisible= false;
+                this.getData();
+                this.fileList=[];
+                this.orgImg={};
+                this.imageUrl = '';
+                this.isSelectFile = false;
+                this.addOrgDocVisible = false;
+                this.editOrgDocVisible = false;
+            },
+            handleSaveAvatarSuccess(res, file) {
+                this.$refs['form'].clearValidate();
+                this.orgDoc={};
+                this.uploadVisible= false;
+                this.getData();
+                this.fileList=[];
+                this.orgImg={};
+                this.imageUrl = '';
+                this.isSelectFile = false;
+                this.addOrgDocVisible = false;
+                this.editOrgDocVisible = false;
+            },
+            handleEditAvatarSuccess(res, file) {
+                this.$refs['editForm'].clearValidate();
+                this.orgDoc={};
                 this.uploadVisible= false;
                 this.getData();
                 this.fileList=[];
@@ -697,11 +750,14 @@
                 this.uploadOrgDocUrl = this.$baseURL + "/orgDoc/updateOrgDoc";
                 this.editOrgDocVisible=true;
                 this.orgDoc = row;
+                this.editableOrgDoc = JSON.parse(JSON.stringify(this.orgDoc));
                 this.isSelectFile = false;
                 if(row.beginDate){
+                    this.editableOrgDoc.beginDate=getDate(new Date(row.beginDate));
                     this.orgDoc.beginDate=getDate(new Date(row.beginDate));
                 }
                 if(row.endDate){
+                    this.editableOrgDoc.endDate=getDate(new Date(row.endDate));
                     this.orgDoc.endDate=getDate(new Date(row.endDate));
                 }
                 this.imageUrl = this.$baseURL + "/" + row.url;

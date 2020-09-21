@@ -80,8 +80,8 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
@@ -127,12 +127,12 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%" >
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -349,6 +349,7 @@
                 this.getData();
                 this.$refs.uploadFileEdit.clearFiles();
                 this.isSelectUploadFile = false;
+                this.$refs.editForm.clearValidate();
             },
             beforeAvatarUpload(file) {
                 const isLt5M = file.size / 1024 / 1024 < 5;
@@ -420,9 +421,11 @@
                 this.isSelectUploadFile = false;
 
                 if(row.beginDate){
+                    this.form.beginDate = getDate(new Date(row.beginDate));
                     this.editableForm.beginDate = getDate(new Date(row.beginDate));
                 }
                 if(row.endDate){
+                    this.form.endDate = getDate(new Date(row.endDate));
                     this.editableForm.endDate = getDate(new Date(row.endDate));
                 }
             },
@@ -437,8 +440,8 @@
             },
             // 保存编辑
             saveEdit() {
-                this.form = this.editableForm;
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         if(this.isSelectUploadFile)
                             this.$refs.uploadFileEdit.submit();
@@ -450,6 +453,7 @@
                                     this.isSelectUploadFile=false;
                                 }).catch(error=>console.log(error))
                         }
+                        this.$refs.editForm.clearValidate();
                     } else {
                         return false;
                     }

@@ -17,6 +17,12 @@
                 >新增</el-button>
                 <el-button
                         type="warning"
+                        icon="el-icon-search"
+                        class="handle-del mr10"
+                        @click="findTemplates"
+                >查找模板</el-button>
+                <el-button
+                        type="warning"
                         icon="el-icon-edit"
                         class="handle-del mr10"
                         @click="usePlan"
@@ -58,18 +64,6 @@
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="250" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   :accept="ext"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -107,20 +101,31 @@
                 ></el-pagination>
             </div>
         </div>
-
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog" @open="loadData">
-            <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog" @open="loadData">
+            <el-form ref="editForm" :model="editableForm" :rules="rules"  label-width="90px">
                 <el-form-item label="开票日期" prop="billingDate">
                     <el-date-picker style="width: 100%;"
-                                    v-model="form.billingDate"
+                                    v-model="editableForm.billingDate"
                                     type="date"
                                     value-format="yyyy-MM-dd"
                                     placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="类别" prop="safetyProductionCostPlanId">
-                    <el-select v-model="form.safetyProductionCostPlanId" placeholder="请选择" style="width: 100%;" >
+                    <el-select v-model="editableForm.safetyProductionCostPlanId" placeholder="请选择" style="width: 100%;" >
                         <el-option
                                 v-for="item in safetyProductionCostPlans"
                                 :key="item.id"
@@ -130,28 +135,28 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="金额(元)" prop="sumOfMoney">
-                    <el-input-number v-model="form.sumOfMoney"></el-input-number>
+                    <el-input-number v-model="editableForm.sumOfMoney"></el-input-number>
                 </el-form-item>
                 <el-form-item label="票据号码">
-                    <el-input v-model="form.billNo"  maxlength="50"></el-input>
+                    <el-input v-model="editableForm.billNo"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="内容摘要">
-                    <el-input v-model="form.content"  maxlength="500" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="editableForm.content"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
                 <!--<el-form-item label="经办人">
                     <el-input v-model="form.operator"></el-input>
                 </el-form-item>-->
                 <el-form-item label="备注">
-                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" @open="loadData">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog" @open="loadData">
             <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
                 <el-form-item label="开票日期" prop="billingDate">
                     <el-date-picker style="width: 100%;"
@@ -252,11 +257,11 @@
                             <table class="plan" cellspacing="0" cellpadding="0" style="width: 100%;">
                                 <tr>
                                     <td style="width: 70%;text-align: center;">安全生产费用支出类别</td>
-                                    <td style="width: 30%;text-align: center;">计划使用金额</td>
+                                    <td style="width: 40%;text-align: center;">计划使用金额</td>
                                 </tr>
                                 <tr v-for="(plan,index) in safetyProductionCostPlans">
                                     <td style="width: 70%;">{{plan.name}}</td>
-                                    <td style="width: 30%;">
+                                    <td style="width: 40%;">
                                         <input v-if="!safetyProductionCost.fillIn" v-model="safetyProductionCostPlans[index].planCost" :ref="'plan'+index" @blur="checkMoney('plan',index)"></input>
                                         <div v-else>{{safetyProductionCostPlans[index].planCost}}</div>
                                     </td>
@@ -348,11 +353,11 @@
                             <table class="plan" cellspacing="0" cellpadding="0" style="width: 100%;">
                                 <tr>
                                     <td style="width: 70%;text-align: center;">安全生产费用支出类别</td>
-                                    <td style="width: 30%;text-align: center;">支出金额</td>
+                                    <td style="width: 40%;text-align: center;">支出金额</td>
                                 </tr>
                                 <tr v-for="(plan,index) in safetyProductionCostPlans">
                                     <td style="width: 70%;">{{plan.name}}</td>
-                                    <td style="width: 30%;">
+                                    <td style="width: 40%;">
                                         <div>{{safetyProductionCostPlans[index].planCost}}</div>
                                     </td>
                                 </tr>
@@ -500,6 +505,55 @@
                 <el-button @click="totalVisible=false">关闭</el-button>
             </span>
         </el-dialog>
+
+        <!--查看系统模板-->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <!--<template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>-->
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button v-if="scope.row.url"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   style="color:#67C23A"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -515,7 +569,14 @@
                     date:'',
                     type:'year'
                 },
-
+                templateVisible:false,
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
+                template:{},
+                templatesVisible:false,
                 uploadUrl:'',
                 param:{type:'contract'},
                 headers:{
@@ -538,6 +599,7 @@
                 org:{},
                 pageTotal: 0,
                 form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 rules:{
@@ -566,6 +628,23 @@
             this.getData();
         },
         methods: {
+            downloadTemplate(index,row){
+                // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
+            },
+            //查找模板
+            findTemplates(){
+                this.$axios.get("/safetyAccountTemplate/safetyAccountTemplatesByPage",{
+                    params:{
+                        page:this.templates.pageIndex,
+                        limit:this.templates.pageSize
+                    }
+                }).then(res => {
+                    this.templatesData = res.data.data;
+                    this.templates.pageTotal = res.data.count;
+                    this.templatesVisible = true;
+                }).catch(error => console.log(error));
+            },
             upload(index,row){
                 this.$refs.uploadFile.clearFiles();
                 this.param.id=row.id;
@@ -807,19 +886,21 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
-                //this.form=JSON.parse(JSON.stringify(this.form));
+                this.editableForm=JSON.parse(JSON.stringify(this.form));
                 if(row.safetyProductionCostPlan){
                     this.form.safetyProductionCostPlanId = row.safetyProductionCostPlan.id;
+                    this.editableForm.safetyProductionCostPlanId = row.safetyProductionCostPlan.id;
                 }
                 if(row.billingDate){
                     this.form.billingDate=getDate(new Date(row.billingDate));
+                    this.editableForm.billingDate=getDate(new Date(row.billingDate));
                 }
                 this.editVisible = true;
-                this.$refs["form"].clearValidate();
             },
             // 保存编辑
             saveEdit() {
-                this.$refs["form"].validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs["editForm"].validate(validate => {
                     if (validate) {
                         this.form.org=null;
                         this.form.safetyProductionCostPlan=null;
@@ -830,6 +911,7 @@
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });
@@ -886,7 +968,7 @@
         width:20%;
     }
     .per30{
-        width:30%;
+        width:40%;
     }
 
     table tr td{

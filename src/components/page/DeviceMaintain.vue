@@ -34,18 +34,6 @@
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   :accept="ext"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -83,35 +71,46 @@
                 ></el-pagination>
             </div>
         </div>
-
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="时间" prop="operDate">
                     <el-date-picker
-                            v-model="form.operDate"
+                            v-model="editableForm.operDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="内容" prop="content">
-                    <el-input v-model="form.content" maxlength="2000" show-word-limit  type="textarea"></el-input>
+                    <el-input v-model="editableForm.content" maxlength="2000" show-word-limit  type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="价格">
-                    <el-input-number v-model="form.price"  ></el-input-number>
+                    <el-input-number v-model="editableForm.price"  ></el-input-number>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" type="textarea" maxlength="500" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note" type="textarea" maxlength="500" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form))">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="时间" prop="operDate">
                     <el-date-picker
@@ -224,6 +223,7 @@
                 addVisible: false,
                 pageTotal: 0,
                 form:{},
+                editableForm:{},
                 idx: -1,
                 id: -1,
                 rules:{
@@ -350,20 +350,24 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.operDate){
                     this.form.operDate = getDate(new Date(row.operDate));
+                    this.editableForm.operDate = getDate(new Date(row.operDate));
                 }
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.form.deviceId=this.deviceId;
                         this.$axios.put("/deviceMaintain/deviceMaintain?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
+                                this.$refs.editForm.clearValidate();
                             }
                         }).catch(err => {
                             console.log(err);

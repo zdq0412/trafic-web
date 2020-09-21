@@ -1,3 +1,4 @@
+
 <template>
     <div>
         <div class="crumbs">
@@ -88,7 +89,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadSelectData">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="用户名" prop="username">
                     <el-input v-model="form.username" maxlength="15"
@@ -126,7 +127,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadSelectData">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%" @open="loadSelectData">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="用户名" prop="username">
                     <el-input v-model="form.username" maxlength="15"
@@ -290,7 +291,9 @@
                     }
                 }).then(res=>{
                     if(res.data.result.resultCode==200){
-                        this.$message.success("密码已修改!");
+                        this.$alert("密码已重置为:<span style='color:red;'>" + res.data.data + "</span>", {
+                            dangerouslyUseHTMLString: true
+                        });
                     }else{
                         this.$message.error(res.data.result.message);
                     }
@@ -354,7 +357,7 @@
             saveEdit() {
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.$axios.put("/user/user?" + this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/user/updateUser" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();

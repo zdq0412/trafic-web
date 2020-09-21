@@ -15,6 +15,12 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
+                <el-button
+                        type="warning"
+                        icon="el-icon-search"
+                        class="handle-del mr10"
+                        @click="findTemplates"
+                >查找模板</el-button>
             </div>
             <el-table
                     :data="tableData"
@@ -73,36 +79,36 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :model="form" :rules="rules"  label-width="120px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog">
+            <el-form ref="editForm" :model="editableForm" :rules="rules"  label-width="120px">
                 <el-form-item label="车牌号码" prop="carNum">
-                    <el-input v-model="form.carNum"  maxlength="10"></el-input>
+                    <el-input v-model="editableForm.carNum"  maxlength="10"></el-input>
                 </el-form-item>
                 <el-form-item label="行驶时间" prop="driveDate">
                     <el-date-picker style="width: 100%;"
-                                    v-model="form.driveDate"
+                                    v-model="editableForm.driveDate"
                                     type="datetime"
                                     value-format="yyyy-MM-dd HH:mm:ss"
                                     placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="驾驶员姓名">
-                    <el-input v-model="form.driverName"  maxlength="50"></el-input>
+                    <el-input v-model="editableForm.driverName"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="货物名称">
-                    <el-input v-model="form.goodsName"  maxlength="50"></el-input>
+                    <el-input v-model="editableForm.goodsName"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="运营路线">
-                    <el-input v-model="form.driveLines"  maxlength="500" type="textarea"></el-input>
+                    <el-input v-model="editableForm.driveLines"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="车辆运行状况">
-                    <el-input v-model="form.carStatus"  maxlength="500" type="textarea"></el-input>
+                    <el-input v-model="editableForm.carStatus"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="GPS运行状况">
-                    <el-input v-model="form.gpsStatus"  maxlength="500" type="textarea"></el-input>
+                    <el-input v-model="editableForm.gpsStatus"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
                 <el-form-item label="有无违法违章行为">
-                    <el-select v-model="form.illegal" placeholder="请选择">
+                    <el-select v-model="editableForm.illegal" placeholder="请选择">
                         <el-option
                                 v-for="item in options"
                                 :key="item.value"
@@ -112,16 +118,16 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note"  maxlength="500" type="textarea"></el-input>
+                    <el-input v-model="editableForm.note"  maxlength="500" type="textarea"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog">
             <el-form ref="form" :model="form" :rules="rules"  label-width="120px">
                 <el-form-item label="车牌号码" prop="carNum">
                     <el-input v-model="form.carNum"  maxlength="10"></el-input>
@@ -168,6 +174,54 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
+        <!--查看系统模板-->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <!--<template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>-->
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button v-if="scope.row.url"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   style="color:#67C23A"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -181,6 +235,14 @@
                     pageIndex: 1,
                     pageSize: 10,
                 },
+                templateVisible:false,
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
+                template:{},
+                templatesVisible:false,
                 tableData: [],
                 delList: [],
                 editVisible: false,
@@ -197,6 +259,7 @@
                     }
                 ],
                 form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 rules:{
@@ -218,6 +281,23 @@
             this.getData();
         },
         methods: {
+            downloadTemplate(index,row){
+                // window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
+            },
+            //查找模板
+            findTemplates(){
+                this.$axios.get("/gpsAccountTemplate/gpsAccountTemplatesByPage",{
+                    params:{
+                        page:this.templates.pageIndex,
+                        limit:this.templates.pageSize
+                    }
+                }).then(res => {
+                    this.templatesData = res.data.data;
+                    this.templates.pageTotal = res.data.count;
+                    this.templatesVisible = true;
+                }).catch(error => console.log(error));
+            },
             handleAdd(){
                 this.addVisible=true;
                 this.form={};
@@ -275,17 +355,17 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
-                this.form=JSON.parse(JSON.stringify(this.form));
+                this.editableForm=JSON.parse(JSON.stringify(this.form));
                 if(row.driveDate){
                     this.form.driveDate = getDateTime(new Date(row.driveDate))
+                    this.editableForm.driveDate = getDateTime(new Date(row.driveDate))
                 }
                 this.editVisible = true;
-                this.$refs["form"].clearValidate();
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
-                    console.log(this.form);
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.$axios.put("/gpsAccount/gpsAccount?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
@@ -294,6 +374,7 @@
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });

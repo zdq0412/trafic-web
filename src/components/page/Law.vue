@@ -78,15 +78,15 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog" @open="loadData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog" @open="loadData">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="发布日期" prop="publishDate">
                     <el-date-picker
-                            v-model="form.publishDate"
+                            v-model="editableForm.publishDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -94,24 +94,24 @@
                 </el-form-item>
                 <el-form-item label="实施日期" prop="implementDate">
                     <el-date-picker
-                            v-model="form.implementDate"
+                            v-model="editableForm.implementDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="发文部门">
-                    <el-input v-model="form.publishDepartment"  maxlength="50"></el-input>
+                    <el-input v-model="editableForm.publishDepartment"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="区域" v-if="!haveOrg" >
                     <el-cascader
-                            v-model="form.area"
+                            v-model="editableForm.area"
                             :options="areas"
                             :props="{label:'name',value:'id',checkStrictly: true}"
                             @change="handleChange"></el-cascader>
                 </el-form-item>
                 <el-form-item label="企业类别" v-if="!haveOrg" >
-                    <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;" >
+                    <el-select v-model="editableForm.orgCategoryId" placeholder="请选择" style="width: 100%;" >
                         <el-option
                                 v-for="item in orgCategories"
                                 :key="item.id"
@@ -121,22 +121,22 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
                 <el-form-item label="时效性" prop="timeliness">
-                    <el-select v-model="form.timeliness">
+                    <el-select v-model="editableForm.timeliness">
                         <el-option label="有效"  value="有效"></el-option>
                         <el-option label="无效"  value="无效"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form))">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" @open="loadData">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog" @open="loadData">
             <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -296,6 +296,7 @@
                 pageTotal: 0,
                 haveOrg:false,
                 form: {},
+                editableForm: {},
                 idx: -1,
                 org:{},
                 id: -1,
@@ -492,33 +493,37 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.publishDate){
                     this.form.publishDate = getDate(new Date(row.publishDate));
+                    this.editableForm.publishDate = getDate(new Date(row.publishDate));
                 }
                 if(row.implementDate){
                     this.form.implementDate = getDate(new Date(row.implementDate));
+                    this.editableForm.implementDate = getDate(new Date(row.implementDate));
                 }
                 if(row.orgCategory){
-                    this.form.orgCategoryId = row.orgCategory.id;
+                    this.editableForm.orgCategoryId = row.orgCategory.id;
                 }
                 if(row.province && row.city && row.region){
-                    this.form.area=[row.province.id,row.city.id,row.region.id];
-                    this.form.provinceId=row.province.id;
-                    this.form.cityId = row.city.id;
-                    this.form.regionId = row.region.id;
+                    this.editableForm.area=[row.province.id,row.city.id,row.region.id];
+                    this.editableForm.provinceId=row.province.id;
+                    this.editableForm.cityId = row.city.id;
+                    this.editableForm.regionId = row.region.id;
                 }else if(row.province && row.city){
-                    this.form.area=[row.province.id,row.city.id];
-                    this.form.provinceId=row.province.id;
-                    this.form.cityId = row.city.id;
+                    this.editableForm.area=[row.province.id,row.city.id];
+                    this.editableForm.provinceId=row.province.id;
+                    this.editableForm.cityId = row.city.id;
                 }else if(row.province){
-                    this.form.area=[row.province.id];
-                    this.form.provinceId=row.province.id;
+                    this.editableForm.area=[row.province.id];
+                    this.editableForm.provinceId=row.province.id;
                 }
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.form.content='';
                         this.$axios.put("/law/law?" + this.$qs.stringify(this.form)).then(res => {
@@ -528,6 +533,7 @@
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });

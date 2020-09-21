@@ -51,18 +51,6 @@
                 </el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   accept=".doc,.docx"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -100,18 +88,30 @@
                 ></el-pagination>
             </div>
         </div>
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   accept=".doc,.docx"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"  @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%"  @close="closeDialog('editForm')">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-row>
                     <el-col>
                         <el-form-item label="检查时间" prop="checkDate">
                             <el-date-picker
-                                    v-model="form.checkDate"
+                                    v-model="editableForm.checkDate"
                                     type="datetime"
                                     value-format="yyyy-MM-dd HH:mm:ss"
                                     placeholder="选择检查时间">
@@ -120,16 +120,16 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" maxlength="500" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note" maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"    @close="closeDialog" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"    @close="closeDialog('form')" >
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -156,7 +156,7 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
+        <el-dialog title="备注" :visible.sync="noteVisible" width="40%">
             {{note}}
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
@@ -174,7 +174,7 @@
                         <div v-else>{{tankVehicle.carNo}}</div>
                     </td>
                     <td class="per20" style="text-align: center;">检查时间</td>
-                    <td class="per20">  年 月 日</td>
+                    <td class="per20"> {{tankVehicle.checkDate | formatCheckDateOfYear}} 年{{tankVehicle.checkDate | formatCheckDateOfMonth}} 月{{tankVehicle.checkDate | formatCheckDateOfDate}} 日</td>
                 </tr>
                 <tr>
                     <td colspan="3">罐体有无破损、罐体是否整洁、罐体灯光是否完整</td>
@@ -188,7 +188,6 @@
                             <el-checkbox v-model="tankVehicle.checkItem1" disabled>
                                 <span v-if="!tankVehicle.checkItem1"> {{tankVehicle.checkItem1Msg}}</span>
                             </el-checkbox>
-
                         </div>
                     </td>
                 </tr>
@@ -673,6 +672,7 @@
                 form: {
                     area:[]
                 },
+                editableForm:{},
                 idx: -1,
                 org:{},
                 id: -1,
@@ -690,6 +690,27 @@
             formatDate(value){
                 if(value){
                     return getDate(new Date(value));
+                }else{
+                    return '';
+                }
+            },
+            formatCheckDateOfYear(value){
+                if(value){
+                    return new Date(value).getFullYear();
+                }else{
+                    return '';
+                }
+            },
+            formatCheckDateOfMonth(value){
+                if(value){
+                    return new Date(value).getMonth()+1;
+                }else{
+                    return '';
+                }
+            },
+            formatCheckDateOfDate(value){
+                if(value){
+                    return new Date(value).getDate();
                 }else{
                     return '';
                 }
@@ -806,7 +827,7 @@
                 });
             },
             showContent(row){
-                this.form = row;
+               // this.form = row;
                 this.tankVehicle=row;
                 this.showContentVisible=true;
                 this.editable = false;
@@ -838,8 +859,8 @@
                     return '';
                 }
             },
-            closeDialog(){
-                this.$refs["form"].clearValidate();
+            closeDialog(form){
+                this.$refs[form].clearValidate();
             },
             // 获取 easy-mock 的模拟数据
             getData() {
@@ -885,8 +906,13 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
-                if(row.orgCategory){
+                if(row.checkDate){
+                    this.form.checkDate=getDateTime(new Date(row.checkDate));
+                    this.editableForm.checkDate=getDateTime(new Date(row.checkDate));
+                }
+                /*if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
                 }
                 if(row.province && row.city && row.region){
@@ -895,11 +921,12 @@
                     this.form.area=[row.province.id,row.city.id];
                 }else if(row.province){
                     this.form.area=[row.province.id];
-                }
+                }*/
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.form.content='';
                         this.$axios.put("/tankVehicle/tankVehicle?" + this.$qs.stringify(this.form)).then(res => {
@@ -909,6 +936,7 @@
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });
@@ -919,7 +947,7 @@
             },
             // 保存新增
             saveAdd(){
-                this.$refs["form"].clearValidate();
+               // this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
                         this.$axios.post("/tankVehicle/tankVehicle",this.$qs.stringify(this.form)).then(res=>{
@@ -973,7 +1001,7 @@
         width:20%;
     }
     .per30{
-        width:30%;
+        width:40%;
     }
 
     table tr td{

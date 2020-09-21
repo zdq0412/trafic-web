@@ -102,6 +102,16 @@ export default new Router({
                   meta:{title:'四不放过记录模板'}
                 },
                 {
+                  path:'/gpsAccountTemplate',
+                  component:()=>import('../components/page/GpsAccountTemplate.vue'),
+                  meta:{title:'GPS台账模板'}
+                },
+                {
+                  path:'/safetyAccountTemplate',
+                  component:()=>import('../components/page/SafetyAccountTemplate.vue'),
+                  meta:{title:'安全投入台账模板'}
+                },
+                {
                   path:'/healthyRecord',
                   component:()=>import('../components/page/HealthyRecord.vue'),
                   meta:{title:'职业健康记录'}

@@ -1,6 +1,6 @@
 <template>
     <div class="login-wrap">
-        <el-tabs v-model="activeName"  style="position:absolute;top:50%;left:50%;margin: -300px 0 0 -175px;
+        <el-tabs v-model="activeName"  style="position:absolute;top:55%;left:50%;margin: -300px 0 0 -175px;
 width:500px;text-align: center;height:500px;" stretch>
             <el-tab-pane label="登录" name="login" >
                 <transition name="el-fade-in-linear">
@@ -236,8 +236,8 @@ width:500px;text-align: center;height:500px;" stretch>
         position: relative;
         width: 100%;
         height: 100%;
-        /*background-image: url(../../assets/img/login-bg.jpg);*/
-        background: url(../../assets/img/bg.jpg) no-repeat;
+        background: url(../../assets/img/login-bg.jpg) no-repeat;
+        /*background: url(../../assets/img/bg.jpg) no-repeat;*/
         background-size: 100% 100%;
         overflow: auto;
     }

@@ -54,18 +54,6 @@
                 </el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   accept=".doc,.docx"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -103,37 +91,48 @@
                 ></el-pagination>
             </div>
         </div>
-
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   accept=".doc,.docx"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog" @open="loadData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog" @open="loadData">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="发布日期" prop="publishDate">
                     <el-date-picker
-                            v-model="form.publishDate"
+                            v-model="editableForm.publishDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="发文部门">
-                    <el-input v-model="form.publishDepartment"  maxlength="50"></el-input>
+                    <el-input v-model="editableForm.publishDepartment"  maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
                 <el-form-item label="时效性" prop="timeliness">
-                    <el-select v-model="form.timeliness">
+                    <el-select v-model="editableForm.timeliness">
                         <el-option label="有效"  value="有效"></el-option>
                         <el-option label="无效"  value="无效"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
@@ -196,7 +195,7 @@
                 <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog" @open="loadData">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog" @open="loadData">
             <el-form ref="form" :model="form" :rules="rules"  label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -228,7 +227,7 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
+        <el-dialog title="备注" :visible.sync="noteVisible" width="40%">
             {{note}}
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
@@ -321,6 +320,7 @@
                 pageTotal: 0,
                 haveOrg:false,
                 form: {},
+                editableForm: {},
                 template:{},
                 idx: -1,
                 org:{},
@@ -564,14 +564,17 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.publishDate){
                     this.form.publishDate = getDate(new Date(row.publishDate));
+                    this.editableForm.publishDate = getDate(new Date(row.publishDate));
                 }
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.form.content='';
                         this.$axios.put("/rules/rules?" + this.$qs.stringify(this.form)).then(res => {
@@ -581,6 +584,7 @@
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });

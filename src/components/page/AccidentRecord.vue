@@ -78,7 +78,7 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%">
             <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="editableForm.name" maxlength="50"
@@ -114,7 +114,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%" >
             <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"

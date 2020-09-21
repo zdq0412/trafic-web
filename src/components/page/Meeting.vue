@@ -51,18 +51,6 @@
                 </el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   :accept="ext"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -100,32 +88,44 @@
                 ></el-pagination>
             </div>
         </div>
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%"   @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%"   @close="closeDialog('editForm')">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="90px">
                 <el-form-item label="会议名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="开会时间" prop="meetingDate">
                     <el-date-picker
-                            v-model="form.meetingDate"
+                            v-model="editableForm.meetingDate"
                             type="datetime"
                             value-format="yyyy-MM-dd HH:mm:ss"
                             placeholder="选择开会时间">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note"  maxlength="500" type="textarea" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note"  maxlength="500" type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"   @close="closeDialog" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"   @close="closeDialog('form')" >
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="会议名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -148,7 +148,7 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="备注" :visible.sync="noteVisible" width="30%">
+        <el-dialog title="备注" :visible.sync="noteVisible" width="40%">
             {{note}}
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="noteVisible=false">确 定</el-button>
@@ -173,7 +173,7 @@
                     </div>
                 </div>
                 <div>
-                    <div  style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;height:30%;">{{meeting.name}}</div>
+                    <div  style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;height:40%;">{{meeting.name}}</div>
                     <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="border: none;">
@@ -532,6 +532,7 @@
                 haveOrg:false,
                 meeting:{},
                 form:{},
+                editableForm:{},
                 idx: -1,
                 org:{},
                 headers:{
@@ -764,7 +765,7 @@
                 });
             },
             showContent(row){
-                this.form = row;
+                //this.form = row;
                 this.meeting=row;
                 this.showContentVisible=true;
                 this.editable = false;
@@ -777,15 +778,15 @@
                 this.form = {};
                 this.addVisible = true;
             },
-            dateFormatter(row, column, cellValue, index){
+            dateFormatter(row, column, cellValue){
                 if(cellValue){
                     return getDate(new Date(cellValue));
                 }else{
                     return '';
                 }
             },
-            closeDialog(){
-                this.$refs["form"].clearValidate();
+            closeDialog(form){
+                this.$refs[form].clearValidate();
             },
             getData() {
                 this.$axios.get("/meeting/meetingsByPage",{
@@ -829,14 +830,17 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.meetingDate){
                     this.form.meetingDate=getDateTime(new Date(row.meetingDate));
+                    this.editableForm.meetingDate=getDateTime(new Date(row.meetingDate));
                 }
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.$axios.post("/meeting/updateMeeting" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
@@ -845,6 +849,7 @@
                             } else {
                                 this.$message.error(res.data.result.message);
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });
@@ -911,7 +916,7 @@
         width:20%;
     }
     .per30{
-        width:30%;
+        width:40%;
     }
 
     table tr td{

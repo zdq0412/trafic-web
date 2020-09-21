@@ -68,23 +68,11 @@
                 <el-table-column prop="keepOnRecordDate" label="备案时间" :formatter="dateFormatter"></el-table-column>
                 <el-table-column label="备案文件">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadBakFile"
-                                   :data="param"
-                                   :accept="ext"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="bakUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button v-if="scope.row.keepOnRecord"
-                                type="text"
-                                icon="el-icon-upload2"
-                                class="upload"
-                                @click="uploadBak(scope.$index, scope.row)"
+                                   type="text"
+                                   icon="el-icon-upload2"
+                                   class="upload"
+                                   @click="uploadBak(scope.$index, scope.row)"
                         >上传</el-button>
                         <el-button v-if="scope.row.keepOnRecordRealPath"
                                    type="text"
@@ -94,19 +82,20 @@
                         >下载</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column label="应急预案演练">
+                <!--<el-table-column label="应急预案演练">
                     <template slot-scope="scope">
                         <el-button
-                                   type="text"
-                                   icon="el-icon-search"
-                                   class="upload"
-                                   @click="lookup(scope.$index, scope.row)"
+                                type="text"
+                                icon="el-icon-search"
+                                class="upload"
+                                @click="lookup(scope.$index, scope.row)"
                         >查看</el-button>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
                         <el-button
+                                v-if="!scope.row.keepOnRecord"
                                 type="text"
                                 style="color:#E6A23C;"
                                 icon="el-icon-paperclip"
@@ -137,42 +126,53 @@
                 ></el-pagination>
             </div>
         </div>
-
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadBakFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="bakUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
-                    <el-form-item label="预案名称" prop="prePlanName">
-                        <el-input v-model="editableForm.prePlanName" maxlength="50"
-                                  show-word-limit></el-input>
-                    </el-form-item>
-                    <el-form-item label="编制日期"  prop="writeDate">
-                        <el-date-picker
-                                v-model="editableForm.writeDate"
-                                type="date"
-                                value-format="yyyy-MM-dd"
-                                placeholder="选择日期">
-                        </el-date-picker>
-                    </el-form-item>
-                    <el-form-item label="备案名称" prop="keepOnRecordName" v-if="editableForm.keepOnRecord">
-                        <el-input v-model="editableForm.keepOnRecordName" maxlength="50"
-                                  show-word-limit></el-input>
-                    </el-form-item>
-                    <el-form-item label="备案日期"  v-if="editableForm.keepOnRecord" prop="keepOnRecordDate">
-                        <el-date-picker
-                                v-model="editableForm.keepOnRecordDate"
-                                type="date"
-                                value-format="yyyy-MM-dd"
-                                placeholder="选择日期">
-                        </el-date-picker>
-                    </el-form-item>
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog('editForm')">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="100px">
+                <el-form-item label="预案名称" prop="prePlanName">
+                    <el-input v-model="editableForm.prePlanName" maxlength="50"
+                              show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="编制日期"  prop="writeDate">
+                    <el-date-picker
+                            v-model="editableForm.writeDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="备案名称" prop="keepOnRecordName" v-if="editableForm.keepOnRecord">
+                    <el-input v-model="editableForm.keepOnRecordName" maxlength="50"
+                              show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="备案日期"  v-if="editableForm.keepOnRecord" prop="keepOnRecordDate">
+                    <el-date-picker
+                            v-model="editableForm.keepOnRecordDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog('form')">
             <el-form ref="form" :model="form" :rules="rules"  label-width="100px">
                 <el-form-item label="预案名称" prop="prePlanName">
                     <el-input v-model="form.prePlanName" maxlength="50"
@@ -194,15 +194,15 @@
         </el-dialog>
 
         <!--备案-->
-        <el-dialog title="备案" :visible.sync="preplanVisible" width="30%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+        <el-dialog title="备案" :visible.sync="preplanVisible" width="40%" @close="closeDialog('preplanForm')">
+            <el-form ref="preplanForm" :rules="rules" :model="preplanForm" label-width="100px">
                 <el-form-item label="备案名称" prop="keepOnRecordName">
-                    <el-input v-model="form.keepOnRecordName" maxlength="50"
+                    <el-input v-model="preplanForm.keepOnRecordName" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="备案日期" prop="keepOnRecordDate">
                     <el-date-picker
-                            v-model="form.keepOnRecordDate"
+                            v-model="preplanForm.keepOnRecordDate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -210,7 +210,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="preplanVisible = false">取 消</el-button>
+                <el-button @click="preplanVisible = false;preplanForm=JSON.parse(JSON.stringify(form));">取 消</el-button>
                 <el-button type="primary" @click="savePreplan">确 定</el-button>
             </span>
         </el-dialog>
@@ -289,6 +289,8 @@
                 pageTotal: 0,
                 form: {},
                 editableForm: {},
+                preplanForm:{},
+                preplanFormOnly:{},
                 idx: -1,
                 id: -1,
                 rules:{
@@ -322,7 +324,7 @@
                 this.findTemplates();
             },
             downloadTemplate(index,row){
-               // window.location.href=this.$baseURL + "/" + row.url;
+                // window.location.href=this.$baseURL + "/" + row.url;
                 window.open(this.$baseURL + "/" + row.url);
             },
             //查找模板
@@ -359,11 +361,11 @@
                 this.$refs.bakUploadBtn.$el.click();
             },
             downloadPreplan(index,row){
-               // window.location.href=this.$baseURL + "/" + row.prePlanUrl;
+                // window.location.href=this.$baseURL + "/" + row.prePlanUrl;
                 window.open(this.$baseURL + "/" + row.prePlanUrl);
             },
             downloadBak(index,row){
-               // window.location.href=this.$baseURL + "/" + row.keepOnRecordUrl;
+                // window.location.href=this.$baseURL + "/" + row.keepOnRecordUrl;
                 window.open(this.$baseURL + "/" + row.keepOnRecordUrl);
             },
             handleAvatarSuccess(res, file) {
@@ -389,8 +391,8 @@
                 }
                 return  true;
             },
-            closeDialog(){
-                this.$refs["form"].clearValidate();
+            closeDialog(form){
+                this.$refs[form].clearValidate();
             },
             // 获取 easy-mock 的模拟数据
             getData() {
@@ -417,23 +419,11 @@
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
-                        this.$axios.get("/emergencyPlanBak/preplanDrillRecord/" + this.form.id).then(res => {
-                            if(res.data.data){
-                                this.$confirm('存在演练记录，删除该预案，将同时删除演练记录，是否确认?','提示',{
-                                    type:'warning'
-                                }).then(()=>{
-                                    this.$axios.delete("/emergencyPlanBak/emergencyPlanBak/" + this.form.id).then(res => {
-                                        if(res.data.result.resultCode==200){
-                                            this.$message.success('删除成功');
-                                            this.getData();
-                                        }else{
-                                            this.$message.error(res.data.result.message);
-                                        }
-                                    }) .catch(error =>{
-                                        console.log(error);
-                                    });
-                                })
-                            }else{
+                    this.$axios.get("/emergencyPlanBak/preplanDrillRecord/" + this.form.id).then(res => {
+                        if(res.data.data){
+                            this.$confirm('存在演练记录，删除该预案，将同时删除演练记录，是否确认?','提示',{
+                                type:'warning'
+                            }).then(()=>{
                                 this.$axios.delete("/emergencyPlanBak/emergencyPlanBak/" + this.form.id).then(res => {
                                     if(res.data.result.resultCode==200){
                                         this.$message.success('删除成功');
@@ -444,11 +434,23 @@
                                 }) .catch(error =>{
                                     console.log(error);
                                 });
-                            }
-                        }) .catch(error =>{
-                            console.log(error);
-                        });
-                    })
+                            })
+                        }else{
+                            this.$axios.delete("/emergencyPlanBak/emergencyPlanBak/" + this.form.id).then(res => {
+                                if(res.data.result.resultCode==200){
+                                    this.$message.success('删除成功');
+                                    this.getData();
+                                }else{
+                                    this.$message.error(res.data.result.message);
+                                }
+                            }) .catch(error =>{
+                                console.log(error);
+                            });
+                        }
+                    }) .catch(error =>{
+                        console.log(error);
+                    });
+                })
                     .catch(() => {});
             },
             // 编辑操作
@@ -458,28 +460,31 @@
                 this.editableForm=JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.writeDate){
+                    this.form.writeDate = getDate(new Date(row.writeDate));
                     this.editableForm.writeDate = getDate(new Date(row.writeDate));
                 }
                 if(row.keepOnRecord){
                     if(row.keepOnRecordDate){
                         this.editableForm.keepOnRecordDate = getDate(new Date(row.keepOnRecordDate));
+                        this.form.keepOnRecordDate = getDate(new Date(row.keepOnRecordDate));
                     }
                 }
             },
             // 备案操作
             handlePreplan(index, row) {
                 this.idx = index;
-                this.form = row;
-                //this.form=JSON.parse(JSON.stringify(this.form));
+                this.preplanFormOnly = row;
+                this.preplanForm = JSON.parse(JSON.stringify(this.preplanFormOnly));
                 this.preplanVisible = true;
                 if(row.keepOnRecordDate){
-                    this.form.keepOnRecordDate = getDate(new Date(row.keepOnRecordDate));
+                    this.preplanFormOnly.keepOnRecordDate = getDate(new Date(row.keepOnRecordDate));
+                    this.preplanForm.keepOnRecordDate = getDate(new Date(row.keepOnRecordDate));
                 }
             },
             // 保存编辑
             saveEdit() {
                 this.form = this.editableForm;
-                this.$refs.form.validate(validate => {
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
                         this.form.emergencyPlanBakId=this.emergencyPlanBakId;
                         this.$axios.put("/emergencyPlanBak/emergencyPlanBak?" + this.$qs.stringify(this.form)).then(res => {
@@ -487,6 +492,7 @@
                                 this.editVisible = false;
                                 this.getData();
                             }
+                            this.$refs.editForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });
@@ -497,14 +503,16 @@
             },
             // 保存备案
             savePreplan() {
-                this.$refs.form.validate(validate => {
+               this.preplanFormOnly = JSON.parse(JSON.stringify(this.preplanForm));
+                this.$refs.preplanForm.validate(validate => {
                     if (validate) {
-                        this.form.emergencyPlanBakId=this.emergencyPlanBakId;
-                        this.$axios.put("/emergencyPlanBak/preplan?" + this.$qs.stringify(this.form)).then(res => {
+                        this.preplanForm.emergencyPlanBakId=this.emergencyPlanBakId;
+                        this.$axios.post("/emergencyPlanBak/updatePreplan", this.$qs.stringify(this.preplanFormOnly)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.preplanVisible = false;
                                 this.getData();
                             }
+                            this.$refs.preplanForm.clearValidate();
                         }).catch(err => {
                             console.log(err);
                         });

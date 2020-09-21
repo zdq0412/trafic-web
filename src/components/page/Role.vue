@@ -65,7 +65,7 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @open="loadOrgCategory">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadOrgCategory">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -91,7 +91,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%" @open="loadOrgCategory">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%" @open="loadOrgCategory">
             <el-form ref="form" :rules="rules" :model="form" label-width="70px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -117,7 +117,7 @@
             </span>
         </el-dialog>
         <!-- 新增授权对话框 -->
-        <el-dialog title="授权" :visible.sync="grantFunctionVisible" width="30%">
+        <el-dialog title="授权" :visible.sync="grantFunctionVisible" width="40%">
             <el-checkbox v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
             <div style="height:500px;overflow: auto;">
                 <function-tree ref="functionTree" v-if="grantFunctionVisible" :paramType="param" :param="roleId"></function-tree>

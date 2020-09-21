@@ -35,18 +35,6 @@
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="280" align="center">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadFile"
-                                   :data="param"
-                                   :accept="ext"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -84,9 +72,20 @@
                 ></el-pagination>
             </div>
         </div>
-
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" @close="closeDialog">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog">
             <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="editableForm.name" maxlength="50"
@@ -118,7 +117,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%"  @close="closeDialog">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog">
             <el-form ref="form" :model="form" :rules="rules"  label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
