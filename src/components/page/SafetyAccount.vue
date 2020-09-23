@@ -439,7 +439,7 @@
                         <td>
                             <table class="plan" cellspacing="0" cellpadding="0" style="width: 100%;">
                                 <tr>
-                                    <td style="width: 40%;text-align: center;">安全生产费用支出类别（每月）</td>
+                                    <td style="width: 30%;text-align: center;">安全生产费用支出类别（每月）</td>
                                     <td>1</td>
                                     <td>2</td>
                                     <td>3</td>
@@ -968,7 +968,7 @@
         width:20%;
     }
     .per30{
-        width:40%;
+        width:30%;
     }
 
     table tr td{

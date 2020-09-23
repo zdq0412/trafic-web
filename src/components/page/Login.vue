@@ -106,9 +106,8 @@ width:500px;text-align: center;height:500px;" stretch>
                     </div>
                 </transition>
             </el-tab-pane>
+            <div style="color:red;margin-top:5px;font-size:12px;">如存在疑问，请拨打电话：17706832223</div>
         </el-tabs>
-
-        <!--<div style="color:red;margin-top:5px;font-size:12px;">建议使用火狐或谷歌浏览器!</div>-->
     </div>
 </template>
 

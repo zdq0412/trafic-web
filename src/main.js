@@ -16,7 +16,7 @@ Vue.prototype.$qs = qs;
 //Vue.prototype.$baseURL='http://47.99.164.110:8088';
 Vue.prototype.$baseURL='http://192.168.0.133:8088';
 Vue.prototype.$axios = axios.create({
-   // baseURL:"http://47.99.164.110:8088",
+   //baseURL:"http://47.99.164.110:8088",
    baseURL:"http://192.168.0.133:8088",
     transformRequest:[function(data,header){
        header.token = localStorage.getItem("token");

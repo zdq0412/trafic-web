@@ -916,7 +916,7 @@
         width:20%;
     }
     .per30{
-        width:40%;
+        width:30%;
     }
 
     table tr td{
