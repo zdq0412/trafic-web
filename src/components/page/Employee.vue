@@ -399,13 +399,12 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form = row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/employee/employee/" + this.form.id).then(res => {
+                        this.$axios.delete("/employee/employee/" + row.id).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getData();

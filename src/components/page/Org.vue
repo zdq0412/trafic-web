@@ -337,13 +337,12 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/org/org/" + this.form.id).then(res => {
+                        this.$axios.delete("/org/org/" + row.id).then(res => {
                             this.$message.success('删除成功');
                             this.getData();
                         }) .catch(error =>{

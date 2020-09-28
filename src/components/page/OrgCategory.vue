@@ -235,13 +235,15 @@
             },
             // 删除操作
             handleDelete(index, row,operType) {
-                this.form = row;
-                this.form.operType = operType;
+               /* this.form = row;
+                this.form.operType = operType;*/
+                let f = row;
+                f.operType=operType;
                 // 二次确认删除
                 this.$confirm('确定执行该操作吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
-                        this.$axios.post("/orgCategory/orgCategoryStatus",this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/orgCategory/orgCategoryStatus",this.$qs.stringify(f)).then(res => {
                             this.$message.success('操作成功');
                             this.getData();
                         }) .catch(error =>{

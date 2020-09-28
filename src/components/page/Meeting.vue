@@ -315,7 +315,7 @@
 
                 </div>
             </div>
-            <span slot="footer" class="dialog-footer" style="position:fixed;bottom: 30px;left:45%;">
+            <span slot="footer" class="dialog-footer" style="position:fixed;bottom: 20px;left:45%;">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
                 <el-button v-if="!editable" type="warning" v-print="'#printContent'">打印</el-button>
                 <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
@@ -807,12 +807,10 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
-                })
-                    .then(() => {
+                }).then(() => {
                         this.$axios.delete("/meeting/meeting/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');

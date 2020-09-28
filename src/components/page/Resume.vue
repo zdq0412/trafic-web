@@ -89,7 +89,7 @@
                     <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="有效期开始" >
+                <!--<el-form-item label="有效期开始" >
                     <el-date-picker
                             v-model="editableForm.beginDate"
                             type="date"
@@ -104,7 +104,7 @@
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
-                </el-form-item>
+                </el-form-item>-->
                 <el-form-item label="备注">
                     <el-input v-model="editableForm.note" show-word-limit maxlength="200" type="textarea" :rows="3"></el-input>
                 </el-form-item>
@@ -121,7 +121,7 @@
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="有效期开始" >
+                <!--<el-form-item label="有效期开始" >
                     <el-date-picker
                             v-model="form.beginDate"
                             type="date"
@@ -136,7 +136,7 @@
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                     </el-date-picker>
-                </el-form-item>
+                </el-form-item>-->
                 <el-form-item label="备注">
                     <el-input v-model="form.note" maxlength="200" show-word-limit type="textarea" :rows="3"></el-input>
                 </el-form-item>
@@ -219,8 +219,6 @@
                 },
                 template:{},
                 templatesVisible:false,
-
-
                 uploadUrl:'',
                 param:{type:'resume'},
                 headers:{
@@ -229,7 +227,6 @@
                 ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
                 tableData: [],
                 delList: [],
-                empId:'',
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
@@ -246,8 +243,11 @@
             };
         },
         created() {
-            this.empId = this.$route.params.empId;
             this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
+            this.getData();
+        },
+        activated(){
+            localStorage.setItem("empId",this.$route.params.empId);
             this.getData();
         },
         methods: {
@@ -322,7 +322,7 @@
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
-                        empId:localStorage.getItem("empId")
+                       empId:localStorage.getItem("empId")
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -337,13 +337,12 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/resume/resume/" + this.form.id).then(res => {
+                        this.$axios.delete("/resume/resume/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -374,7 +373,6 @@
                 this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.form.empId=this.empId;
                         this.$axios.post("/resume/updateResume" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
@@ -393,11 +391,13 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.form.empId = this.empId;
+                        this.form.empId =localStorage.getItem("empId");
                         this.$axios.post("/resume/resume",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
+                            }else {
+                                this.$message.error(res.data.result.message);
                             }
                         }).catch(err =>{
                             console.log(err);

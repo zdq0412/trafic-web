@@ -227,10 +227,8 @@
                     token : localStorage.getItem("token")
                 },
                 ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
-
                 tableData: [],
                 delList: [],
-                empId:'',
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
@@ -246,8 +244,11 @@
             };
         },
         created() {
-            this.empId = this.$route.params.empId;
             this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
+            this.getData();
+        },
+        activated(){
+            localStorage.setItem("empId",this.$route.params.empId);
             this.getData();
         },
         methods: {
@@ -344,13 +345,12 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/qualificationDocument/qualificationDocument/" + this.form.id).then(res => {
+                        this.$axios.delete("/qualificationDocument/qualificationDocument/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -381,7 +381,6 @@
                 this.form = this.editableForm;
                 this.$refs.form.validate(validate => {
                     if (validate) {
-                        this.form.empId=this.empId;
                         this.$axios.post("/qualificationDocument/updateQualificationDocument",this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
@@ -400,11 +399,13 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.form.empId = this.empId;
+                        this.form.empId = localStorage.getItem("empId");
                         this.$axios.post("/qualificationDocument/qualificationDocument",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
+                            }else{
+                                this.$message.error(res.data.result.message);
                             }
                         }).catch(err =>{
                             console.log(err);

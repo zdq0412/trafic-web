@@ -237,8 +237,11 @@
             };
         },
         created() {
-            this.deviceId = this.$route.params.deviceId;
             this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
+            this.getData();
+        },
+        activated(){
+          localStorage.setItem("deviceId",this.$route.params.deviceId) ;
             this.getData();
         },
         methods: {
@@ -312,7 +315,7 @@
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
-                        deviceId:this.deviceId
+                        deviceId:localStorage.getItem("deviceId")
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -327,13 +330,12 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/deviceMaintain/deviceMaintain/" + this.form.id).then(res => {
+                        this.$axios.delete("/deviceMaintain/deviceMaintain/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -362,7 +364,6 @@
                 this.form = JSON.parse(JSON.stringify(this.editableForm));
                 this.$refs.editForm.validate(validate => {
                     if (validate) {
-                        this.form.deviceId=this.deviceId;
                         this.$axios.put("/deviceMaintain/deviceMaintain?" + this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
@@ -382,7 +383,7 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.form.deviceId = this.deviceId;
+                        this.form.deviceId = localStorage.getItem("deviceId");
                         this.$axios.post("/deviceMaintain/deviceMaintain",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;

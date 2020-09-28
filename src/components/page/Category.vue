@@ -260,14 +260,17 @@
             },
             // 删除操作
             handleDelete(index, row,operType) {
-                this.form=row;
-                this.form.operType = operType;
+               /* this.form=row;
+                this.form.operType = operType;*/
+
+                let f = row;
+                f.operType=operType;
                 // 二次确认删除
                 this.$confirm('确定执行该操作吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.post("/category/categoryStatus",this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/category/categoryStatus",this.$qs.stringify(f)).then(res => {
                             if(res.data.result.resultCode===200){
                                 this.$message.success('操作成功');
                                 this.getData();

@@ -15,7 +15,7 @@
                         class="handle-del mr10"
                         @click="handleAdd"
                 >新增</el-button>
-                <el-input v-model="query.name" placeholder="人员名称" class="handle-input mr10"></el-input>
+                <el-input v-model="query.name" placeholder="设备名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table
@@ -310,13 +310,12 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form = row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/device/device/" + this.form.id).then(res => {
+                        this.$axios.delete("/device/device/" + row.id).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getData();

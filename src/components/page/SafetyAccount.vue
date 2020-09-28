@@ -583,7 +583,7 @@
                     token : localStorage.getItem("token")
                 },
                 ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
-
+                templatesData:[],
                 tableData: [],
                 safetyProductionCostPlans:[],
                 safetyProductionCost:{},
@@ -826,11 +826,11 @@
             handleAdd(){
                 this.addVisible=true;
                 this.form={};
-                this.$refs["form"].clearValidate();
             },
             loadData(){
                 this.$axios.get("/safetyProductionCostPlan/safetyProductionCostPlan").then(res=>{
                     this.safetyProductionCostPlans = res.data;
+                    this.closeDialog();
                 }).catch(error=>console.log(error))
             },
             dateFormatter(row, column, cellValue, index){
@@ -841,6 +841,7 @@
                 }
             },
             closeDialog(){
+                this.form={};
                 this.$refs["form"].clearValidate();
             },
             // 获取 easy-mock 的模拟数据
@@ -863,13 +864,12 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/safetyProductionCostPlanDetail/safetyProductionCostPlanDetail/" + this.form.id).then(res => {
+                        this.$axios.delete("/safetyProductionCostPlanDetail/safetyProductionCostPlanDetail/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -922,7 +922,6 @@
             },
             // 保存新增
             saveAdd(){
-                this.$refs["form"].clearValidate();
                 this.$refs["form"].validate(validate =>{
                     if(validate){
                         this.$axios.post("/safetyProductionCostPlanDetail/safetyProductionCostPlanDetail",this.$qs.stringify(this.form)).then(res=>{
@@ -944,6 +943,10 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageIndex', val);
                 this.getData();
+            },
+            handleTemplatesPageChange(val) {
+                this.$set(this.templates, 'pageIndex', val);
+                this.findTemplates();
             }
         }
     };

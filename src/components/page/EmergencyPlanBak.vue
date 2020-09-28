@@ -32,18 +32,6 @@
                 <el-table-column prop="writeDate" label="编制时间" :formatter="dateFormatter"></el-table-column>
                 <el-table-column label="预案文件">
                     <template slot-scope="scope">
-                        <el-upload style="display: none;"
-                                   :action="uploadUrl"
-                                   :limit="1"
-                                   :auto-upload="true"
-                                   ref="uploadPreplanFile"
-                                   :data="param"
-                                   :accept="ext"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload"
-                                   :headers="headers">
-                            <el-button size="small" ref="preplanUploadBtn" slot="trigger" type="primary">导入</el-button>
-                        </el-upload>
                         <el-button
                                 type="text"
                                 icon="el-icon-upload2"
@@ -126,6 +114,18 @@
                 ></el-pagination>
             </div>
         </div>
+        <el-upload style="display: none;"
+                   :action="uploadUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadPreplanFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleAvatarSuccess"
+                   :before-upload="beforeAvatarUpload"
+                   :headers="headers">
+            <el-button size="small" ref="preplanUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
         <el-upload style="display: none;"
                    :action="uploadUrl"
                    :limit="1"
@@ -414,17 +414,16 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
-                    this.$axios.get("/emergencyPlanBak/preplanDrillRecord/" + this.form.id).then(res => {
+                    this.$axios.get("/emergencyPlanBak/preplanDrillRecord/" + row.id).then(res => {
                         if(res.data.data){
                             this.$confirm('存在演练记录，删除该预案，将同时删除演练记录，是否确认?','提示',{
                                 type:'warning'
                             }).then(()=>{
-                                this.$axios.delete("/emergencyPlanBak/emergencyPlanBak/" + this.form.id).then(res => {
+                                this.$axios.delete("/emergencyPlanBak/emergencyPlanBak/" + row.id).then(res => {
                                     if(res.data.result.resultCode==200){
                                         this.$message.success('删除成功');
                                         this.getData();
@@ -436,7 +435,7 @@
                                 });
                             })
                         }else{
-                            this.$axios.delete("/emergencyPlanBak/emergencyPlanBak/" + this.form.id).then(res => {
+                            this.$axios.delete("/emergencyPlanBak/emergencyPlanBak/" + row.id).then(res => {
                                 if(res.data.result.resultCode==200){
                                     this.$message.success('删除成功');
                                     this.getData();

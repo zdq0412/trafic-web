@@ -195,13 +195,12 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/areaManager/areaManager/" + this.form.id).then(res => {
+                        this.$axios.delete("/areaManager/areaManager/" + row.id).then(res => {
                             this.$message.success('删除成功');
                             this.getData();
                         }) .catch(error =>{

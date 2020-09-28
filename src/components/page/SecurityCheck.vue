@@ -125,7 +125,7 @@
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="40%"   @close="closeDialog" >
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%"   @close="closeDialog" @open="clearValidate">
             <el-form ref="form" :rules="rules" :model="form" label-width="90px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
@@ -266,12 +266,12 @@
                     </table>
                 </div>
             </div>
-            <span slot="footer" class="dialog-footer">
+            <div style="width:100%;text-align: center;">
                 <el-button v-if="!editable" type="primary" @click="editContent">编辑</el-button>
                 <el-button v-if="!editable" type="warning" v-print="printObj">打印</el-button>
                 <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
-            </span>
+            </div>
         </el-dialog>
         <!--查看系统模板-->
         <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
@@ -673,7 +673,16 @@
                 }
             },
             closeDialog(){
-                this.$refs["form"].clearValidate();
+                this.form={};
+                if(this.$refs["form"]){
+                    this.$refs["form"].clearValidate();
+                }
+                if(this.$refs["editableForm"]){
+                    this.$refs["editableForm"].clearValidate();
+                }
+            },
+            clearValidate(){
+              this.closeDialog();
             },
             // 获取 easy-mock 的模拟数据
             getData() {
@@ -696,7 +705,6 @@
             },
             // 删除操作
             handleDelete(index, row) {
-                this.form=row;
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
