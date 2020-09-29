@@ -71,7 +71,7 @@
                 </el-breadcrumb>
             </div>
             <div class="container">
-                <div class="handle-box">
+                <div class="handle-box" style="margin-top: -20px;margin-bottom:10px;">
                     <el-button
                             type="primary"
                             icon="el-icon-plus"
@@ -583,6 +583,7 @@
                 this.orgDoc={};
                 this.isSelectFile = false;
                 this.uploadOrgDocUrl=this.$baseURL + "/orgDoc/addOrgDoc";
+                this.fileList=[];
             },
             dateFormatter(row,column,cellValue){
                 if(cellValue){

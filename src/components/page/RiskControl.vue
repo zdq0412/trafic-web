@@ -316,7 +316,8 @@
             handleAdd(){
                 this.addVisible=true;
                 this.$refs["form"].clearValidate();
-              this.form = {};
+                this.form = {};
+                this.fileList=[];
             },
             closeDialog(){
                 this.$refs["form"].clearValidate();

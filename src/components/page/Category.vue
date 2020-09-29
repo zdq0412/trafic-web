@@ -166,7 +166,6 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
-                fileList:[],
                 value :'',
                 row:{},
                 fullscreenLoading:false,

@@ -396,7 +396,7 @@
                 }
                 this.form = {};
                 this.filename='';
-
+                this.fileList=[];
             },
             // 保存编辑
             saveEdit() {
@@ -428,10 +428,6 @@
             },
             // 保存新增
             saveAdd() {
-                if(!this.form.name){
-                    this.$message.error("请输入名称!");
-                    return false;
-                }
                 if(!validateUploadFile(this.fileList)){
                     this.$message.error("请选择上传文件!");
                     return false;

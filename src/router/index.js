@@ -244,7 +244,7 @@ export default new Router({
                 {
                   path:'/accidentRecord',
                   component:()=>import('../components/page/AccidentRecord.vue'),
-                  meta:{title:'事故记录及处理'}
+                  meta:{title:'事故记录处理'}
                 },
                 {
                   path:'/fourRecord',

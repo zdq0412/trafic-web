@@ -149,7 +149,6 @@
                     pageSize: 10
                 },
                 pageTotal: 0,
-                fileList:[],
                 tableData: [],
                 addVisible:false,
                 editVisible:false,

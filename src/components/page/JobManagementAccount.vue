@@ -437,7 +437,7 @@
                 }
                 this.form = {};
                 this.filename='';
-
+                this.fileList=[];
             },
             // 保存编辑
             saveEdit() {

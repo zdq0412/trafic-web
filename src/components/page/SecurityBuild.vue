@@ -202,7 +202,7 @@
 
 <script>
     import {getDate} from "../common/utils";
-
+    import {validateUploadFile} from "../common/validate";
     export default {
         name: 'basetable',
         data() {
@@ -401,7 +401,7 @@
                 }
                 this.form = {};
                 this.filename='';
-
+                this.fileList=[];
             },
             // 保存编辑
             saveEdit() {
@@ -431,6 +431,10 @@
             },
             // 保存新增
             saveAdd() {
+                if(!validateUploadFile(this.fileList)){
+                    this.$message.error("请选择上传文件!");
+                    return false;
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {

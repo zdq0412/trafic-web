@@ -471,6 +471,7 @@
                 this.form = {};
                 this.imageUrl = '';
                 this.isSelectFile = false;
+                this.fileList=[];
             },
             // 保存编辑
             saveEdit() {

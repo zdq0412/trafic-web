@@ -237,7 +237,7 @@
 
 <script>
     import {getDate} from "../common/utils";
-
+    import {validateUploadFile} from "../common/validate";
     export default {
         name: 'basetable',
         data() {
@@ -396,7 +396,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/securityExamination/securityExamination/" + row.id).then(res => {
+                        this.$axios.delete("/securityExamination/securityExamination/" + row .id).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -435,7 +435,7 @@
                 }
                 this.form = {};
                 this.filename='';
-
+                this.fileList=[];
             },
             // 保存编辑
             saveEdit() {
@@ -468,6 +468,10 @@
             },
             // 保存新增
             saveAdd() {
+                if(!validateUploadFile(this.fileList)){
+                    this.$message.error("请选择上传文件!");
+                    return false;
+                }
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate => {
                     if (validate) {
