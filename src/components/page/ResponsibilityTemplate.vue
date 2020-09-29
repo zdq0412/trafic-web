@@ -100,16 +100,16 @@
         </el-upload>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="40%"  @open="loadSelectData" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="form" label-width="90px">
+            <el-form ref="editableForm" :rules="rules" :model="editableForm" label-width="90px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-row type="flex" class="row-bg" v-if="!haveOrg">
                     <el-col >
                         <el-form-item label="省市区">
                             <el-cascader
-                                    v-model="form.area"
+                                    v-model="editableForm.area"
                                     :options="areas"
                                     :props="{label:'name',value:'id',checkStrictly: true}"
                                     @change="handleChange"></el-cascader>
@@ -119,7 +119,7 @@
                 <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;"  @change="$set(form,orgCategoryId)">
+                            <el-select v-model="editableForm.orgCategoryId" placeholder="请选择" style="width: 100%;"  @change="$set(editableForm,orgCategoryId)">
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -131,7 +131,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
+                    <el-input v-model="editableForm.note"  maxlength="500"  type="textarea" :rows="3"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -245,6 +245,7 @@
                 form: {
                     area:[]
                 },
+                editableForm:{},
                 idx: -1,
                 org:{},
                 id: -1,
@@ -343,6 +344,7 @@
             },
             handleAdd(){
                 this.form = {};
+                this.editableForm = {};
                 this.addVisible = true;
             },
             handleChange(){
@@ -359,6 +361,22 @@
                     if(this.form.area.length==3){
                         this.form.cityId=this.form.area[1];
                         this.form.regionId=this.form.area[2];
+                    }
+                }
+
+                if(this.editableForm.area&&this.editableForm.area.length>0){
+                    this.editableForm.provinceId=this.editableForm.area[0];
+                    if(this.editableForm.area.length==1){
+                        this.editableForm.cityId='';
+                        this.editableForm.regionId='';
+                    }
+                    if(this.editableForm.area.length==2){
+                        this.editableForm.cityId=this.editableForm.area[1];
+                        this.editableForm.regionId='';
+                    }
+                    if(this.editableForm.area.length==3){
+                        this.editableForm.cityId=this.editableForm.area[1];
+                        this.editableForm.regionId=this.editableForm.area[2];
                     }
                 }
             },
@@ -414,27 +432,42 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm=JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
+                    this.editableForm.orgCategoryId = row.orgCategory.id;
                 }
                 if(row.province && row.city && row.region){
                     this.form.area=[row.province.id,row.city.id,row.region.id];
                     this.form.provinceId=row.province.id;
                     this.form.cityId = row.city.id;
                     this.form.regionId = row.region.id;
+
+                    this.editableForm.area=[row.province.id,row.city.id,row.region.id];
+                    this.editableForm.provinceId=row.province.id;
+                    this.editableForm.cityId = row.city.id;
+                    this.editableForm.regionId = row.region.id;
                 }else if(row.province && row.city){
                     this.form.area=[row.province.id,row.city.id];
                     this.form.provinceId=row.province.id;
                     this.form.cityId = row.city.id;
+
+                    this.editableForm.area=[row.province.id,row.city.id];
+                    this.editableForm.provinceId=row.province.id;
+                    this.editableForm.cityId = row.city.id;
                 }else if(row.province){
                     this.form.area=[row.province.id];
                     this.form.provinceId=row.province.id;
+
+                    this.editableForm.area=[row.province.id];
+                    this.editableForm.provinceId=row.province.id;
                 }
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editableForm.validate(validate => {
                     if (validate) {
                         this.form.content='';
                         this.$axios.put("/responsibilityTemplate/responsibilityTemplate?" + this.$qs.stringify(this.form)).then(res => {

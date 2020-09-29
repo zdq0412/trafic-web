@@ -214,8 +214,8 @@
                 </el-card>
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="showContentVisible=false,editContentVisible=true" v-if="form.org">编辑</el-button>
-                <el-button type="warning" @click="handleExecute" v-if="form.content">发文执行</el-button>
+                <el-button type="primary" @click="showContentVisible=false;editContentVisible=true">编辑</el-button>
+                <el-button type="warning" @click="handleExecute" v-if="form.content && haveOrg">发文执行</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </span>
         </el-dialog>

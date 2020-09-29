@@ -250,7 +250,7 @@
                 </el-card>
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="showContentVisible=false,editContentVisible=true">编辑</el-button>
+                <el-button type="primary" @click="showContentVisible=false;editContentVisible=true">编辑</el-button>
                  <el-button type="warning" v-print="printObj">打印</el-button>
                  <el-button type="success" @click="handleExecute" v-if="form.content && Object.keys(org).length>0">发文执行</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>

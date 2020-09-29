@@ -78,14 +78,14 @@
         </div>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="120px">
+            <el-form ref="editableForm" :rules="rules" :model="editableForm" label-width="120px">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="form.name" maxlength="50"
+                    <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="作业管理类别">
-                    <el-select v-model="form.jobManagementAccountTypeId" placeholder="请选择"
-                               @change="$set(form,jobManagementAccountTypeId)" style="width: 100%;" >
+                    <el-select v-model="editableForm.jobManagementAccountTypeId" placeholder="请选择"
+                               @change="$set(editableForm,jobManagementAccountTypeId)" style="width: 100%;" >
                         <el-option
                                 v-for="item in categorys"
                                 :key="item.id"
@@ -117,7 +117,7 @@
                     <el-col >
                         <el-form-item label="省市区">
                             <el-cascader
-                                    v-model="form.area"
+                                    v-model="editableForm.area"
                                     :options="areas"
                                     :props="{label:'name',value:'id',checkStrictly: true}"
                                     @change="handleAreaChange"></el-cascader>
@@ -127,7 +127,7 @@
                 <el-row v-if="!haveOrg">
                     <el-col>
                         <el-form-item label="企业类别">
-                            <el-select v-model="form.orgCategoryId" placeholder="请选择" style="width: 100%;"  @change="$set(form,orgCategoryId)">
+                            <el-select v-model="editableForm.orgCategoryId" placeholder="请选择" style="width: 100%;"  @change="$set(editableForm,orgCategoryId)">
                                 <el-option
                                         v-for="item in orgCategories"
                                         :key="item.id"
@@ -139,7 +139,7 @@
                     </el-col>
                 </el-row>
                 <el-form-item label="备注">
-                    <el-input type="textarea"  maxlength="500"  v-model="form.note"></el-input>
+                    <el-input type="textarea"  maxlength="500"  v-model="editableForm.note"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -260,6 +260,7 @@
                 form: {
                     jobManagementAccountTypeId:''
                 },
+                editableForm:{},
                 idx: -1,
                 id: -1,
                 imgUrl:'',
@@ -351,6 +352,22 @@
                         this.form.regionId=this.form.area[2];
                     }
                 }
+
+                if(this.editableForm.area&&this.editableForm.area.length>0){
+                    this.editableForm.provinceId=this.editableForm.area[0];
+                    if(this.editableForm.area.length==1){
+                        this.editableForm.cityId='';
+                        this.editableForm.regionId='';
+                    }
+                    if(this.editableForm.area.length==2){
+                        this.editableForm.cityId=this.editableForm.area[1];
+                        this.editableForm.regionId='';
+                    }
+                    if(this.editableForm.area.length==3){
+                        this.editableForm.cityId=this.editableForm.area[1];
+                        this.editableForm.regionId=this.editableForm.area[2];
+                    }
+                }
             },
             handleAvatarSuccess(res, file) {
                 this.addVisible= false;
@@ -427,27 +444,42 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm=JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 this.filename = row.filename;
                 this.isSelectUploadFile = false;
                 if(row.jobManagementAccountType){
                     this.form.jobManagementAccountTypeId = row.jobManagementAccountType.id;
+                    this.editableForm.jobManagementAccountTypeId = row.jobManagementAccountType.id;
                 }
                 if(row.orgCategory){
                     this.form.orgCategoryId = row.orgCategory.id;
+                    this.editableForm.orgCategoryId = row.orgCategory.id;
                 }
                 if(row.province && row.city && row.region){
                     this.form.area=[row.province.id,row.city.id,row.region.id];
                     this.form.provinceId=row.province.id;
                     this.form.cityId=row.city.id;
                     this.form.regionId=row.region.id;
+
+                    this.editableForm.area=[row.province.id,row.city.id,row.region.id];
+                    this.editableForm.provinceId=row.province.id;
+                    this.editableForm.cityId=row.city.id;
+                    this.editableForm.regionId=row.region.id;
                 }else if(row.province && row.city){
                     this.form.area=[row.province.id,row.city.id];
                     this.form.provinceId=row.province.id;
                     this.form.cityId=row.city.id;
+
+                    this.editableForm.area=[row.province.id,row.city.id];
+                    this.editableForm.provinceId=row.province.id;
+                    this.editableForm.cityId=row.city.id;
                 }else if(row.province){
                     this.form.area=[row.province.id];
                     this.form.provinceId=row.province.id;
+
+                    this.editableForm.area=[row.province.id];
+                    this.editableForm.provinceId=row.province.id;
                 }
             },
             handleAdd(){
@@ -456,12 +488,14 @@
                     this.$refs.form.resetFields();
                 }
                 this.form = {};
+                this.editableForm = {};
                 this.filename='';
                 this.fileList=[];
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form=JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editableForm.validate(validate => {
                     if (validate) {
                         if(this.isSelectUploadFile)
                             this.$refs.uploadFileEdit.submit();
