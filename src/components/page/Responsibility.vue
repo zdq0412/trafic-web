@@ -3,8 +3,8 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 责任制-<span style="color:red;">{{(org.province==null?'':org.province.name)+(org.city==null?'':org.city.name)+(org.region==null?'':org.region.name)}}
-                    {{org.orgCategory==null?'':org.orgCategory.name}}类</span>
+                    <i class="el-icon-lx-cascades"></i> 责任制<!-- -<span style="color:red;">{{(org.province==null?'':org.province.name)+(org.city==null?'':org.city.name)+(org.region==null?'':org.region.name)}}
+                    {{org.orgCategory==null?'':org.orgCategory.name}}类</span>-->
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>

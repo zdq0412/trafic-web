@@ -597,7 +597,6 @@
                 form: {},
                 editableForm: {},
                 idx: -1,
-                org:{},
                 id: -1,
                 rules:{
                     checkDate: [

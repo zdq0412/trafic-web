@@ -14,7 +14,7 @@
                         type="primary"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addVisible=true;form={};"
+                        @click="addVisible=true;form={};editableForm={};"
                 >新增</el-button>
                 <el-input v-model="query.username" placeholder="用户名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
@@ -90,13 +90,13 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData">
-            <el-form ref="form" :rules="rules" :model="form" label-width="70px">
+            <el-form ref="editableForm" :rules="rules" :model="editableForm" label-width="70px">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="form.username" maxlength="15"
+                    <el-input v-model="editableForm.username" maxlength="15"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="所属角色" >
-                    <el-select v-model="form.roleId" @change="$set(form,roleId)">
+                    <el-select v-model="editableForm.roleId" @change="$set(editableForm,roleId)">
                         <el-option v-for="item in roles"
                                    :key="item.id"
                                    :label="item.name"
@@ -104,14 +104,14 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="真名">
-                    <el-input v-model="form.realname" maxlength="10"
+                    <el-input v-model="editableForm.realname" maxlength="10"
                               show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="手机号" prop="tel">
-                    <el-input v-model="form.tel"  maxlength="11"></el-input>
+                    <el-input v-model="editableForm.tel"  maxlength="11"></el-input>
                 </el-form-item>
                 <el-form-item label="所在企业" v-if="!haveOrg">
-                    <el-select v-model="form.orgId" @change="$set(form,orgId)">
+                    <el-select v-model="editableForm.orgId" @change="$set(editableForm,orgId)">
                         <el-option
                                 v-for="item in orgs"
                                 :key="item.id"
@@ -198,6 +198,7 @@
                 addVisible: false,
                 pageTotal: 0,
                 form: {},
+                editableForm: {},
                 idx: -1,
                 id: -1,
                 status:false,
@@ -344,17 +345,21 @@
             handleEdit(index, row) {
                 this.idx = index;
                 this.form = row;
+                this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.role){
                     this.form.roleId=row.role.id;
+                    this.editableForm.roleId=row.role.id;
                 }
                 if(row.org){
                     this.form.orgId=row.org.id;
+                    this.editableForm.orgId=row.org.id;
                 }
             },
             // 保存编辑
             saveEdit() {
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editableForm.validate(validate => {
                     if (validate) {
                         this.$axios.post("/user/updateUser" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {

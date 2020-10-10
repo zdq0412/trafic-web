@@ -386,6 +386,8 @@
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
+                            }else{
+                                alert(res.data.result.message);
                             }
                         }).catch(err => {
                             console.log(err);

@@ -14,20 +14,20 @@
         </div>
         <!--企业名称-->
         <div class="name">
-            <h3>{{org.name}}</h3>
+            <h3>{{org==null?"":org.name}}</h3>
         </div>
         <!--企业介绍-->
-        <div class="introduction" v-html="org.introduction">
+        <div class="introduction" v-html="org.introduction" v-if="org!=null">
         </div>
         <!--企业基本信息-->
         <div class="baseInfo">
             <div style="display:inline-block;">
                 <label>安全举报电话:</label>
-                <span> {{org.reportTel}}</span>
+                <span> {{org==null?"":org.reportTel}}</span>
             </div>
             <div style="display:inline-block;margin-left:20px;">
                 <label>安全举报邮箱:</label>
-                <span> {{org.email}}</span>
+                <span> {{org==null?"":org.email}}</span>
             </div>
         </div>
         <!--企业图片-->
@@ -487,7 +487,7 @@
         },
         computed:{
             updata:function(){
-                return {"orgId":this.org.id,"name":this.orgImg.name};
+                return {"orgId":this.org==null?"":this.org.id,"name":this.orgImg.name};
             },
             orgDocData:function(){
                 return this.orgDoc;
@@ -704,7 +704,7 @@
             handleImageAdded: function(file, Editor, cursorLocation, resetUploader) {
                 let formData = new FormData();
                 formData.append("files", file);
-                formData.append("orgId",this.org.id);
+                formData.append("orgId",this.org==null?"":this.org.id);
                 this.$axios({
                     url: "/orgImg/photos",
                     method: "POST",
@@ -817,8 +817,10 @@
                 this.org = this.editableOrg;
                 this.$refs.form.validate(validate=>{
                     if(validate){
-                        if(this.org.establishedTime){
-                            this.org.establishedTime = getDate(new Date(this.org.establishedTime));
+                        if(this.org){
+                            if(this.org.establishedTime){
+                                this.org.establishedTime = getDate(new Date(this.org.establishedTime));
+                            }
                         }
                         this.$axios.post("/org/orgIntroduction" , this.$qs.stringify(this.org)).then(res => {
                             if (res.data.result.resultCode == 200) {
