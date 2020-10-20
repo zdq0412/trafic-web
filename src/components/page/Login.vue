@@ -5,7 +5,6 @@ width:500px;text-align: center;height:500px;" stretch>
             <el-tab-pane label="登录" name="login" >
                 <transition name="el-fade-in-linear">
                     <div class="ms-login">
-                        <!--<div class="ms-title">后台管理系统</div>-->
                         <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                             <el-form-item prop="username">
                                 <el-input v-model="param.username" maxlength="50" tabindex="1" placeholder="username">
@@ -17,17 +16,18 @@ width:500px;text-align: center;height:500px;" stretch>
                                           show-password
                                           maxlength="16"
                                           placeholder="password"
-                                          v-model="param.password"
-                                          @keyup.enter.native="submitForm()"
-                                >
+                                          v-model="param.password">
                                     <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                                 </el-input>
                             </el-form-item>
+                            <el-form-item prop="verifyCode" style="text-align: left;" id="verifyCode">
+                                <el-input tabindex="3" v-model="param.verifyCode" placeholder="请输入验证码" style="width:250px;"  @keyup.enter.native="submitForm()">
+                                    <el-button slot="prepend" icon="el-icon-chat-dot-round"></el-button>
+                                </el-input>
+                                <img :src="verifyUrl" style="height:30px;margin-left:3px;" @click="changeVerifyUrl" />
+                            </el-form-item>
                             <div class="login-btn">
-                                <el-button type="primary" tabindex="3" @click="submitForm()">登录</el-button>
-                                <!--<router-link to="/reg">
-                                    <el-link type="primary" >还没有账户?点击注册!</el-link>
-                                </router-link>-->
+                                <el-button type="primary" tabindex="4" @click="submitForm()">登录</el-button>
                             </div>
                         </el-form>
                     </div>
@@ -134,10 +134,13 @@ width:500px;text-align: center;height:500px;" stretch>
                 param: {
                     username: '',
                     password: '',
+                    verifyCode:''
                 },
+                verifyUrl: this.$baseURL + '/verifyCode?time='+new Date(),
                 rules: {
                     username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
                     password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+                    verifyCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
                     name: [{ required: true, message: '请输入企业名称', trigger: 'blur' }],
                     code: [{ required: true, message: '请输入企业代码', trigger: 'blur' }],
                     shortName: [{ required: true, message: '请输入企业简称', trigger: 'blur' }],
@@ -153,7 +156,17 @@ width:500px;text-align: center;height:500px;" stretch>
         created(){
             this.loadSelectData();
         },
+        mounted(){
+            this.$refs.login.resetField();
+          this.param.username="";
+          this.param.password="";
+          this.param.verifyCode="";
+        },
         methods: {
+            changeVerifyUrl(){
+              this.verifyUrl=this.$baseURL + "/verifyCode?time="+new Date();
+              this.param.verifyCode='';
+            },
             loadSelectData(){
                 this.$axios.get("/orgCategory/orgCategorys").then(res => {
                     this.orgCategories = res.data.data;
@@ -199,7 +212,7 @@ width:500px;text-align: center;height:500px;" stretch>
                     const that = this;
                     if (valid) {
                         //解决后台接收不到参数问题
-                        this.$axios.post("/login",this.$qs.stringify({username:this.param.username,password:this.param.password})).then(function (res) {
+                        this.$axios.post("/login",this.$qs.stringify({username:this.param.username,password:this.param.password,verifyCode:this.param.verifyCode})).then(function (res) {
                             if(res.data.result.resultCode===200){
                                 localStorage.setItem('username', that.param.username);
                                 let token = res.data.data;
@@ -213,17 +226,20 @@ width:500px;text-align: center;height:500px;" stretch>
                                 if(loginType=="User"){
                                     that.$router.push("/");
                                 }
+                            }else if(res.data.result.resultCode===500){
+                                that.changeVerifyUrl();
+                                that.$message.error(res.data.result.message);
                             }else{
-                                that.$alert("用户名或密码错误!");
+                                that.changeVerifyUrl();
+                                that.$message.error("用户名或密码错误!");
                             }
                         }).catch(function(error){
                             that.$message.error("登陆失败，网络连接不可用!");
                         });
-                    } else {
+                    }/* else {
                         this.$message.error('请输入账号和密码');
-                        console.log('error submit!!');
                         return false;
-                    }
+                    }*/
                 });
             },
         },
@@ -273,5 +289,10 @@ width:500px;text-align: center;height:500px;" stretch>
         font-size: 12px;
         line-height: 30px;
         color: #fff;
+    }
+   #verifyCode div img{
+        vertical-align: middle;
+       margin-bottom: 5px;
+       cursor: pointer;
     }
 </style>

@@ -36,6 +36,7 @@ Vue.prototype.$axios = axios.create({
     headers: {
         'token': ''
     },
+    withCredentials:true
 });
 Vue.config.productionTip = false;
 Vue.use(VueI18n);
