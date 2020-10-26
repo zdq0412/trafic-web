@@ -76,6 +76,7 @@ width:500px;text-align: center;height:500px;" stretch>
                                 <el-cascader style="width: 100%;" tabindex="7"
                                              v-model="form.area"
                                              :options="areas"
+                                             filterable
                                              :props="{label:'name',value:'id'}"
                                              @change="handleChange"
                                              placeholder="地区">

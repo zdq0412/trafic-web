@@ -111,6 +111,7 @@
                 <el-form-item label="所在部门">
                     <el-cascader  v-model="departmentIds"
                                   :options="depts"
+                                  filterable
                                   :props="{label:'name',value:'id',checkStrictly: true}"
                                   @change="changeDepartment"
                     ></el-cascader>
@@ -178,6 +179,7 @@
                 <el-form-item label="所在部门">
                     <el-cascader  v-model="departmentIds"
                                   :options="depts"
+                                  filterable
                                   :props="{label:'name',value:'id',checkStrictly: true}"
                                   clearable
                                   @change="changeDepartment"

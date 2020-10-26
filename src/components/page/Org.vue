@@ -100,6 +100,7 @@
                         <el-form-item label="省市区" prop="area">
                             <el-cascader  v-model="form.area"
                                          :options="areas"
+                                          filterable
                                           :props="{label:'name',value:'id'}"
                                          @change="handleChange"></el-cascader>
                         </el-form-item>
@@ -180,6 +181,7 @@
                             <el-cascader
                                     v-model="form.area"
                                     :options="areas"
+                                    filterable
                                     :props="{label:'name',value:'id'}"
                                     @change="handleChange"></el-cascader>
                         </el-form-item>
