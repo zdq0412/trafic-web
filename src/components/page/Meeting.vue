@@ -44,6 +44,15 @@
                 </el-table-column>
                 <el-table-column prop="creator" label="创建人"></el-table-column>
                 <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column label="签到和会议现场照片">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-search"
+                                @click="lookup(scope.$index, scope.row)"
+                        >查看</el-button>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
@@ -258,12 +267,12 @@
                         <tr>
                             <td colspan="6">
                                 <textarea v-if="editable"  maxlength="2000" v-model="meeting.content"  style="height:744mm;"></textarea>
-                                <div v-else v-html="meeting.content" style="height:744mm;"></div>
+                                <div v-else v-html="meeting.content" style="height:447mm;"></div>
                             </td>
                         </tr>
                     </table>
                     <div style="page-break-after: always;"></div>
-                    <div style="width: 170mm;margin-left:20mm;margin-right:20mm;margin-top:20mm; text-align: center;border: 1px solid black;height:30px;line-height:30px;">
+                    <div style="width: 170mm;margin-left:20mm;margin-right:20mm;text-align: center;border: 1px solid black;height:30px;line-height:30px;">
                         最后形成意见或决定</div>
                     <div style="width: 170mm;margin-left:20mm;margin-right:20mm;;text-align: center;border: 1px solid black;">
                         <textarea v-if="editable"  maxlength="2000" v-model="meeting.finalDecision" style="height:260mm;width:100%;"></textarea>
@@ -273,7 +282,7 @@
                 <div style="page-break-after: always;">&nbsp;</div>
                 <div style="margin-top: 20mm;">
                     <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
-                        <caption style="font-size: 18px;letter-spacing: 10px;">会议签到表</caption>
+                        <caption style="font-size: 18px;letter-spacing: 10px;margin-top: 5mm;">会议签到表</caption>
                         <tr>
                             <td colspan="4" style="border: none;text-align: left;">
                                 会议名称：{{meeting.meetingName}}
@@ -645,6 +654,11 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            lookup(index, row) {
+                localStorage.setItem("pid",row.id);
+                localStorage.setItem("type",'MEETING');
+                this.$router.push({name:"photo",params:{pid:row.id,type:'MEETING'}});
+            },
             uploadTemplate(index,row){
                 this.$refs.uploadFile.clearFiles();
                 this.param.id=row.id;

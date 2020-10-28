@@ -45,6 +45,15 @@
                 <el-table-column prop="creator" label="创建人"></el-table-column>
                 <el-table-column prop="trainingDate" label="培训时间" :formatter="datetimeFormatter"></el-table-column>
                 <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
+                <el-table-column label="签到和培训现场照片">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-search"
+                                @click="lookup(scope.$index, scope.row)"
+                        >查看</el-button>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
@@ -693,6 +702,11 @@
             }).catch(error=>console.log(error));
         },
         methods: {
+            lookup(index, row) {
+                localStorage.setItem("pid",row.id);
+                localStorage.setItem("type",'TRAINING');
+                this.$router.push({name:"photo",params:{pid:row.id,type:'TRAINING'}});
+            },
             importTemplate(index,row){//引入模板
                 this.template = row;
                 this.$confirm('确定要引入该模板吗？', '提示', {

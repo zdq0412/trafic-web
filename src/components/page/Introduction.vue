@@ -56,7 +56,7 @@
                 </div>
             </div>
             <div style="display: inline-block;margin-left: 10px;">
-                <div  class="avatar-uploader" style="height: 200px;width:200px;" @click="uploadVisible=true;orgImg={};editableOrgImg=JSON.parse(JSON.stringify(orgImg));imageUrl='';">
+                <div  class="avatar-uploader" style="height: 100px;width:100px;" @click="uploadVisible=true;orgImg={};editableOrgImg=JSON.parse(JSON.stringify(orgImg));imageUrl='';">
                     <i class="el-icon-plus avatar-uploader-iconBtn"></i>
                 </div>
             </div>
@@ -394,18 +394,7 @@
                     }else{
                         callback();
                     }
-                   /* if(this.editableOrgDoc.endDate){
-                        let beginDate = new Date(value);
-                        let endDate = new Date(this.editableOrgDoc.endDate);
-                        if(beginDate.getTime()>=endDate.getTime()){
-                            callback(new Error("开始日期不能大于等于结束日期!"));
-                        }else{
-                            callback();
-                        }
-                    }else{
-                        callback();
-                    }*/
-                }  else{
+                }else{
                     callback(new Error("请选择开始日期!"));
                 }
             };
@@ -422,18 +411,6 @@
                     }else{
                         callback();
                     }
-
-                /*    if(this.editableOrgDoc.beginDate){
-                        let beginDate = new Date(this.editableOrgDoc.beginDate);
-                        let endDate = new Date(value);
-                        if(beginDate.getTime()>=endDate.getTime()){
-                            callback(new Error("结束日期不能小于等于开始日期!"));
-                        }else{
-                            callback();
-                        }
-                    }else{
-                        callback();
-                    }*/
                 }  else{
                     callback(new Error("请选择结束日期!"));
                 }
@@ -890,9 +867,9 @@
     .avatar-uploader-iconBtn {
         font-size: 28px;
         color: #8c939d;
-        width: 200px;
-        height: 200px;
-        line-height: 200px;
+        width: 100px;
+        height: 100px;
+        line-height: 100px;
         text-align: center;
         float: left;
     }

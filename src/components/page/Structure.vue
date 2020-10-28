@@ -20,13 +20,14 @@
                     <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
                 </div>
                 <el-table
+                        ref="deptTable"
                         :data="departments"
                         style="width: 100%;height:80%;"
                         row-key="id"
                         border
                         highlight-current-row
                         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-                        @current-change="handleCurrentChange">
+                        @row-click="handleCurrentChange">
                     <el-table-column prop="name" label="部门名称"></el-table-column>
                     <el-table-column prop="tel" label="部门电话"></el-table-column>
                     <el-table-column prop="business" label="部门职能"></el-table-column>
@@ -46,7 +47,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <div class="pagination">
+                <div class="pagination" style="margin-bottom: -20px;">
                     <el-pagination
                             background
                             layout="total, prev, pager, next"
@@ -186,7 +187,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <div class="pagination">
+                <div class="pagination" style="margin-bottom: -20px;">
                     <el-pagination
                             background
                             layout="total, prev, pager, next"
@@ -352,6 +353,7 @@
                 this.form = {};
                 this.row = {};
                 this.pids=[];
+                this.$refs.deptTable.setCurrentRow();
             },
             handlePositionAdd(){
                 this.form = {};

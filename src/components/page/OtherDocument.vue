@@ -209,7 +209,6 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
-
                 templatesData:[],
                 templateVisible:false,
                 templates: {
@@ -257,7 +256,6 @@
                 this.findTemplates();
             },
             downloadTemplate(index,row){
-               // window.location.href=this.$baseURL + "/" + row.url;
                 window.open(this.$baseURL + "/" + row.url);
             },
             //查找模板
@@ -311,7 +309,7 @@
                     this.$message.error('上传文件大小不能超过 5MB!');
                     return false
                 }
-                return  false;
+                return  true;
             },
             closeDialog(){
                 this.$refs["form"].clearValidate();

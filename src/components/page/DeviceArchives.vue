@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 设备档案
+                    <i class="el-icon-lx-cascades"></i> 设备列表
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -39,6 +39,15 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row)"
+                        >查看</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column label="设备档案">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-search"
+                                @click="lookupDeviceArchive(scope.$index, scope.row)"
                         >查看</el-button>
                     </template>
                 </el-table-column>
@@ -237,6 +246,9 @@
         methods: {
             lookup(index, row) {
                 this.$router.push({name:"deviceMaintain",params:{deviceId:row.id}});
+            },
+            lookupDeviceArchive(index, row) {
+                this.$router.push({name:"deviceArchive",params:{deviceId:row.id}});
             },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){

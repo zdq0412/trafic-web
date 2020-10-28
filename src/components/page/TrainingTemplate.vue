@@ -309,6 +309,7 @@
                 form: {
                     area:[]
                 },
+                editableForm:{},
                 idx: -1,
                 org:{},
                 id: -1,

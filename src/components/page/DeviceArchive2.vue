@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 资质文件管理
+                    <i class="el-icon-lx-cascades"></i> 设备档案
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -13,27 +13,31 @@
                         type="primary"
                         icon="el-icon-plus"
                         class="handle-del mr10"
-                        @click="addVisible=true;form={}"
+                        @click="addVisible=true;form={};"
                 >新增</el-button>
-                <el-button
-                        type="warning"
-                        icon="el-icon-search"
-                        class="handle-del mr10"
-                        @click="findTemplates"
-                >查找模板</el-button>
             </div>
             <el-table
                     :data="tableData"
                     border
                     class="table"
-                    header-cell-class-name="table-header"
-            >
+                    header-cell-class-name="table-header">
                 <el-table-column prop="name" label="名称"></el-table-column>
-                <el-table-column prop="createDate" label="创建时间" :formatter="dateTimeFormatter"></el-table-column>
+                <el-table-column prop="url" label="文件"  align="center">
+                    <template slot-scope="scope">
+                        <el-image
+                                class="table-td-thumb"
+                                :src="$baseURL + '/' + scope.row.url"
+                                style="cursor: pointer;"
+                                @click="dialogImageUrl=$baseURL + '/' + scope.row.url;dialogVisible=true;"
+                        ></el-image>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="beginDate" label="有效期开始" :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="endDate" label="有效期结束" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="endDate" label="有效期截止" :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="money" label="金额(元)"></el-table-column>
+                <el-table-column prop="supplier" label="供应方"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
-                <el-table-column label="操作" width="280" align="center">
+                <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
@@ -72,6 +76,10 @@
                 ></el-pagination>
             </div>
         </div>
+        <!--预览图片-->
+        <el-dialog :visible.sync="dialogVisible">
+            <img style="width: 100%;" :src="dialogImageUrl" alt="">
+        </el-dialog>
         <el-upload style="display: none;"
                    :action="uploadUrl"
                    :limit="1"
@@ -85,8 +93,8 @@
             <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
         </el-upload>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @close="closeDialog">
-            <el-form ref="form" :rules="rules" :model="editableForm" label-width="100px">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%">
+            <el-form ref="editForm" :rules="rules" :model="editableForm" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
@@ -107,18 +115,24 @@
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
+                <el-form-item label="金额(元)">
+                    <el-input-number v-model="editableForm.money"></el-input-number>
+                </el-form-item>
+                <el-form-item label="供应方">
+                    <el-input  v-model="editableForm.supplier" maxlength="100"></el-input>
+                </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="editableForm.note" maxlength="200" type="textarea" :rows="3"></el-input>
+                    <el-input type="textarea" v-model="editableForm.note" maxlength="200"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible = false;editableForm=JSON.parse(JSON.stringify(form))">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :visible.sync="addVisible" width="40%"  @close="closeDialog">
-            <el-form ref="form" :model="form" :rules="rules"  label-width="100px">
+        <el-dialog title="新增" :visible.sync="addVisible" width="40%">
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
@@ -139,8 +153,14 @@
                             placeholder="选择日期">
                     </el-date-picker>
                 </el-form-item>
+                <el-form-item label="金额(元)">
+                    <el-input-number v-model="form.money"></el-input-number>
+                </el-form-item>
+                <el-form-item label="供应方">
+                    <el-input  v-model="form.supplier" maxlength="100"></el-input>
+                </el-form-item>
                 <el-form-item label="备注">
-                    <el-input v-model="form.note" maxlength="200" type="textarea" :rows="3"></el-input>
+                    <el-input type="textarea" v-model="form.note" maxlength="200"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -148,61 +168,11 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
-
-
-        <!--查看系统模板-->
-        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
-            <el-table
-                    :data="templatesData"
-            >
-                <el-table-column
-                        label="序号"
-                        type="index"
-                        width="50"
-                        align="center">
-                    <template scope="scope">
-                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="name" label="名称">
-                </el-table-column>
-                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
-                <el-table-column prop="creator"  label="创建人"></el-table-column>
-                <el-table-column prop="note" label="备注"  width="150" >
-                    <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="220" align="center">
-                    <template slot-scope="scope">
-                        <el-button v-if="scope.row.url"
-                                   type="text"
-                                   icon="el-icon-download"
-                                   style="color:#67C23A"
-                                   @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="pagination">
-                <el-pagination
-                        background
-                        layout="total, prev, pager, next"
-                        :current-page="templates.pageIndex"
-                        :page-size="templates.pageSize"
-                        :total="templates.pageTotal"
-                        @current-change="handleTemplatesPageChange"
-                ></el-pagination>
-            </div>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
-            </span>
-        </el-dialog>
     </div>
 </template>
 
 <script>
-    import {getDateTime,getDate} from "../common/utils";
+    import {getDate} from "../common/utils";
 
     export default {
         name: 'basetable',
@@ -212,28 +182,21 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
-                templatesData:[],
-                templateVisible:false,
-                templates: {
-                    pageIndex: 1,
-                    pageSize: 10,
-                    pageTotal:0
-                },
-                template:{},
-                templatesVisible:false,
                 uploadUrl:'',
-                param:{type:'qualificationDocument'},
+                param:{type:'deviceArchive'},
                 headers:{
                     token : localStorage.getItem("token")
                 },
                 ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
                 tableData: [],
-                delList: [],
+                deviceId:'',
                 editVisible: false,
                 addVisible: false,
                 pageTotal: 0,
-                form: {},
-                editableForm: {},
+                dialogVisible:false,
+                form:{},
+                editableForm:{},
+                dialogImageUrl:'',
                 idx: -1,
                 id: -1,
                 rules:{
@@ -248,42 +211,13 @@
             this.getData();
         },
         activated(){
-            localStorage.setItem("empId",this.$route.params.empId);
+          localStorage.setItem("deviceId",this.$route.params.deviceId) ;
             this.getData();
         },
         methods: {
-            // 分页导航
-            handleTemplatesPageChange(val) {
-                this.$set(this.templates, 'pageIndex', val);
-                this.findTemplates();
-            },
-            downloadTemplate(index,row){
-                window.open(this.$baseURL + "/" + row.url);
-            },
-            //查找模板
-            findTemplates(){
-                this.$axios.get("/empArchivesTemplate/empArchivesTemplatesByPage",{
-                    params:{
-                        type:'qualificationDocument',
-                        page:this.templates.pageIndex,
-                        limit:this.templates.pageSize
-                    }
-                }).then(res => {
-                    this.templatesData = res.data.data;
-                    this.templates.pageTotal = res.data.count;
-                    this.templatesVisible = true;
-                }).catch(error => console.log(error));
-            },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
                     return getDate(new Date(cellValue));
-                }else{
-                    return '';
-                }
-            },
-            dateTimeFormatter(row, column, cellValue, index){
-                if(cellValue){
-                    return getDateTime(new Date(cellValue));
                 }else{
                     return '';
                 }
@@ -294,7 +228,6 @@
                 this.$refs.fileUploadBtn.$el.click();
             },
             download(index,row){
-               // window.location.href=this.$baseURL + "/" + row.url;
                 window.open(this.$baseURL + "/" + row.url);
             },
             handleAvatarSuccess(res, file) {
@@ -309,7 +242,7 @@
                 const isWord = (file.type === 'application/msword' || file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document');
                 const isPdf = file.type==='application/pdf';
                 const isRar = (file.type==='application/octet-stream' || file.type==='');
-                const isZip = file.type==='application/x-zip-compressed';
+                const isZip = (file.type==='application/x-zip-compressed' || file.type==='application/zip');
                 if(!isJPG && !isPNG && !isBMP && !isWord && !isPdf && !isRar && !isZip){
                     this.$message.error('上传文件支持的类型：jpg、png、bmp、doc、docx、pdf、rar、zip!');
                     return false;
@@ -325,11 +258,11 @@
             },
             // 获取 easy-mock 的模拟数据
             getData() {
-                this.$axios.get("/qualificationDocument/qualificationDocumentsByPage",{
+                this.$axios.get("/deviceArchive/deviceArchivesByPage",{
                     params:{
                         page:this.query.pageIndex,
                         limit:this.query.pageSize,
-                        empId:localStorage.getItem("empId")
+                        deviceId:localStorage.getItem("deviceId")
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
@@ -349,7 +282,7 @@
                     type: 'warning'
                 })
                     .then(() => {
-                        this.$axios.delete("/qualificationDocument/qualificationDocument/" + row.id).then(res => {
+                        this.$axios.delete("/deviceArchive/deviceArchive/" + row.id).then(res => {
                             if(res.data.result.resultCode==200){
                                 this.$message.success('删除成功');
                                 this.getData();
@@ -369,21 +302,24 @@
                 this.editableForm = JSON.parse(JSON.stringify(this.form));
                 this.editVisible = true;
                 if(row.beginDate){
+                    this.form.beginDate = getDate(new Date(row.beginDate));
                     this.editableForm.beginDate = getDate(new Date(row.beginDate));
                 }
                 if(row.endDate){
+                    this.form.endDate = getDate(new Date(row.endDate));
                     this.editableForm.endDate = getDate(new Date(row.endDate));
                 }
             },
             // 保存编辑
             saveEdit() {
-                this.form = this.editableForm;
-                this.$refs.form.validate(validate => {
+                this.form = JSON.parse(JSON.stringify(this.editableForm));
+                this.$refs.editForm.validate(validate => {
                     if (validate) {
-                        this.$axios.post("/qualificationDocument/updateQualificationDocument",this.$qs.stringify(this.form)).then(res => {
+                        this.$axios.post("/deviceArchive/updateDeviceArchive" , this.$qs.stringify(this.form)).then(res => {
                             if (res.data.result.resultCode == 200) {
                                 this.editVisible = false;
                                 this.getData();
+                                this.$refs.editForm.clearValidate();
                             }
                         }).catch(err => {
                             console.log(err);
@@ -398,13 +334,11 @@
                 this.$refs["form"].clearValidate();
                 this.$refs.form.validate(validate =>{
                     if(validate){
-                        this.form.empId = localStorage.getItem("empId");
-                        this.$axios.post("/qualificationDocument/qualificationDocument",this.$qs.stringify(this.form)).then(res=>{
+                        this.form.deviceId = localStorage.getItem("deviceId");
+                        this.$axios.post("/deviceArchive/deviceArchive",this.$qs.stringify(this.form)).then(res=>{
                             if(res.data.result.resultCode==200){
                                 this.addVisible = false;
                                 this.getData();
-                            }else{
-                                this.$message.error(res.data.result.message);
                             }
                         }).catch(err =>{
                             console.log(err);
@@ -422,11 +356,14 @@
         }
     };
 </script>
-
 <style scoped>
     @import "../../assets/css/common.css";
     .handle-box {
         margin-bottom: 20px;
+    }
+    .table-td-thumb{
+        height:50px;
+        width:50px;
     }
     .table {
         width: 100%;

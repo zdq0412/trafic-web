@@ -134,7 +134,13 @@ export default new Router({
                 {
                   path:'/deviceArchives',
                   component:()=>import('../components/page/DeviceArchives.vue'),
-                  meta:{title:'设备档案'}
+                  meta:{title:'设备列表'}
+                },
+                {
+                  path:'/deviceArchives2',
+                  component:()=>import('../components/page/DeviceArchive2.vue'),
+                  meta:{title:'设备档案'},
+                  name:'deviceArchive'
                 },
                 {
                   path:'/safetyAccount',
@@ -385,6 +391,12 @@ export default new Router({
                     name:'qualificationDocument',
                     component: () => import( '../components/page/QualificationDocument.vue'),
                     meta: { title: '资质文件' }
+                },
+                {
+                    path: '/photo',
+                    name:'photo',
+                    component: () => import( '../components/page/Photos.vue'),
+                    meta: { title: '现场照片' }
                 },
                 {
                     path: '/jobHistory',
