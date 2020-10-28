@@ -175,24 +175,24 @@
         <!--显示培训内容-->
         <el-dialog title="培训内容" :visible.sync="showContentVisible" width="50%">
             <div id="printContent">
-                <div style="height: 232mm;width:210mm;padding-top: 65mm;">
-                    <div style="font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">企业安全学习及培训教育记录</div>
-                    <div style="margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                <div class="titleDiv">
+                    <div class="titleName">企业安全学习及培训教育记录</div>
+                    <div class="orgNameDiv">
                         <label>企业名称:</label>
-                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                        <div class="orgName">
                             {{org.name}}
                         </div>
                     </div>
-                    <div style="margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                    <div class="addrDiv">
                         <label>地&nbsp;&nbsp;&nbsp;&nbsp;址:</label>
-                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                        <div class="addr">
                             {{org.addr}}
                         </div>
                     </div>
                 </div>
                 <div>
-                    <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;">{{training.name}}</div>
-                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;   " cellspacing="0" cellpadding="0">
+                    <div class="trainingName">{{training.name}}</div>
+                    <table class="trainingTable" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="border: none;">
                                 <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
@@ -264,15 +264,15 @@
                         </tr>
                         <tr>
                             <td colspan="4">
-                                <textarea v-if="editable" maxlength="2000" v-model="training.content" style="height:744mm;" ></textarea>
-                                <div v-else v-html="training.content" style="height:744mm;"></div>
+                                <textarea v-if="editable" maxlength="2000" v-model="training.content" class="trainingContent" ></textarea>
+                                <div v-else v-html="training.content" class="trainingContent"></div>
                             </td>
                         </tr>
                     </table>
                 </div>
                 <div style="page-break-after: always;"></div>
                 <div style="width:100%;">
-                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;margin-top:20mm;" cellspacing="0" cellpadding="0">
+                    <table class="empTable" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="height:20mm;">
                                 <table style="width: 100%;">
@@ -327,8 +327,8 @@
                 </div>
                 <div style="page-break-after: always;"></div>
                 <div>
-                    <div style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;margin-top:20mm;">补课签到表</div>
-                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
+                    <div class="asignInForm">补课签到表</div>
+                    <table class="asignInFormTable" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="border: none;">
                                 <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
@@ -1004,6 +1004,108 @@
 
 <style scoped>
     @import "../../assets/css/common.css";
+
+    @media print {
+        .titleDiv{
+            height: 232mm;width:210mm;padding-top: 65mm;
+        }
+
+        .titleName{
+            font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .orgNameDiv{
+            margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .orgName{
+            border-bottom: black solid 1px;width: 130mm;display: inline-block;
+        }
+
+        .addrDiv{
+            margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .addr{
+            border-bottom: black solid 1px;width: 130mm;display: inline-block;
+        }
+
+        .trainingName{
+            font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;
+        }
+
+        .trainingTable{
+            width: 170mm;margin-left:auto;margin-right:auto;
+        }
+
+        .trainingContent{
+            height:464mm;
+        }
+
+        .empTable{
+            width: 170mm;margin-left:auto;margin-right:auto;margin-top:20mm;
+        }
+
+        .asignInForm{
+            font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;margin-top:20mm;
+        }
+
+        .asignInFormTable{
+            width: 170mm;margin-left:auto;margin-right:auto;
+        }
+    }
+
+    @media screen {
+        .titleDiv{
+            height: 232mm;width:100%;padding-top: 65mm;
+        }
+
+        .titleName{
+            font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .orgNameDiv{
+            margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .orgName{
+            border-bottom: black solid 1px;width: 60%;display: inline-block;
+        }
+
+        .addrDiv{
+            margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .addr{
+            border-bottom: black solid 1px;width: 60%;display: inline-block;
+        }
+
+        .trainingName{
+            font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;
+        }
+
+        .trainingTable{
+            width: 98%;margin-left:auto;margin-right:auto;
+        }
+
+        .trainingContent{
+            height:500px;
+        }
+
+        .empTable{
+            width: 98%;margin-left:auto;margin-right:auto;margin-top:20px;
+        }
+
+        .asignInForm{
+            font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;margin-top:20px;
+        }
+
+        .asignInFormTable{
+            width: 98%;margin-left:auto;margin-right:auto;
+        }
+    }
+
+
     .handle-box {
         margin-bottom: 20px;
     }

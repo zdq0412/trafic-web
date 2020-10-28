@@ -166,24 +166,24 @@
         <!--显示会议内容-->
         <el-dialog title="" :visible.sync="showContentVisible" width="50%">
             <div id="printContent">
-                <div class="titleDiv">
-                    <div class="titleName">安全生产会议记录</div>
-                    <div class="orgNameDiv">
+                <div style="height: 232mm;width:210mm;padding-top: 65mm;">
+                    <div style="font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">安全生产会议记录</div>
+                    <div style="margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
                         <label>企业名称:</label>
-                        <div class="orgName">
+                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
                             {{org.name}}
                         </div>
                     </div>
-                    <div class="addrDiv">
+                    <div style="margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
                         <label>地&nbsp;&nbsp;&nbsp;&nbsp;址:</label>
-                        <div class="addr">
+                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
                             {{org.addr}}
                         </div>
                     </div>
                 </div>
                 <div>
-                    <div  class="meetingName">{{meeting.name}}</div>
-                    <table class="meetingTable" cellspacing="0" cellpadding="0">
+                    <div  style="font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;height:40%;">{{meeting.name}}</div>
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="6" style="border: none;">
                                 <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
@@ -211,6 +211,7 @@
                             <td class="per20">
                                 <table style="width:100%;" cellspacing="0" cellpadding="0">
                                     <tr>
+                                        <!--<td>  {{meeting.meetingDate | formatHour}}点  {{meeting.meetingDate | formatMinute}} 分开会</td>-->
                                         <td>  {{meeting.meetingDate | formatMeetingTime}}开会</td>
                                     </tr>
                                     <tr>
@@ -265,24 +266,23 @@
                         </tr>
                         <tr>
                             <td colspan="6">
-                                <textarea v-if="editable"  maxlength="2000" v-model="meeting.content"  class="meetingContent"></textarea>
-                                <div v-else v-html="meeting.content" class="meetingContent"></div>
+                                <textarea v-if="editable"  maxlength="2000" v-model="meeting.content"  style="height:744mm;"></textarea>
+                                <div v-else v-html="meeting.content" style="height:447mm;"></div>
                             </td>
                         </tr>
                     </table>
                     <div style="page-break-after: always;"></div>
-                    <div class="finalDecisionDiv">
-                        最后形成意见或决定
-                    </div>
-                    <div class="finalDecision">
-                        <textarea v-if="editable"  maxlength="2000" v-model="meeting.finalDecision" class="finalDecisionContent"></textarea>
-                        <div v-else v-html="meeting.finalDecision" class="finalDecisionContent"></div>
+                    <div style="width: 170mm;margin-left:20mm;margin-right:20mm;text-align: center;border: 1px solid black;height:30px;line-height:30px;">
+                        最后形成意见或决定</div>
+                    <div style="width: 170mm;margin-left:20mm;margin-right:20mm;;text-align: center;border: 1px solid black;">
+                        <textarea v-if="editable"  maxlength="2000" v-model="meeting.finalDecision" style="height:260mm;width:100%;"></textarea>
+                        <div v-else v-html="meeting.finalDecision" style="height:260mm;"></div>
                     </div>
                 </div>
                 <div style="page-break-after: always;">&nbsp;</div>
-                <div class="signInFormDiv">
-                    <table class="signInFormTable" cellspacing="0" cellpadding="0">
-                        <caption class="signInFormTitle">会议签到表</caption>
+                <div style="margin-top: 20mm;">
+                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
+                        <caption style="font-size: 18px;letter-spacing: 10px;margin-top: 5mm;">会议签到表</caption>
                         <tr>
                             <td colspan="4" style="border: none;text-align: left;">
                                 会议名称：{{meeting.meetingName}}
@@ -317,7 +317,7 @@
                     </table>
                 </div>
                 <div style="page-break-after: always;"></div>
-                <div class="photoDiv">
+                <div style="width: 170mm;margin-left:20mm;margin-right:20mm;">
                     <div style="font-size: 18px;">
                         会议活动照片粘贴处:
                     </div>
@@ -907,137 +907,6 @@
 
 <style scoped>
     @import "../../assets/css/common.css";
- @media print {
-    .titleDiv{
-        height: 232mm;width:210mm;padding-top: 65mm;
-    }
-
-     .meetingContent{
-         height:744mm;
-     }
-
-    .titleName{
-        font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;
-    }
-
-    .orgNameDiv{
-        margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
-    }
-
-    .orgName{
-        border-bottom: black solid 1px;width: 130mm;display: inline-block;
-    }
-
-    .addrDiv{
-        margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
-    }
-
-    .addr{
-        border-bottom: black solid 1px;width: 130mm;display: inline-block;
-    }
-
-    .meetingName{
-        font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;height:40%;
-    }
-
-    .meetingTable{
-        width: 170mm;margin-left:20mm;margin-right:20mm;
-    }
-
-    .finalDecisionDiv{
-        width: 170mm;margin-left:20mm;margin-right:20mm;text-align: center;border: 1px solid black;height:30px;line-height:30px;
-    }
-
-    .finalDecision{
-        width: 170mm;margin-left:20mm;margin-right:20mm;;text-align: center;border: 1px solid black;
-    }
-
-    .finalDecisionContent{
-        height:260mm;width:100%;
-    }
-
-    .signInFormDiv{
-        margin-top: 20mm;
-    }
-
-    .signInFormTable{
-        width: 170mm;margin-left:20mm;margin-right:20mm;
-    }
-
-    .signInFormTitle{
-        font-size: 18px;letter-spacing: 10px;margin-top: 5mm;
-    }
-
-    .photoDiv{
-        width: 170mm;margin-left:20mm;margin-right:20mm; height: 232mm;
-    }
- }
-    /***---------------------------------------------------------------------**/
-    @media screen {
-        .titleDiv{
-            height: 232mm;width: 100%;padding-top: 65mm;
-        }
-
-        .meetingContent{
-            height:500px;
-        }
-
-        .titleName{
-            font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;
-        }
-
-        .orgNameDiv{
-            margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
-        }
-
-        .orgName{
-            border-bottom: black solid 1px;width: 130mm;display: inline-block;
-        }
-
-        .addrDiv{
-            margin-top:20mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
-        }
-
-        .addr{
-            border-bottom: black solid 1px;width: 65%;display: inline-block;
-        }
-
-        .meetingName{
-            font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;height:40%;
-        }
-
-        .meetingTable{
-            width: 98%;margin-left:auto;margin-right:auto;
-        }
-
-        .finalDecisionDiv{
-            width: 98%;margin-left:auto;margin-right:auto;text-align: center;border: 1px solid black;height:30px;line-height:30px;
-        }
-
-        .finalDecision{
-            width: 98%;margin-left:auto;margin-right:auto;text-align: center;border: 1px solid black;
-        }
-
-        .finalDecisionContent{
-            height:500px;width:100%;
-        }
-
-        .signInFormDiv{
-            margin-top: 20px;
-        }
-
-        .signInFormTable{
-            width: 100%;margin-left:20px;margin-right:20px;
-        }
-
-        .signInFormTitle{
-            font-size: 18px;letter-spacing: 10px;margin-top: 5px;
-        }
-
-        .photoDiv{
-            width: 100%;margin-left:20px;margin-right:20px; height:500px;
-        }
-    }
 
     .handle-box {
         margin-bottom: 20px;

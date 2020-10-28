@@ -166,24 +166,24 @@
         <!--显示内容-->
         <el-dialog title="" :visible.sync="showContentVisible" width="50%">
             <div id="printContent">
-                <div style="height: 232mm;width:210mm;padding-top: 65mm;">
-                    <div style="font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;">安全管理监督检查记录</div>
-                    <div style="margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                <div class="titleDiv">
+                    <div class="titleName">安全管理监督检查记录</div>
+                    <div class="orgNameDiv">
                         <label>企业名称:</label>
-                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                        <div class="orgName">
                             {{org.name}}
                         </div>
                     </div>
-                    <div style="margin-top:30mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;">
+                    <div class="addrDiv">
                         <label>地&nbsp;&nbsp;&nbsp;&nbsp;址:</label>
-                        <div style="border-bottom: black solid 1px;width: 130mm;display: inline-block;">
+                        <div class="addr">
                             {{org.addr}}
                         </div>
                     </div>
                 </div>
-                <div style="padding-top:30mm;">
+                <div style="padding-top:0;">
                     <div  style="font-size: 18px;letter-spacing: 10px;text-align: center;width:95%;height:40%;">{{securityCheck.name}}</div>
-                    <table style="width: 170mm;margin-left:20mm;margin-right:20mm;" cellspacing="0" cellpadding="0">
+                    <table class="securityCheckTable" cellspacing="0" cellpadding="0">
                         <tr>
                             <td colspan="2" style="border: none;">
                                 <div style="float: right;margin-right: 10px;padding-bottom: 3px;">
@@ -818,6 +818,68 @@
 
 <style scoped>
     @import "../../assets/css/common.css";
+
+    @media print {
+        .titleDiv{
+            height: 232mm;width:100%;padding-top: 65mm;
+        }
+
+        .titleName{
+            font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .orgNameDiv{
+            margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .orgName{
+            border-bottom: black solid 1px;width: 60%;display: inline-block;
+        }
+
+        .addrDiv{
+            margin-top:30mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .addr{
+            border-bottom: black solid 1px;width: 60%;display: inline-block;
+        }
+
+        .securityCheckTable{
+            width: 170mm;margin-left:auto;margin-right:auto;
+        }
+    }
+
+    @media screen {
+        .titleDiv{
+            height: 232mm;width:100%;padding-top: 65mm;
+        }
+
+        .titleName{
+            font-size: 30px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .orgNameDiv{
+            margin-top:60mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .orgName{
+            border-bottom: black solid 1px;width: 60%;display: inline-block;
+        }
+
+        .addrDiv{
+            margin-top:30mm;font-size: 25px;color:black;text-align: center;letter-spacing: 2mm;
+        }
+
+        .addr{
+            border-bottom: black solid 1px;width: 60%;display: inline-block;
+        }
+
+        .securityCheckTable{
+            width: 98%;margin-left:auto;margin-right:auto;
+        }
+    }
+
+
     .handle-box {
         margin-bottom: 20px;
     }
