@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 设备档案
+                    <i class="el-icon-lx-cascades"></i> 设备档案--{{deviceName}}
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -199,6 +199,7 @@
                 dialogImageUrl:'',
                 idx: -1,
                 id: -1,
+                deviceName:'',
                 rules:{
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' }
@@ -208,6 +209,7 @@
         },
         created() {
             this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
+            this.deviceName=localStorage.getItem("deviceName");
             this.getData();
         },
         activated(){

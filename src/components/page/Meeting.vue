@@ -265,7 +265,7 @@
                         </tr>
                         <tr>
                             <td colspan="6">
-                                <textarea v-if="editable"  maxlength="2000" v-model="meeting.content"  class="meetingContent"></textarea>
+                                <textarea v-if="editable"  maxlength="20000" v-model="meeting.content"  class="meetingContent"></textarea>
                                 <div v-else v-html="meeting.content" class="meetingContent"></div>
                             </td>
                         </tr>
@@ -275,7 +275,7 @@
                         最后形成意见或决定
                     </div>
                     <div class="finalDecision">
-                        <textarea v-if="editable"  maxlength="2000" v-model="meeting.finalDecision" class="finalDecisionContent"></textarea>
+                        <textarea v-if="editable"  maxlength="20000" v-model="meeting.finalDecision" class="finalDecisionContent"></textarea>
                         <div v-else v-html="meeting.finalDecision" class="finalDecisionContent"></div>
                     </div>
                 </div>
@@ -979,7 +979,7 @@
         }
 
         .meetingContent{
-            height:500px;
+            min-height:500px;
         }
 
         .titleName{
@@ -1019,7 +1019,7 @@
         }
 
         .finalDecisionContent{
-            height:500px;width:100%;
+            min-height:500px;width:100%;
         }
 
         .signInFormDiv{

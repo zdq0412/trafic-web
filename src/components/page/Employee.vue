@@ -27,11 +27,18 @@
             >
                 <el-table-column prop="photo" label="大头照" align="center">
                     <template slot-scope="scope">
-                        <el-image style="cursor:pointer;"
+                        <el-image v-if="scope.row.photo"
+                                style="cursor:pointer;"
                                 class="table-td-thumb"
                                 :src="baseUrl + '/' + scope.row.photo"
                                 @click="showPreview(baseUrl + '/' + scope.row.photo)"
                         ></el-image>
+                        <img v-else
+                                class="table-td-thumb"
+                                style="cursor:pointer;"
+                                src="../../assets/img/img.jpg"
+                               @click="showPreview('')"
+                        />
                         <!-- :preview-src-list="[baseUrl + '/' +scope.row.photo]"-->
                     </template>
                 </el-table-column>
@@ -72,7 +79,8 @@
             </div>
         </div>
         <el-dialog :visible.sync="dialogVisible">
-            <img style="width: 100%;" :src="imgUrl" alt="">
+            <img style="width: 100%;" :src="imgUrl" alt="" v-if="imgUrl!=''">
+            <img v-else style="width:100%;" src="../../assets/img/img.jpg" />
         </el-dialog>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData">

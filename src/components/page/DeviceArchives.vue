@@ -246,9 +246,11 @@
         methods: {
             lookup(index, row) {
                 this.$router.push({name:"deviceMaintain",params:{deviceId:row.id}});
+                localStorage.setItem("deviceName",row.name);
             },
             lookupDeviceArchive(index, row) {
                 this.$router.push({name:"deviceArchive",params:{deviceId:row.id}});
+                localStorage.setItem("deviceName",row.name);
             },
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){

@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 设备保养维修检修记录
+                    <i class="el-icon-lx-cascades"></i> 设备保养维修检修记录--{{deviceName}}
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -226,6 +226,7 @@
                 editableForm:{},
                 idx: -1,
                 id: -1,
+                deviceName:'',
                 rules:{
                     operDate: [
                         { required: true, message: '请选择保养/维修时间', trigger: 'blur' }
@@ -238,6 +239,7 @@
         },
         created() {
             this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
+            this.deviceName = localStorage.getItem("deviceName");
             this.getData();
         },
         activated(){

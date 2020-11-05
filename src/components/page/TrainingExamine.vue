@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 培训考核
+                    <i class="el-icon-lx-cascades"></i> 培训考核--{{empName}}
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -235,6 +235,7 @@
                 editableForm: {},
                 idx: -1,
                 id: -1,
+                empName:'',
                 rules:{
                     name: [
                         { required: true, message: '请输入名称', trigger: 'blur' }
@@ -244,9 +245,13 @@
         },
         created() {
             this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
+            localStorage.setItem("empName",localStorage.getItem("empName"));
+            this.empName = localStorage.getItem("empName");
             this.getData();
         },
         activated(){
+            localStorage.setItem("empName",localStorage.getItem("empName"));
+            this.empName = localStorage.getItem("empName");
             localStorage.setItem("empId",this.$route.params.empId);
             this.getData();
         },

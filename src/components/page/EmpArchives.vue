@@ -26,7 +26,8 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row,'resume')"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(0)}})
+                            <!--<span style="color: #DEA514;">({{scope.row.archiveCode | formatArchiveCode(0)}})</span>--></el-button>
                     </template>
                 </el-table-column>
                 <!--<el-table-column label="身份证">
@@ -44,7 +45,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row,'contract')"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(1)}})</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="资质文件">
@@ -53,7 +54,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row,'qualificationDocument')"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(2)}})</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="从业经历">
@@ -62,7 +63,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row,'jobHistory')"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(3)}})</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="入职培训">
@@ -71,7 +72,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row,'inductionTraining')"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(4)}})</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="安全责任书">
@@ -80,7 +81,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row,'safetyResponsibilityAgreement')"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(5)}})</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="培训考核情况">
@@ -89,7 +90,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row,'trainingExamine')"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(6)}})</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="其他档案">
@@ -98,7 +99,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row,'otherDocument')"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(7)}})</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -134,6 +135,15 @@
         },
         created() {
             this.getData();
+        },
+        filters:{
+            formatArchiveCode(archiveCode,index){
+                if(archiveCode){
+                    return archiveCode.split(".")[index];
+                }else{
+                    return 0;
+                }
+            }
         },
         methods: {
             getData() {
@@ -195,7 +205,7 @@
                         break;
                     }
                 }
-
+                localStorage.setItem("empName",row.name);
                 localStorage.setItem("empId",row.id);
             },
             // 分页导航

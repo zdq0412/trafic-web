@@ -1089,13 +1089,12 @@
         }
 
         .trainingContent{
-            height:500px;
+            min-height:500px;
         }
 
         .empTable{
             width: 98%;margin-left:auto;margin-right:auto;margin-top:20px;
         }
-
         .asignInForm{
             font-size: 18px;letter-spacing: 10px;text-align: center;width:100%;margin-top:20px;
         }
