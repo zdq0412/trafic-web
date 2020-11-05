@@ -39,7 +39,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookup(scope.$index, scope.row)"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(0)}})</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="设备档案">
@@ -48,7 +48,7 @@
                                 type="text"
                                 icon="el-icon-search"
                                 @click="lookupDeviceArchive(scope.$index, scope.row)"
-                        >查看</el-button>
+                        >查看({{scope.row.archiveCode | formatArchiveCode(1)}})</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
@@ -242,6 +242,15 @@
             this.baseUrl = this.$baseURL;
             this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
             this.getData();
+        },
+        filters:{
+            formatArchiveCode(archiveCode,index){
+                if(archiveCode){
+                    return archiveCode.split(".")[index];
+                }else{
+                    return 0;
+                }
+            }
         },
         methods: {
             lookup(index, row) {
