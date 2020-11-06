@@ -9,7 +9,21 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-input v-model="query.name" placeholder="人员名称" class="handle-input mr10"></el-input>
+                <el-select
+                        v-model="query.positionName"
+                        filterable
+                        clearable
+                        allow-create
+                        default-first-option
+                        placeholder="请选择或输入职位名称">
+                    <el-option
+                            v-for="item in commonPositions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.name">
+                    </el-option>
+                </el-select>
+                &nbsp;&nbsp;&nbsp;
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table
@@ -122,10 +136,12 @@
         data() {
             return {
                 query: {
+                    positionName:'',
                     name: '',
                     pageIndex: 1,
                     pageSize: 10
                 },
+                commonPositions:[],
                 tableData: [],
                 pageTotal: 0,
                 form: {},
@@ -135,6 +151,11 @@
         },
         created() {
             this.getData();
+            this.$axios.get("/commonPositions/commonPositions").then(res => {
+                this.commonPositions = res.data;
+            }).catch(error => {
+                console.log(error);
+            });
         },
         filters:{
             formatArchiveCode(archiveCode,index){
@@ -151,7 +172,7 @@
                     params: {
                         page: this.query.pageIndex,
                         limit: this.query.pageSize,
-                        name: this.query.name
+                        positionName: this.query.positionName
                     }
                 }).then(res => {
                     this.tableData = res.data.data;
