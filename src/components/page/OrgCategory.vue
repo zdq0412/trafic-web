@@ -40,7 +40,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="250" align="center">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
@@ -48,6 +48,12 @@
                                 class="lightYellow"
                                 @click="handleFunction(scope.$index, scope.row)"
                         >授权</el-button>
+                        <el-button
+                                type="text"
+                                icon="el-icon-user"
+                                style="color: #67C23A;"
+                                @click="handleCommonPosition(scope.$index, scope.row)"
+                        >预设职位</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -129,16 +135,27 @@
                 <el-button type="primary" @click="saveFunctions">确 定</el-button>
             </span>
         </el-dialog>
+        <!-- 预设职位对话框 -->
+        <el-dialog title="预设职位" :visible.sync="commonPositionVisible" width="40%">
+            <el-checkbox v-model="checkAllCommonPosition"  @change="handleCommonPostionsChange">全选</el-checkbox>
+            <div style="height:500px;overflow: auto;">
+                <common-position-tree ref="commonPositionTree" v-if="commonPositionVisible" :param="orgCategoryId"></common-position-tree>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="commonPositionVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveCommonPositions">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
     import FunctionTree from "../common/FunctionTree"
     import {getDate,getDateTime} from "../common/utils";
-
+    import CommonPositionTree from "../common/CommonPositionTree"
     export default {
         components:{
-            FunctionTree
+            FunctionTree,CommonPositionTree
         },
         name: 'basetable',
         data() {
@@ -149,6 +166,7 @@
                     pageSize: 10
                 },
                 checkAll:false,
+                checkAllCommonPosition:false,
                 tableData: [],
                 delList: [],
                 orgCategoryId:'',
@@ -156,6 +174,7 @@
                 editVisible: false,
                 addVisible: false,
                 grantFunctionVisible:false,
+                commonPositionVisible:false,
                 pageTotal: 0,
                 form: {},
                 editableForm:{},
@@ -186,6 +205,13 @@
                     this.$refs.functionTree.$refs.tree.setCheckedKeys([]);
                 }
             },
+            handleCommonPostionsChange(val) {
+                if (this.checkAllCommonPosition) {
+                    this.$refs.commonPositionTree.$refs.tree.setCheckedNodes(this.$refs.commonPositionTree.commonPositions);
+                } else {
+                    this.$refs.commonPositionTree.$refs.tree.setCheckedKeys([]);
+                }
+            },
             //保存权限
             saveFunctions(){
                 let checkedIds = this.$refs.functionTree.getCheckedKeys();
@@ -200,7 +226,21 @@
                 }).catch(error=>{
                     console.log(error);
                 });
-                console.log(checkedIds);
+            },
+            //保存预设职位
+            saveCommonPositions(){
+                let checkedIds = this.$refs.commonPositionTree.getCheckedKeys();
+                let param = new FormData();
+                param.append("commonPositionsId",JSON.stringify(checkedIds));
+                param.append("orgCategoryId",this.orgCategoryId);
+                this.$axios.put("commonPosition/commonPositionOrgCategorys",param).then(res=>{
+                    if(res.data.result.resultCode==200){
+                        this.commonPositionVisible = false;
+                        this.$message.success("设置成功!");
+                    }
+                }).catch(error=>{
+                    console.log(error);
+                });
             },
             closeDialog(){
                 this.$refs["form"].clearValidate();
@@ -265,6 +305,13 @@
                 this.grantFunctionVisible = true;
                 this.orgCategoryId = row.id;
                 this.checkAll = false;
+            },
+            // 预设职位分配操作
+            handleCommonPosition(index, row) {
+                this.idx = index;
+                this.commonPositionVisible = true;
+                this.orgCategoryId = row.id;
+                this.checkAllCommonPosition = false;
             },
             // 保存编辑
             saveEdit() {

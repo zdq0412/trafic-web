@@ -204,8 +204,21 @@
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="editableForm.name" maxlength="50"
-                                          show-word-limit></el-input>
+                                <!--<el-input v-model="editableForm.name" maxlength="50"
+                                          show-word-limit></el-input>-->
+                                <el-select
+                                        v-model="editableForm.name"
+                                        filterable
+                                        allow-create
+                                        default-first-option
+                                        placeholder="请选择或输入职位名称">
+                                    <el-option
+                                            v-for="item in commonPositions"
+                                            :key="item.id"
+                                            :label="item.name"
+                                            :value="item.name">
+                                    </el-option>
+                                </el-select>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -258,8 +271,21 @@
                     <el-row type="flex" class="row-bg">
                         <el-col>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="form.name" maxlength="50"
-                                          show-word-limit></el-input>
+                                <!--<el-input v-model="form.name" maxlength="50"
+                                          show-word-limit></el-input>-->
+                                <el-select
+                                        v-model="form.name"
+                                        filterable
+                                        allow-create
+                                        default-first-option
+                                        placeholder="请选择或输入职位名称">
+                                    <el-option
+                                            v-for="item in commonPositions"
+                                            :key="item.id"
+                                            :label="item.name"
+                                            :value="item.name">
+                                    </el-option>
+                                </el-select>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -317,6 +343,7 @@
                     pageIndex: 1,
                     pageSize:5
                 },
+                commonPositions:[],
                 pids:[],
                 deptIds:[],
                 departments: [],
@@ -386,6 +413,11 @@
             loadSelectData(){
                 this.$axios.get("/department/departments").then(res => {
                     this.depts = res.data.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+                this.$axios.get("/commonPositions/commonPositions").then(res => {
+                    this.commonPositions = res.data;
                 }).catch(error => {
                     console.log(error);
                 });

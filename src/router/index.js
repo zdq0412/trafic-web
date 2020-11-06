@@ -347,10 +347,14 @@ export default new Router({
                     meta: { title: '模式管理' }
                 },
                 {
-                    // vue-schart组件
                     path: '/riskLevel',
                     component: () => import( '../components/page/RiskLevel.vue'),
                     meta: { title: '风险等级' }
+                },
+                {
+                    path: '/commonPosition',
+                    component: () => import( '../components/page/CommonPosition.vue'),
+                    meta: { title: '预设职位' }
                 },
                 {
                     path: '/404',

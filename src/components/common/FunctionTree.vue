@@ -48,8 +48,6 @@
                         break;
                     }
                 }
-
-                console.log(params);
                 this.$axios.get(url,{
                     params:params
                 }).then(res =>{
