@@ -33,7 +33,7 @@
                     header-cell-class-name="table-header"
             >
                 <el-table-column prop="name" label="姓名"></el-table-column>
-                <el-table-column prop="position.name" label="职务"></el-table-column>
+               <!-- <el-table-column prop="position.name" label="职务"></el-table-column>-->
                 <el-table-column label="简历">
                     <template slot-scope="scope">
                         <el-button

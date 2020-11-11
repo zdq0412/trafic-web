@@ -47,12 +47,18 @@
                 <el-table-column prop="age" label="年龄"></el-table-column>
                 <el-table-column prop="tel" label="联系电话"></el-table-column>
                 <el-table-column prop="idnum" label="身份证"></el-table-column>
-                <el-table-column prop="department.name" label="所在部门"></el-table-column>
-                <el-table-column prop="position.name" label="职务"></el-table-column>
+               <!-- <el-table-column prop="department.name" label="所在部门"></el-table-column>
+                <el-table-column prop="position.name" label="职务"></el-table-column>-->
                 <el-table-column prop="user.role.name" label="角色"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                icon="el-icon-user"
+                                style="color:#E6A23C"
+                                @click="handlePosition(scope.$index, scope.row)"
+                        >职务管理</el-button>
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -83,7 +89,7 @@
             <img v-else style="width:100%;" src="../../assets/img/img.jpg" />
         </el-dialog>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="40%" @open="loadSelectData">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="40%">
             <el-form ref="form" :rules="rules" :model="editableForm" label-width="70px">
                 <el-form-item label="姓名" prop="name">
                     <el-input v-model="editableForm.name" maxlength="50"
@@ -116,7 +122,7 @@
                         </div>
                     </div>
                 </el-form-item>
-                <el-form-item label="所在部门">
+                <!--<el-form-item label="所在部门">
                     <el-cascader  v-model="departmentIds"
                                   :options="depts"
                                   filterable
@@ -133,7 +139,7 @@
                                 :value="item.id">
                         </el-option>
                     </el-select>
-                </el-form-item>
+                </el-form-item>-->
                 <el-form-item label="备注">
                     <el-input type="textarea" maxlength="200" v-model="editableForm.note"></el-input>
                 </el-form-item>
@@ -221,11 +227,25 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
+        <!-- 职务管理对话框 -->
+        <el-dialog title="职务管理" :visible.sync="positionDialogVisible" width="40%">
+            <div style="height:300px;overflow: auto;">
+                <position-tree ref="positionTree" v-if="positionDialogVisible" :paramType="param" :param="employeeId"></position-tree>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="positionDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="savePositions">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
+    import PositionTree from '../common/PositionTree';
     export default {
+        components:{
+          PositionTree
+        },
         name: 'basetable',
         data() {
             let checkTel=(rule, value, callback) =>{
@@ -259,15 +279,18 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+                param:'',
                 dialogImageUrl:'',
                 dialogVisible:false,
                 uploadUrl:'',
                 modifyUrl:'',
+                employeeId:'',
                 roleId:'',
                 headers:{
                     token : localStorage.getItem("token")
                 },
                 file:{},
+                positionDialogVisible:false,
                 imageUrl:'',
                 baseUrl:'',
                 fileList:[],
@@ -313,6 +336,20 @@
             this.getData();
         },
         methods: {
+            savePositions(){
+                let checkedIds = this.$refs.positionTree.getCheckedKeys();
+                let param = new FormData();
+                param.append("positionsId",JSON.stringify(checkedIds));
+                param.append("employeeId",this.employeeId);
+                this.$axios.put("position/employeePositions",param).then(res=>{
+                    if(res.data.result.resultCode==200){
+                        this.positionDialogVisible = false;
+                        this.$message.success("操作成功!");
+                    }
+                }).catch(error=>{
+                    console.log(error);
+                });
+            },
             showPreview(imgUrl){
                 this.imgUrl = imgUrl;
                 this.dialogVisible = true;
@@ -427,6 +464,11 @@
                     })
                     .catch(() => {
                     });
+            },
+            //职务管理
+            handlePosition(index,row){
+                this.employeeId = row.id;
+                this.positionDialogVisible=true;
             },
             // 编辑操作
             handleEdit(index, row) {

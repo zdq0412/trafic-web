@@ -151,7 +151,7 @@
 
 <script>
     import FunctionTree from "../common/FunctionTree"
-    import {getDate,getDateTime} from "../common/utils";
+    import {getDate} from "../common/utils";
     import CommonPositionTree from "../common/CommonPositionTree"
     export default {
         components:{
