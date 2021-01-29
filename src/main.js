@@ -7,17 +7,16 @@ import VueI18n from 'vue-i18n';
 import axios from 'axios';
 import { messages } from './components/common/i18n';
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
-// import './assets/css/theme-green/index.css'; // 浅绿色主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
 import Print from 'vue-print-nb'
 Vue.prototype.$qs = qs;
 //Vue.prototype.$baseURL='http://47.99.164.110:8088';
-Vue.prototype.$baseURL='http://192.168.0.131:8088';
+Vue.prototype.$baseURL='http://192.168.0.115:8088';
 Vue.prototype.$axios = axios.create({
    //baseURL:"http://47.99.164.110:8088",
-   baseURL:"http://192.168.0.131:8088",
+   baseURL:"http://192.168.0.115:8088",
     transformRequest:[function(data,header){
        header.token = localStorage.getItem("token");
         return data;
