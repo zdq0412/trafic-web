@@ -39,12 +39,14 @@
                 </el-table-column>
                 <el-table-column prop="name" label="名称">
                     <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
+                        <!--<span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>-->
+                        <span v-if="scope.row.url!=null && scope.row.url!=''" style="cursor: pointer;color:#409EFF;" @click="downloadTemplate(scope.$index, scope.row)">{{ scope.row.name }}</span>
+                        <span v-else>{{ scope.row.name }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="creator" label="创建人"></el-table-column>
                 <el-table-column prop="checkDate" label="检查时间" :formatter="datetimeFormatter"></el-table-column>
-                <el-table-column label="现场照片">
+                <!--<el-table-column label="现场照片">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
@@ -52,7 +54,7 @@
                                 @click="lookup(scope.$index, scope.row)"
                         >查看</el-button>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
@@ -66,12 +68,12 @@
                                 class="upload"
                                 @click="uploadTemplate(scope.$index, scope.row)"
                         >上传文件</el-button>
-                        <el-button v-if="scope.row.realPath"
+                        <!--<el-button v-if="scope.row.realPath"
                                    type="text"
                                    icon="el-icon-download"
                                    class="download"
                                    @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载文件</el-button>
+                        >下载文件</el-button>-->
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -164,7 +166,7 @@
             </span>
         </el-dialog>
         <!--显示内容-->
-        <el-dialog title="" :visible.sync="showContentVisible" width="50%">
+        <!--<el-dialog title="" :visible.sync="showContentVisible" width="50%">
             <div id="printContent">
                 <div class="titleDiv">
                     <div class="titleName">安全管理监督检查记录</div>
@@ -281,7 +283,7 @@
                 <el-button v-if="editable" type="primary" @click="saveContent">保存</el-button>
                 <el-button  @click="showContentVisible=false">关闭</el-button>
             </div>
-        </el-dialog>
+        </el-dialog>-->
         <!--查看系统模板-->
         <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
             <el-table
@@ -307,7 +309,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="220" align="center">
                     <template slot-scope="scope">
-                        <el-button
+                        <!--<el-button
                                 type="text"
                                 icon="el-icon-view"
                                 @click="checkContent(scope.$index, scope.row)"
@@ -317,7 +319,7 @@
                                 icon="el-icon-copy-document"
                                 class="red"
                                 @click="importTemplate(scope.$index, scope.row)"
-                        >引入</el-button>
+                        >引入</el-button>-->
                         <el-button v-if="scope.row.url"
                                    type="text"
                                    icon="el-icon-download"
@@ -342,7 +344,7 @@
             </span>
         </el-dialog>
         <!--模板内容-->
-        <el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="60%">
+        <!--<el-dialog title="模板内容" :visible.sync="showTemplateContentVisible" width="60%">
             <table style="width: 100%;" cellspacing="0" cellpadding="0">
                 <caption>{{securityCheck.name}}</caption>
                 <tr>
@@ -400,7 +402,7 @@
             <span slot="footer" class="dialog-footer">
                 <el-button  @click="showTemplateContentVisible=false">关闭</el-button>
             </span>
-        </el-dialog>
+        </el-dialog>-->
     </div>
 </template>
 
