@@ -17,6 +17,11 @@
                 >新增</el-button>
                 <el-input v-model="query.name" placeholder="人员名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-button
+                        type="warning"
+                        class="handle-del mr10"
+                        @click="findTemplates"
+                >查看人员档案模板</el-button>
             </div>
             <el-table
                     :data="tableData"
@@ -51,6 +56,19 @@
                 <el-table-column prop="position.name" label="职务"></el-table-column>-->
                 <el-table-column prop="user.role.name" label="角色"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
+                <el-table-column  label="人员档案">
+                    <template slot-scope="scope">
+                        <el-button
+                                type="text"
+                                style="color:#E6A23C"
+                                @click="upload(scope.$index, scope.row)"
+                        >上传</el-button>
+                        <el-button v-if="scope.row.archives!=null && scope.row.archives!=''"
+                                type="text"
+                                @click="download(scope.$index, scope.row)"
+                        >预览</el-button>
+                    </template>
+                </el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
                         <el-button
@@ -122,24 +140,6 @@
                         </div>
                     </div>
                 </el-form-item>
-                <!--<el-form-item label="所在部门">
-                    <el-cascader  v-model="departmentIds"
-                                  :options="depts"
-                                  filterable
-                                  :props="{label:'name',value:'id',checkStrictly: true}"
-                                  @change="changeDepartment"
-                    ></el-cascader>
-                </el-form-item>
-                <el-form-item label="职务">
-                    <el-select v-model="editableForm.positionId" placeholder="请选择">
-                        <el-option
-                                v-for="item in positions"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
-                </el-form-item>-->
                 <el-form-item label="备注">
                     <el-input type="textarea" maxlength="200" v-model="editableForm.note"></el-input>
                 </el-form-item>
@@ -237,6 +237,68 @@
                 <el-button type="primary" @click="savePositions">确 定</el-button>
             </span>
         </el-dialog>
+
+        <el-upload style="display: none;"
+                   :action="uploadArchiveUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadFile"
+                   :data="param"
+                   :accept="ext"
+                   :on-success="handleArchiveSuccess"
+                   :before-upload="beforeArchiveUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
+
+        <!--查看系统模板-->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button v-if="scope.row.url"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   style="color:#67C23A"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -279,10 +341,22 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
-                param:'',
+
+                templatesData:[],
+                templateVisible:false,
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
+                template:{},
+                templatesVisible:false,
+
+                param:{type:'archive'},
                 dialogImageUrl:'',
                 dialogVisible:false,
                 uploadUrl:'',
+                uploadArchiveUrl:'',
                 modifyUrl:'',
                 employeeId:'',
                 roleId:'',
@@ -333,9 +407,36 @@
             this.baseUrl = this.$baseURL;
             this.modifyUrl = this.baseUrl + "/employee/updateEmployee";
             this.uploadUrl = this.$baseURL + "/employee/addEmployee";
+            this.uploadArchiveUrl = this.$baseURL + "/employeeDocumentUpload";
             this.getData();
         },
         methods: {
+            downloadTemplate(index,row){
+                //window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.url);
+            },
+            //查找模板
+            findTemplates(){
+                this.$axios.get("/empArchivesTemplate/empArchivesTemplatesByPage",{
+                    params:{
+                        type:'otherDocument',
+                        page:this.templates.pageIndex,
+                        limit:this.templates.pageSize
+                    }
+                }).then(res => {
+                    this.templatesData = res.data.data;
+                    this.templates.pageTotal = res.data.count;
+                    this.templatesVisible = true;
+                }).catch(error => console.log(error));
+            },
+            download(index,row){
+                window.open(this.$baseURL + "/" + row.archives);
+            },
+            upload(index,row){
+                this.$refs.uploadFile.clearFiles();
+                this.param.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
             savePositions(){
                 let checkedIds = this.$refs.positionTree.getCheckedKeys();
                 let param = new FormData();
@@ -371,10 +472,11 @@
                     this.$refs.upload_add.clearFiles();
                 }else{
                     this.$message.error(res.result.message);
-                    console.log(this.$refs)
                     this.$refs.upload_add.clearFiles();
-                    console.log(this.$refs.upload_add)
                 }
+            },
+            handleArchiveSuccess(res, file) {
+                this.getData();
             },
             handleUpdateSuccess(res, file) {
                 if(res.result.resultCode===200){
@@ -397,6 +499,30 @@
                 }
                 if (!isLt2M) {
                     this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return true;
+            },
+            beforeArchiveUpload(file) {
+                const isLt10M = file.size / 1024 / 1024 < 10;
+              /*  const isJPG = file.type === 'image/jpeg';
+                const isGIF = file.type === 'image/gif';
+                const isPNG = file.type === 'image/png';
+                const isBMP = file.type === 'image/bmp';*/
+                const isPDF = file.type === 'application/pdf';
+
+
+                if (!isPDF) {
+                    this.$message.error('上传文件必须是PDF格式!');
+                    return false;
+                }
+/*
+                if (!isJPG && !isGIF && !isPNG && !isBMP&&!isPDF) {
+                    this.$message.error('上传文件必须是JPG/GIF/PNG/BMP/PDF 格式!');
+                }
+*/
+                if (!isLt10M) {
+                    this.$message.error('上传文件大小不能超过 10MB!');
+                    return false;
                 }
                 return true;
             },

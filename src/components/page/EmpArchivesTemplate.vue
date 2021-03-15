@@ -82,7 +82,7 @@
                     <el-input v-model="editableForm.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="类别" prop="type">
+                <!--<el-form-item label="类别" prop="type">
                     <el-select v-model="editableForm.type" placeholder="请选择">
                         <el-option
                                 v-for="item in options"
@@ -91,7 +91,7 @@
                                 :value="item.value">
                         </el-option>
                     </el-select>
-                </el-form-item>
+                </el-form-item>-->
                 <el-form-item label="文件">
                     <el-upload style="display: none;"
                                :action="modifyUrl"
@@ -152,7 +152,7 @@
                     <el-input v-model="form.name" maxlength="50"
                               show-word-limit></el-input>
                 </el-form-item>
-                <el-form-item label="类别" prop="type">
+                <!--<el-form-item label="类别" prop="type">
                     <el-select v-model="form.type" placeholder="请选择">
                         <el-option
                                    v-for="item in options"
@@ -161,7 +161,7 @@
                                    :value="item.value">
                         </el-option>
                     </el-select>
-                </el-form-item>
+                </el-form-item>-->
                 <el-form-item label="文件">
                     <el-upload style="display: none;"
                                :action="uploadUrl"
@@ -253,12 +253,14 @@
                 addVisible: false,
                 pageTotal: 0,
                 haveOrg:false,
-                form: {},
+                form: {
+                    type:'otherDocument'
+                },
                 editableForm: {},
                 idx: -1,
                 id: -1,
                 imgUrl:'',
-                options: [{
+                options: [/*{
                     value: 'resume',
                     label: '简历'
                 }, {
@@ -282,7 +284,7 @@
                 },{
                     value: 'trainingExamine',
                     label: '培训考核情况'
-                },{
+                },*/{
                     value: 'otherDocument',
                     label: '其他文档'
                 }],
@@ -499,7 +501,9 @@
                 if (this.$refs.form) {
                     this.$refs.form.resetFields();
                 }
-                this.form = {};
+                this.form = {
+                    type:"otherDocument"
+                };
                 this.editableForm = {};
                 this.filename='';
                 this.fileList = [];
