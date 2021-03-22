@@ -39,13 +39,16 @@
                 </el-table-column>
                 <el-table-column prop="name" label="名称">
                     <template scope="scope">
-                        <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
+                        <span v-if="scope.row.url!=null && scope.row.url!=''" style="cursor: pointer;color:#409EFF;" @click="downloadTemplate(scope.$index, scope.row)">{{ scope.row.name }}</span>
+                        <span v-else>{{ scope.row.name }}</span>
+
+                       <!-- <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>-->
                     </template>
                 </el-table-column>
                 <el-table-column prop="creator" label="创建人"></el-table-column>
                 <el-table-column prop="trainingDate" label="培训时间" :formatter="datetimeFormatter"></el-table-column>
                 <el-table-column prop="createDate" label="创建日期" :formatter="dateFormatter"></el-table-column>
-                <el-table-column label="签到和培训现场照片">
+                <!--<el-table-column label="签到和培训现场照片">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
@@ -53,7 +56,7 @@
                                 @click="lookup(scope.$index, scope.row)"
                         >查看</el-button>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
                 <el-table-column prop="note" label="备注">
                     <template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
@@ -67,12 +70,12 @@
                                 class="upload"
                                 @click="uploadTemplate(scope.$index, scope.row)"
                         >上传文件</el-button>
-                        <el-button v-if="scope.row.realPath"
+                       <!-- <el-button v-if="scope.row.realPath"
                                    type="text"
                                    icon="el-icon-download"
                                    class="download"
                                    @click="downloadTemplate(scope.$index, scope.row)"
-                        >下载文件</el-button>
+                        >下载文件</el-button>-->
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"

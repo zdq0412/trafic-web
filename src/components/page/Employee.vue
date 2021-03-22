@@ -244,7 +244,6 @@
                    :auto-upload="true"
                    ref="uploadFile"
                    :data="param"
-                   :accept="ext"
                    :on-success="handleArchiveSuccess"
                    :before-upload="beforeArchiveUpload"
                    :headers="headers">
@@ -304,6 +303,7 @@
 
 <script>
     import PositionTree from '../common/PositionTree';
+    import {getDate} from "../common/utils";
     export default {
         components:{
           PositionTree
@@ -411,6 +411,13 @@
             this.getData();
         },
         methods: {
+            dateFormatter(row, column, cellValue, index){
+                if(cellValue){
+                    return getDate(new Date(cellValue));
+                }else{
+                    return '';
+                }
+            },
             downloadTemplate(index,row){
                 //window.location.href=this.$baseURL + "/" + row.url;
                 window.open(this.$baseURL + "/" + row.url);
@@ -761,6 +768,10 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageIndex', val);
                 this.getData();
+            }, // 分页导航
+            handleTemplatesPageChange(val) {
+                this.$set(this.templates, 'pageIndex', val);
+                this.findTemplates();
             }
         }
     };
