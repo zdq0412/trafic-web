@@ -166,12 +166,12 @@
                                 icon="el-icon-view"
                                 @click="checkContent(scope.$index, scope.row)"
                         >查看内容</el-button>
-                        <el-button
+                        <!--<el-button
                                 type="text"
                                 icon="el-icon-copy-document"
                                 class="red"
                                 @click="importTemplate(scope.$index, scope.row)"
-                        >引入</el-button>
+                        >引入</el-button>-->
                         <el-button v-if="scope.row.url"
                                 type="text"
                                 icon="el-icon-download"

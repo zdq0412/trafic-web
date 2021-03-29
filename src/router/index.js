@@ -220,7 +220,7 @@ export default new Router({
                 {
                   path:'/responsibilityTemplate',
                   component:()=>import('../components/page/ResponsibilityTemplate.vue'),
-                  meta:{title:'责任书模板'}
+                  meta:{title:'应急预案模板'}  //原责任制模板
                 },
                 {
                   path:'/examination',
@@ -250,7 +250,7 @@ export default new Router({
                 {
                   path:'/accidentRecord',
                   component:()=>import('../components/page/AccidentRecord.vue'),
-                  meta:{title:'事故记录处理'}
+                  meta:{title:'违章处理'}
                 },
                 {
                   path:'/fourRecord',
@@ -443,7 +443,7 @@ export default new Router({
         {
             path: '/login',
             component: () => import( '../components/page/Login.vue'),
-            meta: { title: '交通安全信息系统' }
+            meta: { title: '交通运输企业安全台账' }
         },
         {
             path: '*',

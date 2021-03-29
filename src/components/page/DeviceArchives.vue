@@ -17,6 +17,11 @@
                 >新增</el-button>
                 <el-input v-model="query.name" placeholder="设备名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-button
+                        type="warning"
+                        class="handle-del mr10"
+                        @click="findTemplates"
+                >查看设备档案模板</el-button>
             </div>
             <el-table
                     :data="tableData"
@@ -33,22 +38,17 @@
                 <el-table-column prop="manufacturer" label="厂商"></el-table-column>
                 <el-table-column prop="position" label="放置位置"></el-table-column>
                 <el-table-column prop="note" label="备注"></el-table-column>
-                <el-table-column label="保养维修记录">
+                <el-table-column  label="设备档案">
                     <template slot-scope="scope">
                         <el-button
                                 type="text"
-                                icon="el-icon-search"
-                                @click="lookup(scope.$index, scope.row)"
-                        >查看({{scope.row.archiveCode | formatArchiveCode(0)}})</el-button>
-                    </template>
-                </el-table-column>
-                <el-table-column label="设备档案">
-                    <template slot-scope="scope">
-                        <el-button
-                                type="text"
-                                icon="el-icon-search"
-                                @click="lookupDeviceArchive(scope.$index, scope.row)"
-                        >查看({{scope.row.archiveCode | formatArchiveCode(1)}})</el-button>
+                                style="color:#E6A23C"
+                                @click="uploadArchieve(scope.$index, scope.row)"
+                        >上传</el-button>
+                        <el-button v-if="scope.row.archives!=null && scope.row.archives!=''"
+                                   type="text"
+                                   @click="downloadArchieve(scope.$index, scope.row)"
+                        >预览</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
@@ -200,6 +200,67 @@
                 <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
+
+        <el-upload style="display: none;"
+                   :action="uploadArchiveUrl"
+                   :limit="1"
+                   :auto-upload="true"
+                   ref="uploadArchieveFile"
+                   :data="paramArchieve"
+                   :on-success="handleArchiveSuccess"
+                   :before-upload="beforeArchiveUpload"
+                   :headers="headers">
+            <el-button size="small" ref="fileUploadBtn" slot="trigger" type="primary">导入</el-button>
+        </el-upload>
+
+        <!--查看系统模板-->
+        <el-dialog title="系统模板" :visible.sync="templatesVisible" width="70%" >
+            <el-table
+                    :data="templatesData"
+            >
+                <el-table-column
+                        label="序号"
+                        type="index"
+                        width="50"
+                        align="center">
+                    <template scope="scope">
+                        <span>{{(templates.pageIndex - 1) * templates.pageSize + scope.$index + 1}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
+                <el-table-column prop="creator"  label="创建人"></el-table-column>
+                <el-table-column prop="note" label="备注"  width="150" >
+                    <template scope="scope">
+                        <span style="cursor: pointer;color:#409EFF;" @click="showNote(scope.row.note)">{{ scope.row.note }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220" align="center">
+                    <template slot-scope="scope">
+                        <el-button v-if="scope.row.url"
+                                   type="text"
+                                   icon="el-icon-download"
+                                   style="color:#67C23A"
+                                   @click="downloadTemplate(scope.$index, scope.row)"
+                        >下载</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="templates.pageIndex"
+                        :page-size="templates.pageSize"
+                        :total="templates.pageTotal"
+                        @current-change="handleTemplatesPageChange"
+                ></el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="templatesVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -214,14 +275,24 @@
                     pageIndex: 1,
                     pageSize: 10
                 },
+                templatesData:[],
+                templateVisible:false,
+                templates: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    pageTotal:0
+                },
+                template:{},
+                templatesVisible:false,
                 categorys:[],
                 uploadUrl:'',
                 param:{type:'device'},
+                paramArchieve:{type:'deviceArchieve'},
                 headers:{
                     token : localStorage.getItem("token")
                 },
                 ext:'.doc,.docx,.jpg,.jpeg,.bmp,.rar,.zip,.png,.pdf',
-
+                uploadArchiveUrl:'',
                 baseUrl:'',
                 tableData: [],
                 editVisible: false,
@@ -241,6 +312,7 @@
         created() {
             this.baseUrl = this.$baseURL;
             this.uploadUrl = this.$baseURL + "/employeeDocumentUpload";
+            this.uploadArchiveUrl=this.$baseURL + "/employeeDocumentUpload";
             this.getData();
         },
         filters:{
@@ -253,14 +325,56 @@
             }
         },
         methods: {
+            downloadTemplate(index,row){
+                window.open(this.$baseURL + "/" + row.url);
+            },
+            // 分页导航
+            handleTemplatesPageChange(val) {
+                this.$set(this.templates, 'pageIndex', val);
+                this.findTemplates();
+            },
+            //查找模板
+            findTemplates(){
+                this.$axios.get("/deviceArchivesTemplate/deviceArchivesTemplatesByPage",{
+                    params:{
+                        page:this.templates.pageIndex,
+                        limit:this.templates.pageSize
+                    }
+                }).then(res => {
+                    this.templatesData = res.data.data;
+                    this.templates.pageTotal = res.data.count;
+                    this.templatesVisible = true;
+                }).catch(error => console.log(error));
+            },
+            beforeArchiveUpload(file) {
+                const isLt10M = file.size / 1024 / 1024 < 10;
+                const isPDF = file.type === 'application/pdf';
+                if (!isPDF) {
+                    this.$message.error('上传文件必须是PDF格式!');
+                    return false;
+                }
+                if (!isLt10M) {
+                    this.$message.error('上传文件大小不能超过 10MB!');
+                    return false;
+                }
+                return true;
+            },
+            handleArchiveSuccess(res, file) {
+                this.getData();
+            },
+            uploadArchieve(index,row){
+                this.$refs.uploadArchieveFile.clearFiles();
+                this.paramArchieve.id=row.id;
+                this.$refs.fileUploadBtn.$el.click();
+            },
             lookup(index, row) {
                 this.$router.push({name:"deviceMaintain",params:{deviceId:row.id}});
                 localStorage.setItem("deviceName",row.name);
             },
-            lookupDeviceArchive(index, row) {
+           /* lookupDeviceArchive(index, row) {
                 this.$router.push({name:"deviceArchive",params:{deviceId:row.id}});
                 localStorage.setItem("deviceName",row.name);
-            },
+            },*/
             dateFormatter(row, column, cellValue, index){
                 if(cellValue){
                     return getDate(new Date(cellValue));
@@ -276,6 +390,10 @@
             download(index,row){
                 //window.location.href=this.$baseURL + "/" + row.url;
                 window.open(this.$baseURL + "/" + row.url);
+            },
+            downloadArchieve(index,row){
+                //window.location.href=this.$baseURL + "/" + row.url;
+                window.open(this.$baseURL + "/" + row.archives);
             },
             handleAvatarSuccess(res, file) {
                 this.$message.success("上传成功!");

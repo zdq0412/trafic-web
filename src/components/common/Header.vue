@@ -8,11 +8,11 @@
         <div class="logo" v-if="user.org==null">后台管理系统</div>
         <div class="logo" v-else>{{user.org.name}}</div>
         <!--<el-radio v-model="radio1" :label="schema.id" border>{{schema.name}}</el-radio>-->
-        <el-radio-group v-model="schemaId" style="height: 100px;"  @change="switchSchema()">
+        <!--<el-radio-group v-model="schemaId" style="height: 100px;"  @change="switchSchema()">
             <el-radio-button style="height: 100%;line-height: 100px;" v-for="schema in schemas"
                              border   :id="schema.id" :label="schema.id"
             >{{schema.name}}</el-radio-button>
-        </el-radio-group>
+        </el-radio-group>-->
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->

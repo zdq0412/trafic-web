@@ -69,7 +69,7 @@
                                 icon="el-icon-upload2"
                                 class="upload"
                                 @click="upload(scope.$index, scope.row)"
-                        >上传</el-button>
+                        >上传发票</el-button>
                         <el-button v-if="scope.row.realPath"
                                    type="text"
                                    icon="el-icon-download"

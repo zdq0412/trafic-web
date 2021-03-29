@@ -71,12 +71,12 @@
                 </el-table-column>
                 <el-table-column label="操作" width="230" fixed="right" align="center">
                     <template slot-scope="scope">
-                        <el-button
+                       <!-- <el-button
                                 type="text"
                                 icon="el-icon-user"
                                 style="color:#E6A23C"
                                 @click="handlePosition(scope.$index, scope.row)"
-                        >职务管理</el-button>
+                        >职务管理</el-button>-->
                         <el-button
                                 type="text"
                                 icon="el-icon-edit"
@@ -190,7 +190,7 @@
                     </div>
                 </el-form-item>
 
-                <el-form-item label="所在部门">
+                <!--<el-form-item label="所在部门">
                     <el-cascader  v-model="departmentIds"
                                   :options="depts"
                                   filterable
@@ -209,7 +209,7 @@
                                 :value="item.id">
                         </el-option>
                     </el-select>
-                </el-form-item>
+                </el-form-item>-->
                 <el-form-item label="备注">
                     <el-input type="textarea" maxlength="200" v-model="form.note"></el-input>
                 </el-form-item>

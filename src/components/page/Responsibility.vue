@@ -39,9 +39,9 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="name" label="名称">
-                    <template scope="scope">
+                    <!--<template scope="scope">
                         <span style="cursor: pointer;color:#409EFF;" @click="showContent(scope.row)">{{ scope.row.name }}</span>
-                    </template>
+                    </template>-->
                 </el-table-column>
                 <el-table-column prop="createDate" label="创建日期"  :formatter="dateFormatter"></el-table-column>
                 <el-table-column prop="note" label="备注">
@@ -146,12 +146,12 @@
                                 icon="el-icon-view"
                                 @click="checkContent(scope.$index, scope.row)"
                         >查看内容</el-button>
-                        <el-button
+                        <!--<el-button
                                 type="text"
                                 icon="el-icon-copy-document"
                                 class="red"
                                 @click="importTemplate(scope.$index, scope.row)"
-                        >引入</el-button>
+                        >引入</el-button>-->
                         <el-button v-if="scope.row.url"
                                    type="text"
                                    icon="el-icon-download"

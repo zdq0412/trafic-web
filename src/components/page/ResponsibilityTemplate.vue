@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 责任制模板
+                    <i class="el-icon-lx-cascades"></i> 应急预案模板 <!--责任制模板 -->
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
